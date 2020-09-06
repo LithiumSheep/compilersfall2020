@@ -8,12 +8,12 @@ extern "C" {
 enum TokenKind {
   TOK_IDENTIFIER,
   TOK_INTEGER_LITERAL,
-  TOK_OP_PLUS,
-  TOK_OP_MINUS,
-  TOK_OP_TIMES,
-  TOK_OP_DIVIDE,
-  TOK_OP_POWER,
-  TOK_OP_ASSIGN,
+  TOK_PLUS,    //precendence 2
+  TOK_MINUS,   //precendence 2
+  TOK_TIMES,   //precendence 3
+  TOK_DIVIDE,  //precendence 3
+  TOK_POWER,   //precedence 4
+  TOK_ASSIGN,  //precedence 1
   TOK_LPAREN,
   TOK_RPAREN,
   TOK_SEMICOLON,

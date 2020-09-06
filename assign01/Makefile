@@ -14,7 +14,7 @@ CXXFLAGS = $(CFLAGS)
 	$(CC) $(CFLAGS) -c $<
 
 %.o : %.cpp
-	$(CXX) $(CXXFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -std=c++11 -c $<
 
 all : minicalc
 
