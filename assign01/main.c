@@ -3,7 +3,7 @@
 #include "util.h"
 #include "lexer.h"
 #include "parser.h"
-//#include "interp.h"
+#include "interp.h"
 
 enum {
   INTERPRET,
@@ -60,11 +60,11 @@ int main(int argc, char **argv) {
     parser_print_parse_tree(root);
   } else {
     // evaluate and print result
-/*
+
     struct Interpreter *interp = interp_create(root);
     long result = interp_exec(interp);
     printf("Result: %ld\n", result);
-*/
+
   }
 
   parser_destroy(parser);
