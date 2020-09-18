@@ -27,6 +27,7 @@ private:
   // Parse functions for nonterminal grammar symbols
   struct Node *parse_U();
   struct Node *parse_E();
+  struct Node *parse_A();
 
   // Consume a specific token, wrapping it in a Node
   struct Node *expect(enum TokenKind tok_kind);
@@ -75,14 +76,18 @@ struct Node *Parser::parse_E() {
 
   int tag = node_get_tag(next_terminal);
 
-  if (tag == TOK_INTEGER_LITERAL || tag == TOK_IDENTIFIER) {
+  if (tag == TOK_IDENTIFIER) {
+    node_add_kid(e, next_terminal);
+    node_add_kid(e, expect(TOK_ASSIGN));
+  } else if (tag == TOK_INTEGER_LITERAL) {
     // E -> <int_literal> ^
     // E -> <identifier> ^
     node_add_kid(e, next_terminal);
-  } else if (tag == TOK_IDENTIFIER) {
+    // an operator after an interger literal
+    node_add_kid(e, parse_E());
+  } else if (tag == TOK_ASSIGN) {
     // E -> ^ <identifier> = E
     node_add_kid(e, next_terminal);
-    node_add_kid(e, expect(TOK_ASSIGN));
     node_add_kid(e, parse_E());
   } else if (tag == TOK_PLUS || tag == TOK_MINUS || tag == TOK_TIMES || tag == TOK_DIVIDE) {
     // E -> + ^ E E
@@ -93,10 +98,30 @@ struct Node *Parser::parse_E() {
     node_add_kid(e, next_terminal);
 
     node_add_kid(e, parse_E()); // parse first operand
-    node_add_kid(e, parse_E()); // parse second operand
+    // node_add_kid(e, parse_E()); // parse second operand
+  } else if (tag == TOK_SEMICOLON) {
+      // reached the end of execution
+      // peek ahead and see if there is another expression
 } else {
     std::string errmsg = cpputil::format("Illegal expression (at '%s')", node_get_str(next_terminal));
     error_on_node(next_terminal, errmsg.c_str());
+  }
+
+  return e;
+}
+
+struct Node *Parser::parse_A() {
+  struct Node *next_terminal = lexer_next(m_lexer);
+  if (!next_terminal) {
+    error_at_current_pos("Parser error (missing expression)");
+  }
+
+  struct Node *e = node_build0(NODE_A);
+
+  int tag = node_get_tag(next_terminal);
+
+  if (tag == TOK_ASSIGN) {
+
   }
 
   return e;
@@ -138,6 +163,11 @@ const char *minicalc_stringify_node_tag(int tag) {
     err_fatal("Unknown node tag %d\n", tag);
     return nullptr;
   }
+}
+
+void Parser::error_at_current_pos(const std::string &msg) {
+  struct SourceInfo current_pos = lexer_get_current_pos(m_lexer);
+  error_at_pos(current_pos, msg.c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////

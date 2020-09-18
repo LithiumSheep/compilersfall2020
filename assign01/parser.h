@@ -13,7 +13,8 @@ struct Parser;
 // integer value that is large, e.g., 1000)
 enum Nonterminal {
   NODE_EXPR_LIST = 1000,
-  NODE_UNIT
+  NODE_UNIT = 1001,
+  NODE_A = 1002
 };
 
 struct Parser *parser_create(struct Lexer *lexer_to_adopt);
