@@ -52,13 +52,10 @@ struct Node *Parser::parse() {
 struct Node *Parser::parse_U() {
   struct Node *u = node_build0(NODE_UNIT);
 
-  // U -> ^ E ;
-  // U -> ^ E ; U
+  // U -> A ;
   node_add_kid(u, parse_A());
   node_add_kid(u, expect(TOK_SEMICOLON));
 
-  // U -> E ; ^
-  // U -> E ; ^ U
   if (lexer_peek(m_lexer)) {
     // there is more input, then the sequence of expressions continues
     node_add_kid(u, parse_U());
@@ -80,6 +77,7 @@ struct Node *Parser::parse_A() {
   int tag = node_get_tag(next_terminal);
 
   if (tag == TOK_ASSIGN) {
+    // A -> E = A'
     node_add_kid(a, lexer_next(m_lexer));
     node_add_kid(a, parse_A());
   }
@@ -87,13 +85,11 @@ struct Node *Parser::parse_A() {
   return a;
 }
 
-// parsing "+" and "-"
 struct Node *Parser::parse_E() {
 
-  struct Node *e = node_build0(NODE_EXPR);
+  struct Node *e = node_build0(NODE_EXPRESSION);
   node_add_kid(e, parse_T());
 
-  // read the next terminal symbol
   struct Node *next_terminal = lexer_peek(m_lexer);
   if (!next_terminal) {
     error_at_current_pos("Parser error (missing expression)");
@@ -124,6 +120,8 @@ struct Node *Parser::parse_T() {
   int tag = node_get_tag(next_terminal);
 
   if (tag == TOK_TIMES || tag == TOK_DIVIDE) {
+    // T -> F * T'
+    // T -> F / T'
     node_add_kid(t, lexer_next(m_lexer));
     node_add_kid(t, parse_T());
   }
@@ -196,12 +194,14 @@ const char *minicalc_stringify_node_tag(int tag) {
   case TOK_SEMICOLON:
     return "SEMICOLON";
 
-  case NODE_EXPR:
+  case NODE_UNIT:
+    return "U";
+  case NODE_ASSIGN:
+    return "A";
+  case NODE_EXPRESSION:
     return "E";
   case NODE_TERM:
     return "T";
-  case NODE_UNIT:
-    return "U";
   case NODE_FACTOR:
     return "F";
 
