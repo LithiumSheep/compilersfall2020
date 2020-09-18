@@ -99,9 +99,14 @@ long Interpreter::eval(struct Node *expr) {
       return eval(left) * eval(right);
     case TOK_DIVIDE:
       return eval(left) / eval(right);
-    case TOK_POWER:
+    case TOK_POWER: {
+      long exponent = eval(right);
+      if (exponent < 0) {
+        error_at_pos(node_get_source_info(op), "Negative exponent");
+        return -1L;
+      }
       return pow(eval(left), eval(right));
-
+    }
     case TOK_ASSIGN:
       // in this case, the left operand is an identifier naming
       // the variable

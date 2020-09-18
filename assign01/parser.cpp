@@ -140,13 +140,16 @@ struct Node *Parser::parse_F() {
 
   int tag = node_get_tag(next_terminal);
 
-  if (tag == TOK_INTEGER_LITERAL || tag == TOK_IDENTIFIER) {
-    node_add_kid(f, next_terminal);  
+  if (tag == TOK_INTEGER_LITERAL) {
+    node_add_kid(f, next_terminal);
+  } else if (tag == TOK_IDENTIFIER) {
+    node_add_kid(f, next_terminal);
   } else if (tag == TOK_LPAREN) {
     node_add_kid(f, parse_A());
     expect(TOK_RPAREN);
   } else {
-    // TODO: spit error, unexpected TOKEN
+    std::string errmsg = cpputil::format("Illegal expression (at '%s')", node_get_str(next_terminal));
+    error_on_node(next_terminal, errmsg.c_str());
   }
 
   next_terminal = lexer_peek(m_lexer);
