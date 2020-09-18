@@ -173,37 +173,37 @@ const char *minicalc_stringify_node_tag(int tag) {
   switch (tag) {
     case TOK_IDENTIFIER:
       return "IDENTIFIER";
-  case TOK_INTEGER_LITERAL:
-    return "INTEGER_LITERAL";
-  case TOK_PLUS:
-    return "PLUS";
-  case TOK_MINUS:
-    return "MINUS";
-  case TOK_TIMES:
-    return "TIMES";
-  case TOK_DIVIDE:
-    return "DIVIDE";
-  case TOK_POWER:
-    return "POWER";
-  case TOK_ASSIGN:
-    return "ASSIGN";
-  case TOK_LPAREN:
-    return "LEFT_PARENTHESES";
-  case TOK_RPAREN:
-    return "RIGHT_PARENTHESES";
-  case TOK_SEMICOLON:
-    return "SEMICOLON";
+    case TOK_INTEGER_LITERAL:
+      return "INTEGER_LITERAL";
+    case TOK_PLUS:
+      return "PLUS";
+    case TOK_MINUS:
+      return "MINUS";
+    case TOK_TIMES:
+      return "TIMES";
+    case TOK_DIVIDE:
+      return "DIVIDE";
+    case TOK_POWER:
+      return "POWER";
+    case TOK_ASSIGN:
+      return "ASSIGN";
+    case TOK_LPAREN:
+      return "LEFT_PARENTHESES";
+    case TOK_RPAREN:
+      return "RIGHT_PARENTHESES";
+    case TOK_SEMICOLON:
+      return "SEMICOLON";
 
-  case NODE_UNIT:
-    return "U";
-  case NODE_ASSIGN:
-    return "A";
-  case NODE_EXPRESSION:
-    return "E";
-  case NODE_TERM:
-    return "T";
-  case NODE_FACTOR:
-    return "F";
+    case NODE_UNIT:
+      return "U";
+    case NODE_ASSIGN:
+      return "A";
+    case NODE_EXPRESSION:
+      return "E";
+    case NODE_TERM:
+      return "T";
+    case NODE_FACTOR:
+      return "F";
 
   default:
     err_fatal("Unknown node tag %d\n", tag);
