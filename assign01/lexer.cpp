@@ -134,6 +134,8 @@ struct Node *Lexer::read_token() {
       return token_create(TOK_TIMES, lexeme, line, col);
     case '/':
       return token_create(TOK_DIVIDE, lexeme, line, col);
+    case '^':
+      return token_create(TOK_POWER, lexeme, line, col);
     case ';':
       return token_create(TOK_SEMICOLON, lexeme, line, col);
     case '=':

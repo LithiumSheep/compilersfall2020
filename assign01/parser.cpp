@@ -54,7 +54,7 @@ struct Node *Parser::parse_U() {
 
   // U -> ^ E ;
   // U -> ^ E ; U
-  node_add_kid(u, parse_E());
+  node_add_kid(u, parse_A());
   node_add_kid(u, expect(TOK_SEMICOLON));
 
   // U -> E ; ^
@@ -68,20 +68,23 @@ struct Node *Parser::parse_U() {
 }
 
 struct Node *Parser::parse_A() {
-  struct Node *next_terminal = lexer_next(m_lexer);
+
+  struct Node *a = node_build0(NODE_ASSIGN);
+  node_add_kid(a, parse_E());
+
+  struct Node *next_terminal = lexer_peek(m_lexer);
   if (!next_terminal) {
     error_at_current_pos("Parser error (missing expression)");
   }
 
-  struct Node *e = node_build0(NODE_ASSIGN);
-
   int tag = node_get_tag(next_terminal);
 
   if (tag == TOK_ASSIGN) {
-
+    node_add_kid(a, lexer_next(m_lexer));
+    node_add_kid(a, parse_A());
   }
 
-  return e;
+  return a;
 }
 
 // parsing "+" and "-"
@@ -102,7 +105,7 @@ struct Node *Parser::parse_E() {
     // E -> T + E'
     // E -> T - E'
     node_add_kid(e, lexer_next(m_lexer));
-    node_add_kid(e, parse_T());
+    node_add_kid(e, parse_E());
   }
 
   return e;
@@ -110,7 +113,6 @@ struct Node *Parser::parse_E() {
 
 struct Node *Parser::parse_T() {
 
-  // TODO: delegate to F
   struct Node *t = node_build0(NODE_TERM);
   node_add_kid(t, parse_F());
 
@@ -123,7 +125,7 @@ struct Node *Parser::parse_T() {
 
   if (tag == TOK_TIMES || tag == TOK_DIVIDE) {
     node_add_kid(t, lexer_next(m_lexer));
-    node_add_kid(t, parse_F());
+    node_add_kid(t, parse_T());
   }
 
   return t;
@@ -140,16 +142,22 @@ struct Node *Parser::parse_F() {
 
   int tag = node_get_tag(next_terminal);
 
-  if (tag == TOK_INTEGER_LITERAL) {   // TODO: handle identifier
-    node_add_kid(f, next_terminal);
-  } else if (tag == TOK_POWER) {
-
+  if (tag == TOK_INTEGER_LITERAL || tag == TOK_IDENTIFIER) {
+    node_add_kid(f, next_terminal);  
   } else if (tag == TOK_LPAREN) {
-    node_add_kid(f, parse_E());
+    node_add_kid(f, parse_A());
     expect(TOK_RPAREN);
   } else {
     // TODO: spit error, unexpected TOKEN
   }
+
+  next_terminal = lexer_peek(m_lexer);
+  tag = node_get_tag(next_terminal);
+
+  if (tag == TOK_POWER) {
+    node_add_kid(f, lexer_next(m_lexer));
+    node_add_kid(f, parse_F());
+  } 
 
   return f;
 }
@@ -177,6 +185,8 @@ const char *minicalc_stringify_node_tag(int tag) {
     return "TIMES";
   case TOK_DIVIDE:
     return "DIVIDE";
+  case TOK_POWER:
+    return "POWER";
   case TOK_ASSIGN:
     return "ASSIGN";
   case TOK_LPAREN:
