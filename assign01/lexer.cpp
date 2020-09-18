@@ -138,6 +138,10 @@ struct Node *Lexer::read_token() {
       return token_create(TOK_SEMICOLON, lexeme, line, col);
     case '=':
       return token_create(TOK_ASSIGN, lexeme, line, col);
+    case '(':
+      return token_create(TOK_LPAREN, lexeme, line, col);
+    case ')':
+      return token_create(TOK_RPAREN, lexeme, line, col);
     default:
       {
         struct SourceInfo pos = {

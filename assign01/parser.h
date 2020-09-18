@@ -12,9 +12,12 @@ struct Parser;
 // TokenKind values, so the first enumeration member should have an
 // integer value that is large, e.g., 1000)
 enum Nonterminal {
-  NODE_EXPR_LIST = 1000,
+  NODE_EXPR = 1000,
   NODE_UNIT = 1001,
-  NODE_A = 1002
+  NODE_ASSIGN = 1002,
+  NODE_EXPRESSION = 1003,
+  NODE_TERM = 1004,
+  NODE_FACTOR = 1005
 };
 
 struct Parser *parser_create(struct Lexer *lexer_to_adopt);
