@@ -2,6 +2,7 @@
 #include <map>
 #include <cassert>
 #include <cmath>
+// #include <iostream>
 #include "util.h"
 #include "cpputil.h"
 #include "token.h"
@@ -60,9 +61,10 @@ long Interpreter::exec() {
 long Interpreter::eval(struct Node *expr) {
   // the number of children and the first child's tag will determine
   // how to evaluate the expression
-
   int num_kids = node_get_num_kids(expr);
   int tag = node_get_tag(expr);
+
+  //std::cout << "Eval() on node tag" << tag << "\n";
 
   const char *lexeme = node_get_str(expr);
   if (tag == TOK_INTEGER_LITERAL) {
@@ -84,6 +86,8 @@ long Interpreter::eval(struct Node *expr) {
   } else {
     struct Node *op = node_get_kid(expr, 1);  // operator is in the center
     tag = node_get_tag(op);
+
+    // std::cout << "Reached operator " << tag << "\n";
 
     // left and right operands follow
     struct Node *left = node_get_kid(expr, 0);
@@ -112,7 +116,12 @@ long Interpreter::eval(struct Node *expr) {
       // the variable
       {
         // get the variable name
-        std::string varname = node_get_str(left);
+        struct Node *var = left;
+        // iterate down until we get an identifier
+        while(node_get_num_kids(var) == 1) {
+          var = node_get_kid(var, 0);
+        }
+        std::string varname = node_get_str(var);
         // evaluate the expression producing the value to be assigned
         long rvalue = eval(right);
         // store the value
