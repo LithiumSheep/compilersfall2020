@@ -31,7 +31,7 @@ private:
   void unread(int c);
   void fill();
   struct Node *read_token();
-  struct Node *read_continued_token(enum TokenKind kind, const std::string &lexeme_start, int line, int col, int (*pred)(int));
+  struct Node *read_continued_token(enum TokenKind kind, const std::string &lexeme_start, int line, int col);
   struct Node *token_create(enum TokenKind kind, const std::string &lexeme, int line, int col);
 };
 
@@ -121,9 +121,9 @@ struct Node *Lexer::read_token() {
   lexeme.push_back(char(c));
 
   if (isalpha(c)) {
-    return read_continued_token(TOK_IDENTIFIER, lexeme, line, col, isalpha);
+    return read_continued_token(TOK_IDENTIFIER, lexeme, line, col);
   } else if (isdigit(c)) {
-    return read_continued_token(TOK_INTEGER_LITERAL, lexeme, line, col, isdigit);
+    return read_continued_token(TOK_INTEGER_LITERAL, lexeme, line, col);
   } else {
     switch (c) {
     case '+':
@@ -162,18 +162,30 @@ struct Node *Lexer::read_token() {
 // Read the continuation of a (possibly) multi-character token, such as
 // an identifier or integer literal.  pred is a pointer to a predicate
 // function to determine which characters are valid continuations.
-struct Node *Lexer::read_continued_token(enum TokenKind kind, const std::string &lexeme_start, int line, int col, int (*pred)(int)) {
+struct Node *Lexer::read_continued_token(enum TokenKind kind, const std::string &lexeme_start, int line, int col) {
   std::string lexeme(lexeme_start);
   for (;;) {
     int c = read();
-    if (c >= 0 && pred(c)) {
-      // token has finished
-      lexeme.push_back(char(c));
-    } else {
-      if (c >= 0) {
-        unread(c);
+    if (kind == TOK_INTEGER_LITERAL) {
+      if (c >= 0 && isdigit(c)) {
+        // token has finished
+        lexeme.push_back(char(c));
+      } else {
+        if (c >= 0) {
+          unread(c);
+        }
+        return token_create(kind, lexeme, line, col);
       }
-      return token_create(kind, lexeme, line, col);
+    } else if (kind == TOK_IDENTIFIER) {
+      if (c >= 0 && (isdigit(c) || isalpha(c))) {
+        // token has finished
+        lexeme.push_back(char(c));
+      } else {
+        if (c >= 0) {
+          unread(c);
+        }
+        return token_create(kind, lexeme, line, col);
+      }
     }
   }
 }
