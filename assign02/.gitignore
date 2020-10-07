@@ -1,0 +1,7 @@
+/*.o
+/depend.mak
+/parse.tab.h
+/parse.tab.c
+/lex.yy.c
+/grammar_symbols.[hc]
+/interp
