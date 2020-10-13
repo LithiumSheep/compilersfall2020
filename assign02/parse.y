@@ -19,8 +19,36 @@ struct Node *g_translation_unit;
 /* TODO: define terminal and nonterminal symbols */
 
 %token<node> TOK_IDENTIFIER
+%token<node> TOK_INT_LITERAL
+
+// keywords
+%token<node> TOK_KW_VAR
+%token<node> TOK_KW_FUNC
+%token<node> TOK_KW_IF
+%token<node> TOK_KW_ELSE
+%token<node> TOK_KW_WHILE
+
+// operators
+%token<node> TOK_PLUS TOK_MINUS
+%token<node> TOK_TIMES TOK_DIVIDE
+%token<node> TOK_ASSIGN
+%token<node> TOK_EQ TOK_NE
+%token<node> TOK_LT TOK_LE TOK_GT TOK_GE
+%token<node> TOK_AND TOK_OR
+
+// grouping
+%token<node> TOK_LPAREN TOK_RPAREN TOK_LBRACE TOK_RBRACE
+%token<node> TOK_COMMA
+%token<node> TOK_SEMICOLON
 
 %type<node> translation_unit
+
+%right TOK_TIMES TOK_DIVIDE
+%left TOK_PLUS TOK_MINUS
+%left TOK_EQ TOK_NE TOK_LT TOK_LE TOK_GT TOK_GE
+%left TOK_AND TOK_OR
+
+// TODO: precendence of && over ||?
 
 %%
 
