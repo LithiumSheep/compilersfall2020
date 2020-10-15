@@ -43,9 +43,19 @@ struct Node *g_translation_unit;
 %type<node> translation_unit
 //%type<node> definition_list
 //%type<node> definition
-// TODO: statements
+
+%type<node> statement_or_function
+
 %type<node> statement
+
+%type<node> function
+
 %type<node> expression
+//%type<node> var_dec_statement
+//%type<node> if_statement
+//%type<node> if_else_statement
+//%type<node> while_statement
+
 %type<node> assignment_expression
 %type<node> logical_or_expression
 %type<node> logical_and_expression
@@ -53,7 +63,6 @@ struct Node *g_translation_unit;
 %type<node> multiplicative_expression
 %type<node> unary_expression
 %type<node> primary_expression
-// TODO: functions, arguments
 
 
 %right TIMES DIVIDE
@@ -67,8 +76,18 @@ struct Node *g_translation_unit;
 
 /* TODO: add actual grammar rules */
 translation_unit
-	: statement { $$ = g_translation_unit = node_build1(NODE_translation_unit, $1); }
+	: statement_or_function { $$ = g_translation_unit = node_build1(NODE_translation_unit, $1); }
 	;
+
+statement_or_function
+    : statement { $$ = node_build1(NODE_statement_or_function, $1); }
+    | function { $$ = node_build1(NODE_statement_or_function, $1); }
+    ;
+
+/* TODO: flesh out function in parse tree */
+function
+    : KW_FUNC IDENTIFIER LPAREN RPAREN LBRACE RBRACE { $$ = node_build1(NODE_function, $2); }
+    ;
 
 statement
     : expression SEMICOLON { $$ = node_build2(NODE_statement, $1, $2); }
