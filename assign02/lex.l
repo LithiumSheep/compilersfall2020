@@ -22,7 +22,7 @@ char *g_srcfile;
 "else"                       { return create_token(TOK_KW_ELSE, yytext); }
 "while"                      { return create_token(TOK_KW_WHILE, yytext); }
 
-[ \t\n\r\v]+                 { /* do nothing */ }
+[ \t\n]+                     { /* do nothing */ }
 [A-Za-z][A-Za-z0-9]*         { return create_token(TOK_IDENTIFIER, yytext); }
 [0-9]+                       { return create_token(TOK_INT_LITERAL, yytext); }
 "+"                          { return create_token(TOK_PLUS, yytext); }

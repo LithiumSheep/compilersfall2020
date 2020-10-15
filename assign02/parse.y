@@ -47,13 +47,13 @@ struct Node *g_translation_unit;
 // TODO: statements
 %type<node> statement
 %type<node> expression
-//%type<node> assignment_expression
+%type<node> assignment_expression
 //%type<node> logical_or_expression
 //%type<node> logical_and_expression
-//%type<node> additive_expression
-//%type<node> multiplicative_expression
-//%type<node> unary_expression
-//%type<node> primary_expression
+%type<node> additive_expression
+%type<node> multiplicative_expression
+%type<node> unary_expression
+%type<node> primary_expression
 // TODO: functions, arguments
 
 
@@ -68,7 +68,7 @@ struct Node *g_translation_unit;
 
 /* TODO: add actual grammar rules */
 translation_unit
-	: statement { $$ = g_translation_unit = node_build0(NODE_translation_unit); }
+	: statement { $$ = g_translation_unit = node_build1(NODE_translation_unit, $1); }
 	;
 
 statement
@@ -76,7 +76,33 @@ statement
     ;
 
 expression
-    : TOK_INT_LITERAL TOK_PLUS TOK_INT_LITERAL { $$ = node_build3(NODE_expression, $1, $2, $3); }
+    : assignment_expression { $$ = node_build1(NODE_expression, $1); }
+    ;
+
+assignment_expression
+    : TOK_IDENTIFIER TOK_ASSIGN additive_expression { $$ = node_build3(NODE_assignment_expression, $1, $2, $3); }
+    | additive_expression { $$ = node_build1(NODE_assignment_expression, $1); }
+    ;
+
+additive_expression
+    : multiplicative_expression TOK_PLUS multiplicative_expression { $$ = node_build3(NODE_additive_expression, $1, $2, $3); }
+    | multiplicative_expression TOK_MINUS multiplicative_expression { $$ = node_build3(NODE_additive_expression, $1, $2, $3); }
+    | multiplicative_expression { $$ = node_build1(NODE_additive_expression, $1); }
+    ;
+
+multiplicative_expression
+    : unary_expression TOK_TIMES unary_expression { $$ = node_build3(NODE_multiplicative_expression, $1, $2, $3); }
+    | unary_expression TOK_DIVIDE unary_expression { $$ = node_build3(NODE_multiplicative_expression, $1, $2, $3); }
+    | unary_expression { $$ = node_build1(NODE_multiplicative_expression, $1); }
+    ;
+
+unary_expression
+    : primary_expression { $$ = node_build1(NODE_unary_expression, $1); }
+    ;
+
+primary_expression
+    : TOK_IDENTIFIER { $$ = node_build1(NODE_primary_expression, $1); }
+    | TOK_INT_LITERAL { $$ = node_build1(NODE_primary_expression, $1); }
     ;
 
 
