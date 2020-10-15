@@ -22,7 +22,7 @@ char *g_srcfile;
 "else"                       { return create_token(TOK_KW_ELSE, yytext); }
 "while"                      { return create_token(TOK_KW_WHILE, yytext); }
 
-[ \t\n]+                     { /* do nothing */ }
+[ \t\n\r\v]+                 { /* do nothing */ }
 [A-Za-z][A-Za-z0-9]*         { return create_token(TOK_IDENTIFIER, yytext); }
 [0-9]+                       { return create_token(TOK_INT_LITERAL, yytext); }
 "+"                          { return create_token(TOK_PLUS, yytext); }
@@ -38,6 +38,12 @@ char *g_srcfile;
 "&&"                         { return create_token(TOK_AND, yytext); }
 "||"                         { return create_token(TOK_OR, yytext); }
 "="                          { return create_token(TOK_ASSIGN, yytext); }
+"("                          { return create_token(TOK_LPAREN, yytext); }
+")"                          { return create_token(TOK_RPAREN, yytext); }
+"{"                          { return create_token(TOK_LBRACE, yytext); }
+"}"                          { return create_token(TOK_RBRACE, yytext); }
+"."                          { return create_token(TOK_COMMA, yytext); }
+";"                          { return create_token(TOK_SEMICOLON, yytext); }
 .                            { yyerror("Unknown character: %c\n", yytext[0]); }
 
 %%
@@ -46,8 +52,9 @@ void lexer_set_source_file(const char *filename) {
   g_srcfile = xstrdup(filename);
 }
 
-int create_token(int tag, const char *lexeme) {
-  yylval.node = node_alloc_str_copy(tag, yytext);
+int create_token(int kind, const char *lexeme) {
+  struct Node *n = node_alloc_str_copy(kind, lexeme);
   // TODO: set source info
-  return tag;
+  yylval.node = n;
+  return kind;
 }
