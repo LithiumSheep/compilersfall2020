@@ -42,7 +42,7 @@ char *g_srcfile;
 ")"                          { return create_token(TOK_RPAREN, yytext); }
 "{"                          { return create_token(TOK_LBRACE, yytext); }
 "}"                          { return create_token(TOK_RBRACE, yytext); }
-"."                          { return create_token(TOK_COMMA, yytext); }
+","                          { return create_token(TOK_COMMA, yytext); }
 ";"                          { return create_token(TOK_SEMICOLON, yytext); }
 .                            { yyerror("Unknown character: %c\n", yytext[0]); }
 
