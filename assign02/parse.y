@@ -42,6 +42,20 @@ struct Node *g_translation_unit;
 %token<node> TOK_SEMICOLON
 
 %type<node> translation_unit
+//%type<node> definition_list
+//%type<node> definition
+// TODO: statements
+%type<node> statement
+%type<node> expression
+//%type<node> assignment_expression
+//%type<node> logical_or_expression
+//%type<node> logical_and_expression
+//%type<node> additive_expression
+//%type<node> multiplicative_expression
+//%type<node> unary_expression
+//%type<node> primary_expression
+// TODO: functions, arguments
+
 
 %right TOK_TIMES TOK_DIVIDE
 %left TOK_PLUS TOK_MINUS
@@ -54,8 +68,17 @@ struct Node *g_translation_unit;
 
 /* TODO: add actual grammar rules */
 translation_unit
-	: TOK_IDENTIFIER { g_translation_unit = $$ = node_build1(NODE_translation_unit, $1); }
+	: statement { $$ = g_translation_unit = node_build0(NODE_translation_unit); }
 	;
+
+statement
+    : expression TOK_SEMICOLON { $$ = node_build2(NODE_statement, $1, $2); }
+    ;
+
+expression
+    : TOK_INT_LITERAL TOK_PLUS TOK_INT_LITERAL { $$ = node_build3(NODE_expression, $1, $2, $3); }
+    ;
+
 
 %%
 
