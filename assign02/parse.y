@@ -48,8 +48,8 @@ struct Node *g_translation_unit;
 %type<node> statement
 %type<node> expression
 %type<node> assignment_expression
-//%type<node> logical_or_expression
-//%type<node> logical_and_expression
+%type<node> logical_or_expression
+%type<node> logical_and_expression
 %type<node> additive_expression
 %type<node> multiplicative_expression
 %type<node> unary_expression
@@ -81,7 +81,17 @@ expression
 
 assignment_expression
     : TOK_IDENTIFIER TOK_ASSIGN additive_expression { $$ = node_build3(NODE_assignment_expression, $1, $2, $3); }
-    | additive_expression { $$ = node_build1(NODE_assignment_expression, $1); }
+    | logical_or_expression { $$ = node_build1(NODE_assignment_expression, $1); }
+    ;
+
+logical_or_expression
+    : logical_and_expression TOK_OR logical_and_expression { $$ = node_build3(NODE_logical_or_expression, $1, $2, $3); }
+    | logical_and_expression { $$ = node_build1(NODE_logical_or_expression, $1); }
+    ;
+
+logical_and_expression
+    : additive_expression TOK_AND additive_expression { $$ = node_build3(NODE_logical_and_expression, $1, $2, $3); }
+    | additive_expression { $$ = node_build1(NODE_logical_and_expression, $1); }
     ;
 
 additive_expression
