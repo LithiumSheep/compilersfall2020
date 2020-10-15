@@ -18,28 +18,27 @@ struct Node *g_translation_unit;
 
 /* TODO: define terminal and nonterminal symbols */
 
-%token<node> TOK_IDENTIFIER
-%token<node> TOK_INT_LITERAL
+%token<node> IDENTIFIER
+%token<node> INT_LITERAL
 
 // keywords
-%token<node> TOK_KW_VAR
-%token<node> TOK_KW_FUNC
-%token<node> TOK_KW_IF
-%token<node> TOK_KW_ELSE
-%token<node> TOK_KW_WHILE
+%token<node> KW_VAR
+%token<node> KW_FUNC
+%token<node> KW_IF
+%token<node> KW_ELSE
+%token<node> KW_WHILE
 
 // operators
-%token<node> TOK_PLUS TOK_MINUS
-%token<node> TOK_TIMES TOK_DIVIDE
-%token<node> TOK_ASSIGN
-%token<node> TOK_EQ TOK_NE
-%token<node> TOK_LT TOK_LE TOK_GT TOK_GE
-%token<node> TOK_AND TOK_OR
+%token<node> PLUS MINUS
+%token<node> TIMES DIVIDE
+%token<node> ASSIGN
+%token<node> EQ NE LT LE GT GE
+%token<node> AND OR
 
 // grouping
-%token<node> TOK_LPAREN TOK_RPAREN TOK_LBRACE TOK_RBRACE
-%token<node> TOK_COMMA
-%token<node> TOK_SEMICOLON
+%token<node> LPAREN RPAREN LBRACE RBRACE
+%token<node> COMMA
+%token<node> SEMICOLON
 
 %type<node> translation_unit
 //%type<node> definition_list
@@ -57,10 +56,10 @@ struct Node *g_translation_unit;
 // TODO: functions, arguments
 
 
-%right TOK_TIMES TOK_DIVIDE
-%left TOK_PLUS TOK_MINUS
-%left TOK_EQ TOK_NE TOK_LT TOK_LE TOK_GT TOK_GE
-%left TOK_AND TOK_OR
+%right TIMES DIVIDE
+%left PLUS MINUS
+%left EQ NE LT LE GT GE
+%left AND OR
 
 // TODO: precendence of && over ||?
 
@@ -72,7 +71,7 @@ translation_unit
 	;
 
 statement
-    : expression TOK_SEMICOLON { $$ = node_build2(NODE_statement, $1, $2); }
+    : expression SEMICOLON { $$ = node_build2(NODE_statement, $1, $2); }
     ;
 
 expression
@@ -80,29 +79,29 @@ expression
     ;
 
 assignment_expression
-    : TOK_IDENTIFIER TOK_ASSIGN additive_expression { $$ = node_build3(NODE_assignment_expression, $1, $2, $3); }
+    : IDENTIFIER ASSIGN additive_expression { $$ = node_build3(NODE_assignment_expression, $1, $2, $3); }
     | logical_or_expression { $$ = node_build1(NODE_assignment_expression, $1); }
     ;
 
 logical_or_expression
-    : logical_and_expression TOK_OR logical_and_expression { $$ = node_build3(NODE_logical_or_expression, $1, $2, $3); }
+    : logical_and_expression OR logical_and_expression { $$ = node_build3(NODE_logical_or_expression, $1, $2, $3); }
     | logical_and_expression { $$ = node_build1(NODE_logical_or_expression, $1); }
     ;
 
 logical_and_expression
-    : additive_expression TOK_AND additive_expression { $$ = node_build3(NODE_logical_and_expression, $1, $2, $3); }
+    : additive_expression AND additive_expression { $$ = node_build3(NODE_logical_and_expression, $1, $2, $3); }
     | additive_expression { $$ = node_build1(NODE_logical_and_expression, $1); }
     ;
 
 additive_expression
-    : multiplicative_expression TOK_PLUS multiplicative_expression { $$ = node_build3(NODE_additive_expression, $1, $2, $3); }
-    | multiplicative_expression TOK_MINUS multiplicative_expression { $$ = node_build3(NODE_additive_expression, $1, $2, $3); }
+    : multiplicative_expression PLUS multiplicative_expression { $$ = node_build3(NODE_additive_expression, $1, $2, $3); }
+    | multiplicative_expression MINUS multiplicative_expression { $$ = node_build3(NODE_additive_expression, $1, $2, $3); }
     | multiplicative_expression { $$ = node_build1(NODE_additive_expression, $1); }
     ;
 
 multiplicative_expression
-    : unary_expression TOK_TIMES unary_expression { $$ = node_build3(NODE_multiplicative_expression, $1, $2, $3); }
-    | unary_expression TOK_DIVIDE unary_expression { $$ = node_build3(NODE_multiplicative_expression, $1, $2, $3); }
+    : unary_expression TIMES unary_expression { $$ = node_build3(NODE_multiplicative_expression, $1, $2, $3); }
+    | unary_expression DIVIDE unary_expression { $$ = node_build3(NODE_multiplicative_expression, $1, $2, $3); }
     | unary_expression { $$ = node_build1(NODE_multiplicative_expression, $1); }
     ;
 
@@ -111,8 +110,8 @@ unary_expression
     ;
 
 primary_expression
-    : TOK_IDENTIFIER { $$ = node_build1(NODE_primary_expression, $1); }
-    | TOK_INT_LITERAL { $$ = node_build1(NODE_primary_expression, $1); }
+    : IDENTIFIER { $$ = node_build1(NODE_primary_expression, $1); }
+    | INT_LITERAL { $$ = node_build1(NODE_primary_expression, $1); }
     ;
 
 

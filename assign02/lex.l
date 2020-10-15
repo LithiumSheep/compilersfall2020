@@ -16,34 +16,34 @@ char *g_srcfile;
 
 %%
 
-"var"                        { return create_token(TOK_KW_VAR, yytext); }
-"function"                   { return create_token(TOK_KW_FUNC, yytext); }
-"if"                         { return create_token(TOK_KW_IF, yytext); }
-"else"                       { return create_token(TOK_KW_ELSE, yytext); }
-"while"                      { return create_token(TOK_KW_WHILE, yytext); }
+"var"                        { return create_token(KW_VAR, yytext); }
+"function"                   { return create_token(KW_FUNC, yytext); }
+"if"                         { return create_token(KW_IF, yytext); }
+"else"                       { return create_token(KW_ELSE, yytext); }
+"while"                      { return create_token(KW_WHILE, yytext); }
 
 [ \t\n]+                     { /* do nothing */ }
-[A-Za-z][A-Za-z0-9]*         { return create_token(TOK_IDENTIFIER, yytext); }
-[0-9]+                       { return create_token(TOK_INT_LITERAL, yytext); }
-"+"                          { return create_token(TOK_PLUS, yytext); }
-"-"                          { return create_token(TOK_MINUS, yytext); }
-"*"                          { return create_token(TOK_TIMES, yytext); }
-"/"                          { return create_token(TOK_DIVIDE, yytext); }
-"=="                         { return create_token(TOK_EQ, yytext); }
-"!="                         { return create_token(TOK_NE, yytext); }
-"<"                          { return create_token(TOK_LT, yytext); }
-">"                          { return create_token(TOK_GT, yytext); }
-"<="                         { return create_token(TOK_LE, yytext); }
-">="                         { return create_token(TOK_GE, yytext); }
-"&&"                         { return create_token(TOK_AND, yytext); }
-"||"                         { return create_token(TOK_OR, yytext); }
-"="                          { return create_token(TOK_ASSIGN, yytext); }
-"("                          { return create_token(TOK_LPAREN, yytext); }
-")"                          { return create_token(TOK_RPAREN, yytext); }
-"{"                          { return create_token(TOK_LBRACE, yytext); }
-"}"                          { return create_token(TOK_RBRACE, yytext); }
-","                          { return create_token(TOK_COMMA, yytext); }
-";"                          { return create_token(TOK_SEMICOLON, yytext); }
+[A-Za-z][A-Za-z0-9]*         { return create_token(IDENTIFIER, yytext); }
+[0-9]+                       { return create_token(INT_LITERAL, yytext); }
+"+"                          { return create_token(PLUS, yytext); }
+"-"                          { return create_token(MINUS, yytext); }
+"*"                          { return create_token(TIMES, yytext); }
+"/"                          { return create_token(DIVIDE, yytext); }
+"=="                         { return create_token(EQ, yytext); }
+"!="                         { return create_token(NE, yytext); }
+"<"                          { return create_token(LT, yytext); }
+">"                          { return create_token(GT, yytext); }
+"<="                         { return create_token(LE, yytext); }
+">="                         { return create_token(GE, yytext); }
+"&&"                         { return create_token(AND, yytext); }
+"||"                         { return create_token(OR, yytext); }
+"="                          { return create_token(ASSIGN, yytext); }
+"("                          { return create_token(LPAREN, yytext); }
+")"                          { return create_token(RPAREN, yytext); }
+"{"                          { return create_token(LBRACE, yytext); }
+"}"                          { return create_token(RBRACE, yytext); }
+","                          { return create_token(COMMA, yytext); }
+";"                          { return create_token(SEMICOLON, yytext); }
 .                            { yyerror("Unknown character: %c\n", yytext[0]); }
 
 %%
