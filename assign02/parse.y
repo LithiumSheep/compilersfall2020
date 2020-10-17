@@ -55,7 +55,6 @@ struct Node *g_translation_unit;
 %type<node> expression
 %type<node> var_dec_statement
 %type<node> if_statement
-//%type<node> if_else_statement
 //%type<node> while_statement
 
 %type<node> assignment_expression
@@ -87,7 +86,8 @@ translation_unit
 // TODO: do I need definition list?
 
 statement_or_function
-    : statement { $$ = node_build1(NODE_statement_or_function, $1); }    ;
+    : statement { $$ = node_build1(NODE_statement_or_function, $1); }
+    ;
 
 statement
     : expression SEMICOLON { $$ = node_build2(NODE_statement, $1, $2); }
@@ -100,7 +100,8 @@ var_dec_statement
     ;
 
 if_statement
-    : KW_IF RPAREN expression LPAREN RBRACE opt_statement_list LBRACE { $$ = node_build2(NODE_if_statement, $3, $6); }
+    : KW_IF LPAREN expression RPAREN LBRACE opt_statement_list RBRACE { $$ = node_build2(NODE_if_statement, $3, $6); }
+    | KW_IF LPAREN expression RPAREN LBRACE opt_statement_list RBRACE KW_ELSE LBRACE opt_statement_list RBRACE  { $$ = node_build3(NODE_if_statement, $3, $6, $10); }
     ;
 
 opt_statement_list
