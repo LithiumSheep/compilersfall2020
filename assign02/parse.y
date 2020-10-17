@@ -48,11 +48,13 @@ struct Node *g_translation_unit;
 
 %type<node> statement
 
-%type<node> function
+// TODO: function def, call
+//%type<node> func_def
+//%type<node> func_call
 
 %type<node> expression
-//%type<node> var_dec_statement
-//%type<node> if_statement
+%type<node> var_dec_statement
+%type<node> if_statement
 //%type<node> if_else_statement
 //%type<node> while_statement
 
@@ -64,6 +66,9 @@ struct Node *g_translation_unit;
 %type<node> unary_expression
 %type<node> primary_expression
 
+%type<node> identifier_list
+%type<node> opt_statement_list
+%type<node> statement_list
 
 %right TIMES DIVIDE
 %left PLUS MINUS
@@ -79,22 +84,43 @@ translation_unit
 	: statement_or_function { $$ = g_translation_unit = node_build1(NODE_translation_unit, $1); }
 	;
 
-statement_or_function
-    : statement { $$ = node_build1(NODE_statement_or_function, $1); }
-    | function { $$ = node_build1(NODE_statement_or_function, $1); }
-    ;
+// TODO: do I need definition list?
 
-/* TODO: flesh out function in parse tree */
-function
-    : KW_FUNC IDENTIFIER LPAREN RPAREN LBRACE RBRACE { $$ = node_build1(NODE_function, $2); }
-    ;
+statement_or_function
+    : statement { $$ = node_build1(NODE_statement_or_function, $1); }    ;
 
 statement
     : expression SEMICOLON { $$ = node_build2(NODE_statement, $1, $2); }
+    | if_statement { $$ = node_build1(NODE_statement, $1); }
+    | var_dec_statement SEMICOLON { $$ = node_build1(NODE_statement, $1); }
+    ;
+
+var_dec_statement
+    : KW_VAR identifier_list { $$ = node_build1(NODE_var_dec_statement, $2); }
+    ;
+
+if_statement
+    : KW_IF RPAREN expression LPAREN RBRACE opt_statement_list LBRACE { $$ = node_build2(NODE_if_statement, $3, $6); }
+    ;
+
+opt_statement_list
+    : statement_list { $$ = node_build1(NODE_opt_statement_list, $1); }
+    | /* epsilon */ { $$ = node_build0(NODE_opt_statement_list); }
+    ;
+
+statement_list
+    : statement { $$ = node_build1(NODE_statement_list, $1); }
+    | statement statement_list { $$ = node_build2(NODE_statement_list, $1, $2); }
+    ;
+
+identifier_list
+    : IDENTIFIER { $$ = node_build1(NODE_identifier_list, $1); }
+    | IDENTIFIER COMMA identifier_list { $$ = node_build3(NODE_identifier_list, $1, $2, $3); }
     ;
 
 expression
     : assignment_expression { $$ = node_build1(NODE_expression, $1); }
+    // TODO: function call expression
     ;
 
 assignment_expression
@@ -124,6 +150,7 @@ multiplicative_expression
     | unary_expression { $$ = node_build1(NODE_multiplicative_expression, $1); }
     ;
 
+// TODO: handle unary "-"
 unary_expression
     : primary_expression { $$ = node_build1(NODE_unary_expression, $1); }
     ;
