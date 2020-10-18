@@ -40,8 +40,8 @@ struct Node *g_translation_unit;
 %token<node> SEMICOLON
 
 %type<node> translation_unit
-//%type<node> definition_list
-//%type<node> definition
+%type<node> definition_list
+%type<node> definition
 %type<node> statement_or_function
 %type<node> statement
 
@@ -80,10 +80,17 @@ struct Node *g_translation_unit;
 %%
 
 translation_unit
-	: statement_or_function { $$ = g_translation_unit = node_build1(NODE_translation_unit, $1); }
+	: definition_list { $$ = g_translation_unit = node_build1(NODE_translation_unit, $1); }
 	;
 
-// TODO: how to do definition_list
+definition_list
+    : definition { $$ = node_build1(NODE_definition_list, $1); }
+    | definition definition_list { $$ = node_build2(NODE_definition_list, $1, $2); }
+    ;
+
+definition
+	: statement_or_function
+	;
 
 statement_or_function
     : statement { $$ = node_build1(NODE_statement_or_function, $1); }
