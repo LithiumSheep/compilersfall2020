@@ -16,7 +16,6 @@ struct Node *g_translation_unit;
     struct Node *node;
 }
 
-/* TODO: define terminal and nonterminal symbols */
 
 %token<node> IDENTIFIER
 %token<node> INT_LITERAL
@@ -43,19 +42,20 @@ struct Node *g_translation_unit;
 %type<node> translation_unit
 //%type<node> definition_list
 //%type<node> definition
-
 %type<node> statement_or_function
-
 %type<node> statement
 
+// functions
 %type<node> function
 //%type<node> func_call
 
+// statements
 %type<node> expression
 %type<node> var_dec_statement
 %type<node> if_statement
 %type<node> while_statement
 
+// expressions
 %type<node> assignment_expression
 %type<node> logical_or_expression
 %type<node> logical_and_expression
@@ -64,6 +64,7 @@ struct Node *g_translation_unit;
 %type<node> unary_expression
 %type<node> primary_expression
 
+// list types
 %type<node> identifier_list
 %type<node> opt_statement_list
 %type<node> opt_arg_list
@@ -78,12 +79,11 @@ struct Node *g_translation_unit;
 
 %%
 
-/* TODO: add actual grammar rules */
 translation_unit
 	: statement_or_function { $$ = g_translation_unit = node_build1(NODE_translation_unit, $1); }
 	;
 
-// TODO: do I need definition list?
+// TODO: how to do definition_list
 
 statement_or_function
     : statement { $$ = node_build1(NODE_statement_or_function, $1); }
