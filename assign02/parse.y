@@ -48,8 +48,7 @@ struct Node *g_translation_unit;
 
 %type<node> statement
 
-// TODO: function def, call
-//%type<node> func_def
+%type<node> function
 //%type<node> func_call
 
 %type<node> expression
@@ -67,6 +66,7 @@ struct Node *g_translation_unit;
 
 %type<node> identifier_list
 %type<node> opt_statement_list
+%type<node> opt_arg_list
 %type<node> statement_list
 
 %right TIMES DIVIDE
@@ -87,6 +87,11 @@ translation_unit
 
 statement_or_function
     : statement { $$ = node_build1(NODE_statement_or_function, $1); }
+    | function { $$ = node_build1(NODE_statement_or_function, $1); }
+    ;
+
+function
+    : KW_FUNC IDENTIFIER LPAREN opt_arg_list RPAREN LBRACE opt_statement_list RBRACE { $$ = node_build3(NODE_function, $2, $4, $7); }
     ;
 
 statement
@@ -117,6 +122,11 @@ opt_statement_list
 statement_list
     : statement { $$ = node_build1(NODE_statement_list, $1); }
     | statement statement_list { $$ = node_build2(NODE_statement_list, $1, $2); }
+    ;
+
+opt_arg_list
+    : identifier_list { $$ = node_build1(NODE_opt_arg_list, $1); }
+    | /* epsilon */ { $$ = node_build0(NODE_opt_arg_list); }
     ;
 
 identifier_list
@@ -165,7 +175,6 @@ primary_expression
     : IDENTIFIER { $$ = node_build1(NODE_primary_expression, $1); }
     | INT_LITERAL { $$ = node_build1(NODE_primary_expression, $1); }
     ;
-
 
 %%
 
