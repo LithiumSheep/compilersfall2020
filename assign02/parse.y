@@ -55,7 +55,7 @@ struct Node *g_translation_unit;
 %type<node> expression
 %type<node> var_dec_statement
 %type<node> if_statement
-//%type<node> while_statement
+%type<node> while_statement
 
 %type<node> assignment_expression
 %type<node> logical_or_expression
@@ -91,8 +91,9 @@ statement_or_function
 
 statement
     : expression SEMICOLON { $$ = node_build2(NODE_statement, $1, $2); }
-    | if_statement { $$ = node_build1(NODE_statement, $1); }
     | var_dec_statement SEMICOLON { $$ = node_build1(NODE_statement, $1); }
+    | if_statement { $$ = node_build1(NODE_statement, $1); }
+    | while_statement { $$ = node_build1(NODE_statement, $1); }
     ;
 
 var_dec_statement
@@ -102,6 +103,10 @@ var_dec_statement
 if_statement
     : KW_IF LPAREN expression RPAREN LBRACE opt_statement_list RBRACE { $$ = node_build2(NODE_if_statement, $3, $6); }
     | KW_IF LPAREN expression RPAREN LBRACE opt_statement_list RBRACE KW_ELSE LBRACE opt_statement_list RBRACE  { $$ = node_build3(NODE_if_statement, $3, $6, $10); }
+    ;
+
+while_statement
+    : KW_WHILE LPAREN expression RPAREN LBRACE opt_statement_list RBRACE { $$ = node_build2(NODE_while_statement, $3, $6); }
     ;
 
 opt_statement_list
