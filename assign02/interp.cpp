@@ -37,42 +37,46 @@ Interp::~Interp() {
 struct Value Interp::exec() {
     struct Value result;
     struct Node *unit = m_tree;
-    while (unit) {
-        struct Node *def = node_get_kid(unit, 0);
+
+    // evaluation of statements or functions should go on stack
+    // previous values may affect later values
+
+    int num_stmts = node_get_num_kids(unit);
+    int index = 0;
+
+    while (index < num_stmts) {
+        struct Node *def = node_get_kid(unit, index);
+
         result = eval(def);
 
-        if (node_get_num_kids(def) == 1) {
-            unit = node_get_kid(def, 0);
-        } else if (node_get_num_kids(def) == 2) {
-            unit = node_get_kid(def, 1);
-        } else {
-            unit = nullptr;
-        }
+        // add result to stack
+
+        index++;
     }
 
   return result;
 }
 
 struct Value Interp::eval(struct Node *n) {
-    int num_kids = node_get_num_kids(n);
     int tag = node_get_tag(n);
 
     if (tag == NODE_INT_LITERAL) {
         return val_create_ival(strtol(node_get_str(n), nullptr, 10));
     }
 
-    if (num_kids == 0) {
-        return val_create_ival(node_get_ival(n));
-    }
-
     // left and right operands follow
     struct Node *left = node_get_kid(n, 0);
     struct Node *right = node_get_kid(n, 1);
+
     switch(tag) {
         case NODE_AST_PLUS:
             return val_create_ival(eval(left).ival + eval(right).ival);
         case NODE_AST_MINUS:
             return val_create_ival(eval(left).ival - eval(right).ival);
+        case NODE_AST_TIMES:
+            return val_create_ival(eval(left).ival * eval(right).ival);
+        case NODE_AST_DIVIDE:
+            return val_create_ival(eval(left).ival / eval(right).ival);
         default:
             err_fatal("Unknown operator: %d\n", tag);
             return val_create_error();
