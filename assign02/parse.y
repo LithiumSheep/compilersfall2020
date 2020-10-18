@@ -85,12 +85,13 @@ struct Node *g_translation_unit;
 %%
 
 translation_unit
-	: definition_list { $$ = g_translation_unit = node_build1(NODE_translation_unit, $1); }
+	// : definition_list { $$ = g_translation_unit = node_build1(NODE_translation_unit, $1); }
+	: definition_list { $$ = g_translation_unit = $1; }
 	;
 
 definition_list
-    : definition
-    | definition definition_list { $$ = node_build2(NODE_definition_list, $1, $2); }
+    : /* epsilon */ { $$ = node_build0(NODE_definition_list); }
+    | definition_list definition { $$ = $1;  node_add_kid($1, $2); }
     ;
 
 definition
