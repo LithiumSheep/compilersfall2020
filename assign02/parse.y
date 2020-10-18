@@ -70,6 +70,11 @@ struct Node *g_translation_unit;
 %type<node> opt_arg_list
 %type<node> statement_list
 
+// AST types
+%token<node> AST_PLUS AST_MINUS AST_TIMES AST_DIVIDE
+%token<node> AST_AND AST_OR
+%token<node> AST_ASSIGN
+
 %right TIMES DIVIDE
 %left PLUS MINUS
 %left EQ NE LT LE GT GE
@@ -84,7 +89,7 @@ translation_unit
 	;
 
 definition_list
-    : definition { $$ = node_build1(NODE_definition_list, $1); }
+    : definition
     | definition definition_list { $$ = node_build2(NODE_definition_list, $1, $2); }
     ;
 
@@ -93,8 +98,8 @@ definition
 	;
 
 statement_or_function
-    : statement { $$ = node_build1(NODE_statement_or_function, $1); }
-    | function { $$ = node_build1(NODE_statement_or_function, $1); }
+    : statement /*{ $$ = node_build1(NODE_statement_or_function, $1); }*/
+    | function /*{ $$ = node_build1(NODE_statement_or_function, $1); }*/
     ;
 
 function
@@ -102,7 +107,7 @@ function
     ;
 
 statement
-    : expression SEMICOLON { $$ = node_build2(NODE_statement, $1, $2); }
+    : expression SEMICOLON /*{ $$ = node_build2(NODE_statement, $1, $2); }*/
     | var_dec_statement SEMICOLON { $$ = node_build1(NODE_statement, $1); }
     | if_statement { $$ = node_build1(NODE_statement, $1); }
     | while_statement { $$ = node_build1(NODE_statement, $1); }
@@ -138,51 +143,51 @@ opt_arg_list
 
 identifier_list
     : IDENTIFIER { $$ = node_build1(NODE_identifier_list, $1); }
-    | IDENTIFIER COMMA identifier_list { $$ = node_build3(NODE_identifier_list, $1, $2, $3); }
+    | IDENTIFIER COMMA identifier_list { $$ = node_build2(NODE_identifier_list, $1, $3); }
     ;
 
 expression
-    : assignment_expression { $$ = node_build1(NODE_expression, $1); }
+    : assignment_expression /*{ $$ = node_build1(NODE_expression, $1); }*/
     // TODO: function call expression
     // TODO: handle parentesized subexpression
     ;
 
 // TODO might need to recursively go right on assignment?
 assignment_expression
-    : IDENTIFIER ASSIGN additive_expression { $$ = node_build3(NODE_assignment_expression, $1, $2, $3); }
-    | logical_or_expression { $$ = node_build1(NODE_assignment_expression, $1); }
+    : IDENTIFIER ASSIGN additive_expression { $$ = node_build2(NODE_AST_ASSIGN, $1, $3); }
+    | logical_or_expression /*{ $$ = node_build1(NODE_assignment_expression, $1); }*/
     ;
 
 logical_or_expression
-    : logical_and_expression OR logical_or_expression { $$ = node_build3(NODE_logical_or_expression, $1, $2, $3); }
-    | logical_and_expression { $$ = node_build1(NODE_logical_or_expression, $1); }
+    : logical_and_expression OR logical_or_expression { $$ = node_build2(NODE_AST_OR, $1, $3); }
+    | logical_and_expression /*{ $$ = node_build1(NODE_logical_or_expression, $1); }*/
     ;
 
 logical_and_expression
-    : additive_expression AND logical_and_expression { $$ = node_build3(NODE_logical_and_expression, $1, $2, $3); }
-    | additive_expression { $$ = node_build1(NODE_logical_and_expression, $1); }
+    : additive_expression AND logical_and_expression { $$ = node_build2(NODE_AST_AND, $1, $3); }
+    | additive_expression /*{ $$ = node_build1(NODE_logical_and_expression, $1); }*/
     ;
 
 additive_expression
-    : multiplicative_expression PLUS additive_expression { $$ = node_build3(NODE_additive_expression, $1, $2, $3); }
-    | multiplicative_expression MINUS additive_expression { $$ = node_build3(NODE_additive_expression, $1, $2, $3); }
-    | multiplicative_expression { $$ = node_build1(NODE_additive_expression, $1); }
+    : multiplicative_expression PLUS additive_expression { $$ = node_build2(NODE_AST_PLUS, $1, $3); }
+    | multiplicative_expression MINUS additive_expression { $$ = node_build2(NODE_AST_MINUS, $1, $3); }
+    | multiplicative_expression /*{ $$ = node_build1(NODE_additive_expression, $1); }*/
     ;
 
 multiplicative_expression
-    : unary_expression TIMES multiplicative_expression { $$ = node_build3(NODE_multiplicative_expression, $1, $2, $3); }
-    | unary_expression DIVIDE multiplicative_expression { $$ = node_build3(NODE_multiplicative_expression, $1, $2, $3); }
-    | unary_expression { $$ = node_build1(NODE_multiplicative_expression, $1); }
+    : unary_expression TIMES multiplicative_expression { $$ = node_build2(NODE_AST_TIMES, $1, $3); }
+    | unary_expression DIVIDE multiplicative_expression { $$ = node_build2(NODE_AST_DIVIDE, $1, $3); }
+    | unary_expression /*{ $$ = node_build1(NODE_multiplicative_expression, $1); }*/
     ;
 
 // TODO: handle unary "-"
 unary_expression
-    : primary_expression { $$ = node_build1(NODE_unary_expression, $1); }
+    : primary_expression /*{ $$ = node_build1(NODE_unary_expression, $1); }*/
     ;
 
 primary_expression
-    : IDENTIFIER { $$ = node_build1(NODE_primary_expression, $1); }
-    | INT_LITERAL { $$ = node_build1(NODE_primary_expression, $1); }
+    : IDENTIFIER { $$ = $1; }
+    | INT_LITERAL { $$ = $1; }
     ;
 
 %%
