@@ -144,32 +144,34 @@ identifier_list
 expression
     : assignment_expression { $$ = node_build1(NODE_expression, $1); }
     // TODO: function call expression
+    // TODO: handle parentesized subexpression
     ;
 
+// TODO might need to recursively go right on assignment?
 assignment_expression
     : IDENTIFIER ASSIGN additive_expression { $$ = node_build3(NODE_assignment_expression, $1, $2, $3); }
     | logical_or_expression { $$ = node_build1(NODE_assignment_expression, $1); }
     ;
 
 logical_or_expression
-    : logical_and_expression OR logical_and_expression { $$ = node_build3(NODE_logical_or_expression, $1, $2, $3); }
+    : logical_and_expression OR logical_or_expression { $$ = node_build3(NODE_logical_or_expression, $1, $2, $3); }
     | logical_and_expression { $$ = node_build1(NODE_logical_or_expression, $1); }
     ;
 
 logical_and_expression
-    : additive_expression AND additive_expression { $$ = node_build3(NODE_logical_and_expression, $1, $2, $3); }
+    : additive_expression AND logical_and_expression { $$ = node_build3(NODE_logical_and_expression, $1, $2, $3); }
     | additive_expression { $$ = node_build1(NODE_logical_and_expression, $1); }
     ;
 
 additive_expression
-    : multiplicative_expression PLUS multiplicative_expression { $$ = node_build3(NODE_additive_expression, $1, $2, $3); }
-    | multiplicative_expression MINUS multiplicative_expression { $$ = node_build3(NODE_additive_expression, $1, $2, $3); }
+    : multiplicative_expression PLUS additive_expression { $$ = node_build3(NODE_additive_expression, $1, $2, $3); }
+    | multiplicative_expression MINUS additive_expression { $$ = node_build3(NODE_additive_expression, $1, $2, $3); }
     | multiplicative_expression { $$ = node_build1(NODE_additive_expression, $1); }
     ;
 
 multiplicative_expression
-    : unary_expression TIMES unary_expression { $$ = node_build3(NODE_multiplicative_expression, $1, $2, $3); }
-    | unary_expression DIVIDE unary_expression { $$ = node_build3(NODE_multiplicative_expression, $1, $2, $3); }
+    : unary_expression TIMES multiplicative_expression { $$ = node_build3(NODE_multiplicative_expression, $1, $2, $3); }
+    | unary_expression DIVIDE multiplicative_expression { $$ = node_build3(NODE_multiplicative_expression, $1, $2, $3); }
     | unary_expression { $$ = node_build1(NODE_multiplicative_expression, $1); }
     ;
 
