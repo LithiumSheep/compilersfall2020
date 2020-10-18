@@ -114,6 +114,36 @@ struct Value Interp::eval(struct Node *n) {
                 return val_create_true();
             }
             return val_create_false();
+        case NODE_AST_EQ:
+            if (eval(left).ival == eval(right).ival) {
+                return val_create_true();
+            }
+            return val_create_false();
+        case NODE_AST_NE:
+            if (eval(left).ival != eval(right).ival) {
+                return val_create_true();
+            }
+            return val_create_false();
+        case NODE_AST_LT:
+            if (eval(left).ival < eval(right).ival) {
+                return val_create_true();
+            }
+            return val_create_false();
+        case NODE_AST_LE:
+            if (eval(left).ival <= eval(right).ival) {
+                return val_create_true();
+            }
+            return val_create_false();
+        case NODE_AST_GT:
+            if (eval(left).ival > eval(right).ival) {
+                return val_create_true();
+            }
+            return val_create_false();
+        case NODE_AST_GE:
+            if (eval(left).ival >= eval(right).ival) {
+                return val_create_true();
+            }
+            return val_create_false();
         default:
             err_fatal("Unknown operator: %d\n", tag);
             return val_create_error();

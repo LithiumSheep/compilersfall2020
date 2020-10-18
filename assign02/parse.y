@@ -59,6 +59,7 @@ struct Node *g_translation_unit;
 %type<node> assignment_expression
 %type<node> logical_or_expression
 %type<node> logical_and_expression
+%type<node> relational_expression
 %type<node> additive_expression
 %type<node> multiplicative_expression
 %type<node> unary_expression
@@ -73,6 +74,7 @@ struct Node *g_translation_unit;
 // AST types
 %token<node> AST_PLUS AST_MINUS AST_TIMES AST_DIVIDE
 %token<node> AST_AND AST_OR
+%token<node> AST_EQ AST_NE AST_LT AST_LE AST_GT AST_GE
 %token<node> AST_ASSIGN
 %token<node> AST_VAR_DEC
 
@@ -168,8 +170,18 @@ logical_or_expression
     ;
 
 logical_and_expression
-    : additive_expression AND logical_and_expression { $$ = node_build2(NODE_AST_AND, $1, $3); }
-    | additive_expression /*{ $$ = node_build1(NODE_logical_and_expression, $1); }*/
+    : relational_expression AND logical_and_expression { $$ = node_build2(NODE_AST_AND, $1, $3); }
+    | relational_expression /*{ $$ = node_build1(NODE_logical_and_expression, $1); }*/
+    ;
+
+relational_expression
+    : additive_expression EQ relational_expression { $$ = node_build2(NODE_AST_EQ, $1, $3); }
+    | additive_expression NE relational_expression { $$ = node_build2(NODE_AST_NE, $1, $3); }
+    | additive_expression LT relational_expression { $$ = node_build2(NODE_AST_LT, $1, $3); }
+    | additive_expression LE relational_expression { $$ = node_build2(NODE_AST_LE, $1, $3); }
+    | additive_expression GT relational_expression { $$ = node_build2(NODE_AST_GT, $1, $3); }
+    | additive_expression GE relational_expression { $$ = node_build2(NODE_AST_GE, $1, $3); }
+    | additive_expression
     ;
 
 additive_expression
