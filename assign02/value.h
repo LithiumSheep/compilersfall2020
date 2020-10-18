@@ -36,6 +36,8 @@ struct Value {
 struct Value val_create_void(void);
 struct Value val_create_error(void);
 struct Value val_create_ival(long ival);
+struct Value val_create_true();
+struct Value val_create_false();
 struct Value val_create_fn(struct Function *fn);
 struct Value val_create_intrinsic(IntrinsicFunction *intrinsic_fn);
 // You may add additional constructor functions for additional kinds of values.

@@ -34,6 +34,14 @@ struct Value val_create_ival(long ival) {
   return val;
 }
 
+struct Value val_create_true() {
+    return val_create_ival(1);
+}
+
+struct Value val_create_false() {
+    return val_create_ival(0);
+}
+
 struct Value val_create_fn(struct Function *fn) {
   assert(fn != NULL);
   struct Value val;

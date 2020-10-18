@@ -27,6 +27,7 @@ public:
 
 private:
   Value eval(struct Node *n);
+  bool val_is_truthy(Value val);
 };
 
 Interp::Interp(struct Node *t) : m_tree(t) {
@@ -103,10 +104,25 @@ struct Value Interp::eval(struct Node *n) {
             return val_create_ival(eval(left).ival * eval(right).ival);
         case NODE_AST_DIVIDE:
             return val_create_ival(eval(left).ival / eval(right).ival);
+        case NODE_AST_AND:
+            if (val_is_truthy(eval(left)) && val_is_truthy(eval(right))) {
+                return val_create_true();
+            }
+            return val_create_false();
+        case NODE_AST_OR:
+            if (val_is_truthy(eval(left)) || val_is_truthy(eval(right))) {
+                return val_create_true();
+            }
+            return val_create_false();
         default:
             err_fatal("Unknown operator: %d\n", tag);
             return val_create_error();
     }
+}
+
+bool Interp::val_is_truthy(Value val) {
+    // TODO: more types of truthiness
+    return val.ival >= 1;
 }
 
 ////////////////////////////////////////////////////////////////////////
