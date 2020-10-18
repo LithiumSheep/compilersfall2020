@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include "cpputil.h"
 #include "util.h"
 #include "node.h"
 #include "grammar_symbols.h"
@@ -16,7 +17,7 @@
 struct Interp {
 private:
   struct Node *m_tree;
-  std::map<std::string, long> m_vars;
+  std::map<std::string, Value> m_vars;
 
 public:
   Interp(struct Node *t);
@@ -54,7 +55,7 @@ struct Value Interp::exec() {
         index++;
     }
 
-  return result;
+    return result;
 }
 
 struct Value Interp::eval(struct Node *n) {
@@ -64,11 +65,36 @@ struct Value Interp::eval(struct Node *n) {
         return val_create_ival(strtol(node_get_str(n), nullptr, 10));
     }
 
+    if (tag == NODE_AST_VAR_DEC) {
+        // TODO: for all declared variables, assign to 0;
+        return val_create_void();
+    }
+
+    if (tag == NODE_IDENTIFIER) {
+        const char* lexeme = node_get_str(n);
+        std::map<std::string, Value>::const_iterator i = m_vars.find(lexeme);
+        if (i == m_vars.end()) {
+            err_fatal("Undefined variable '%s'", lexeme);
+        }
+        return i->second;
+    }
+
     // left and right operands follow
     struct Node *left = node_get_kid(n, 0);
     struct Node *right = node_get_kid(n, 1);
 
-    switch(tag) {
+    if (tag == NODE_AST_ASSIGN) {
+        std::string varname = node_get_str(left);
+        struct Value val = eval(right);
+        if (val.kind != VAL_INT) {
+            err_fatal("Cannot assign non-int value to variable");
+        }
+        m_vars[varname] = val;
+
+        return val_create_void(); // assignment is a void val type
+    }
+
+    switch (tag) {
         case NODE_AST_PLUS:
             return val_create_ival(eval(left).ival + eval(right).ival);
         case NODE_AST_MINUS:
@@ -88,14 +114,14 @@ struct Value Interp::eval(struct Node *n) {
 ////////////////////////////////////////////////////////////////////////
 
 struct Interp *interp_create(struct Node *t) {
-  Interp *interp = new Interp(t);
-  return interp;
+    Interp *interp = new Interp(t);
+    return interp;
 }
 
 void interp_destroy(struct Interp *interp) {
-  delete interp;
+    delete interp;
 }
 
 struct Value interp_exec(struct Interp *interp) {
-  return interp->exec();
+    return interp->exec();
 }

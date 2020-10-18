@@ -74,6 +74,7 @@ struct Node *g_translation_unit;
 %token<node> AST_PLUS AST_MINUS AST_TIMES AST_DIVIDE
 %token<node> AST_AND AST_OR
 %token<node> AST_ASSIGN
+%token<node> AST_VAR_DEC
 
 %right TIMES DIVIDE
 %left PLUS MINUS
@@ -109,13 +110,19 @@ function
 
 statement
     : expression SEMICOLON /*{ $$ = node_build2(NODE_statement, $1, $2); }*/
-    | var_dec_statement SEMICOLON { $$ = node_build1(NODE_statement, $1); }
+    | var_dec_statement SEMICOLON /*{ $$ = node_build1(NODE_statement, $1); }*/
     | if_statement { $$ = node_build1(NODE_statement, $1); }
     | while_statement { $$ = node_build1(NODE_statement, $1); }
     ;
 
 var_dec_statement
-    : KW_VAR identifier_list { $$ = node_build1(NODE_var_dec_statement, $2); }
+    : KW_VAR identifier_list { $$ = $2 }
+    ;
+
+identifier_list
+    : /* epsilon */ { $$ = node_build0(NODE_AST_VAR_DEC); }
+    | IDENTIFIER { $$ = node_build1(NODE_AST_VAR_DEC, $1); }
+    | IDENTIFIER COMMA identifier_list { $$ = $3; node_add_kid($3, $1); }
     ;
 
 if_statement
@@ -137,14 +144,10 @@ statement_list
     | statement statement_list { $$ = node_build2(NODE_statement_list, $1, $2); }
     ;
 
+// TODO: opt_arg_list might need to use new "arg_list" non-terminal
 opt_arg_list
     : identifier_list { $$ = node_build1(NODE_opt_arg_list, $1); }
     | /* epsilon */ { $$ = node_build0(NODE_opt_arg_list); }
-    ;
-
-identifier_list
-    : IDENTIFIER { $$ = node_build1(NODE_identifier_list, $1); }
-    | IDENTIFIER COMMA identifier_list { $$ = node_build2(NODE_identifier_list, $1, $3); }
     ;
 
 expression
