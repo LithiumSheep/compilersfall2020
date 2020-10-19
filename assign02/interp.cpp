@@ -27,7 +27,7 @@ public:
 
 private:
   struct Value eval(struct Node *n);
-  struct Value exec_from_node(struct Node *n);
+  struct Value eval_all(struct Node *n);
   bool val_is_truthy(Value val);
 };
 
@@ -37,9 +37,49 @@ Interp::Interp(struct Node *t) : m_tree(t) {
 Interp::~Interp() {
 }
 
+struct Environment {
+private:
+    std::map<std::string, Value> vars;
+
+public:
+    Environment();
+    ~Environment();
+    void init_val(std::string name);
+    Value find_val(std::string name);
+    void set_val(std::string name, Value val);
+};
+
+Environment::Environment() {
+
+}
+
+Environment::~Environment() {
+
+}
+
+void Environment::init_val(std::string name) {
+    // cannot re-set a value unless it's shadowing an outer scope
+    vars[name] = val_create_ival(0);
+}
+
+struct Value Environment::find_val(std::string name) {
+    std::map<std::string, Value>::const_iterator i = vars.find(name);
+    if (i == vars.end()) {
+        // did not find the value
+        //err_fatal("Undefined variable '%s'", name);
+    }
+    return i->second;
+}
+
+void Environment::set_val(std::string name, Value val) {
+    find_val(name); // if name is not found, it will throw an error.  Value will be undefined during the set
+    vars[name] = val;
+}
+
+
 // TODO: exec with scope?
 struct Value Interp::exec() {
-    struct Value result;
+    struct Value result = val_create_void();
     struct Node *unit = m_tree;
 
     // evaluation of statements or functions should go on stack
@@ -55,6 +95,20 @@ struct Value Interp::exec() {
 
         // add result to stack
 
+        index++;
+    }
+
+    return result;
+}
+
+struct Value Interp::eval_all(struct Node *statements) {
+    struct Value result = val_create_void();
+    int num_stmts = node_get_num_kids(statements);
+    int index = 0;
+
+    while (index < num_stmts) {
+        struct Node *statement = node_get_kid(statements, index);
+        result = eval(statement);
         index++;
     }
 
@@ -83,7 +137,6 @@ struct Value Interp::eval(struct Node *statement) {
         return i->second;
     }
 
-    // TODO: verify if statements are executing correctly
     if (tag == NODE_AST_IF) {
         struct Node *condition = node_get_kid(statement, 0);
         struct Node *if_clause = node_get_kid(statement, 1);
@@ -100,6 +153,19 @@ struct Value Interp::eval(struct Node *statement) {
             }
         }
         // the result of evaluating an if or if/else statement is a VAL_VOID value
+        return val_create_void();
+    }
+
+
+    if (tag == NODE_AST_WHILE) {
+        struct Node *condition = node_get_kid(statement, 0);
+        struct Node *statements = node_get_kid(statement, 1);
+
+        // TODO: handle while loop
+        while (val_is_truthy(eval(condition))) {
+            exec_from_node(statements);
+        }
+
         return val_create_void();
     }
 
@@ -176,11 +242,6 @@ struct Value Interp::eval(struct Node *statement) {
 bool Interp::val_is_truthy(Value val) {
     // TODO: more types of truthiness
     return val.ival >= 1;
-}
-
-struct Value Interp::exec_from_node(struct Node *n) {
-    // evaluate a list of statements underneath n
-
 }
 
 ////////////////////////////////////////////////////////////////////////
