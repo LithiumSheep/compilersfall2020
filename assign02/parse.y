@@ -109,6 +109,12 @@ function
     : KW_FUNC IDENTIFIER LPAREN opt_arg_list RPAREN LBRACE opt_statement_list RBRACE { $$ = node_build3(NODE_function, $2, $4, $7); }
     ;
 
+opt_arg_list
+    : /* epsilon */ { $$ = node_build0(NODE_opt_arg_list); }
+    | IDENTIFIER { $$ = node_build1(NODE_opt_arg_list, $1); }
+    | IDENTIFIER COMMA opt_arg_list { $$ = $3; node_add_kid($3, $1); }
+    ;
+
 statement
     : expression SEMICOLON /*{ $$ = node_build2(NODE_statement, $1, $2); }*/
     | var_dec_statement SEMICOLON /*{ $$ = node_build1(NODE_statement, $1); }*/
@@ -142,12 +148,6 @@ statement_list
     : statement { $$ = node_build1(NODE_opt_statement_list, $1); }
     | statement_list statement { $$ = $1;  node_add_kid($1, $2); }
     | /* epsilon */ { $$ = node_build0(NODE_opt_statement_list); }
-    ;
-
-opt_arg_list
-    : /* epsilon */ { $$ = node_build0(NODE_opt_arg_list); }
-    | IDENTIFIER { $$ = node_build1(NODE_opt_arg_list, $1); }
-    | IDENTIFIER COMMA identifier_list { $$ = $3; node_add_kid($3, $1); }
     ;
 
 expression
