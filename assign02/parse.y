@@ -47,7 +47,7 @@ struct Node *g_translation_unit;
 
 // functions
 %type<node> function
-//%type<node> func_call
+%type<node> func_call
 
 // statements
 %type<node> expression
@@ -70,6 +70,7 @@ struct Node *g_translation_unit;
 %type<node> opt_statement_list
 %type<node> statement_list
 %type<node> opt_arg_list
+%type<node> opt_param_list
 
 // AST types
 %token<node> AST_PLUS AST_MINUS AST_TIMES AST_DIVIDE
@@ -78,6 +79,7 @@ struct Node *g_translation_unit;
 %token<node> AST_ASSIGN
 %token<node> AST_VAR_DEC
 %token<node> AST_IF AST_WHILE
+%token<node> AST_FUNC_DEF AST_FUNC_CALL
 
 %right ASSIGN
 %left PLUS MINUS TIMES DIVIDE
@@ -106,7 +108,7 @@ statement_or_function
     ;
 
 function
-    : KW_FUNC IDENTIFIER LPAREN opt_arg_list RPAREN LBRACE opt_statement_list RBRACE { $$ = node_build3(NODE_function, $2, $4, $7); }
+    : KW_FUNC IDENTIFIER LPAREN opt_arg_list RPAREN LBRACE opt_statement_list RBRACE { $$ = node_build3(NODE_AST_FUNC_DEF, $2, $4, $7); }
     ;
 
 opt_arg_list
@@ -152,11 +154,21 @@ statement_list
 
 expression
     : assignment_expression /*{ $$ = node_build1(NODE_expression, $1); }*/
-    // TODO: function call expression
+    | func_call
     // TODO: handle parentesized subexpression
     ;
 
-// TODO might need to recursively go right on assignment?
+func_call
+    : IDENTIFIER LPAREN opt_param_list RPAREN { $$ = node_build2(NODE_AST_FUNC_CALL, $1, $3); }
+
+opt_param_list
+    : /* epsilon */ { $$ = node_build0(NODE_opt_param_list); }
+    | IDENTIFIER { $$ = node_build1(NODE_opt_param_list, $1); }
+    | additive_expression { $$ = node_build1(NODE_opt_param_list, $1); }
+    | IDENTIFIER COMMA opt_param_list { $$ = $3; node_add_kid($3, $1); }
+    | additive_expression COMMA opt_param_list { $$ = $3; node_add_kid($3, $1); }
+    ;
+
 assignment_expression
     : IDENTIFIER ASSIGN additive_expression { $$ = node_build2(NODE_AST_ASSIGN, $1, $3); }
     | logical_or_expression /*{ $$ = node_build1(NODE_assignment_expression, $1); }*/
