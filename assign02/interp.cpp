@@ -61,20 +61,21 @@ struct Value Interp::exec() {
     return result;
 }
 
-struct Value Interp::eval(struct Node *n) {
-    int tag = node_get_tag(n);
+struct Value Interp::eval(struct Node *statement) {
+    int tag = node_get_tag(statement);
 
     if (tag == NODE_INT_LITERAL) {
-        return val_create_ival(strtol(node_get_str(n), nullptr, 10));
+        return val_create_ival(strtol(node_get_str(statement), nullptr, 10));
     }
 
     if (tag == NODE_AST_VAR_DEC) {
+        int num_kids = node_get_num_kids(statement);
         // TODO: for all declared variables, assign to 0;
         return val_create_void();
     }
 
     if (tag == NODE_IDENTIFIER) {
-        const char* lexeme = node_get_str(n);
+        const char* lexeme = node_get_str(statement);
         std::map<std::string, Value>::const_iterator i = m_vars.find(lexeme);
         if (i == m_vars.end()) {
             err_fatal("Undefined variable '%s'", lexeme);
@@ -84,16 +85,17 @@ struct Value Interp::eval(struct Node *n) {
 
     // TODO: verify if statements are executing correctly
     if (tag == NODE_AST_IF) {
-        struct Node *condition = node_get_kid(n, 0);
-        struct Node *if_clause = node_get_kid(n, 1);
-        struct Node *else_clause = node_get_kid(n, 2);
+        struct Node *condition = node_get_kid(statement, 0);
+        struct Node *if_clause = node_get_kid(statement, 1);
+        struct Node *else_clause = nullptr;
+        if (node_get_num_kids(statement) == 3) {    // there is an else clause
+            else_clause = node_get_kid(statement, 2);
+        }
 
         if (val_is_truthy(eval(condition))) {
-            if (node_get_num_kids(if_clause) > 0) {
-                exec_from_node(if_clause);
-            }
+            exec_from_node(if_clause);
         } else {
-            if (node_get_num_kids(else_clause) > 0) {
+            if (else_clause) {
                 exec_from_node(if_clause);
             }
         }
@@ -102,8 +104,8 @@ struct Value Interp::eval(struct Node *n) {
     }
 
     // left and right operands follow
-    struct Node *left = node_get_kid(n, 0);
-    struct Node *right = node_get_kid(n, 1);
+    struct Node *left = node_get_kid(statement, 0);
+    struct Node *right = node_get_kid(statement, 1);
 
     if (tag == NODE_AST_ASSIGN) {
         std::string varname = node_get_str(left);
