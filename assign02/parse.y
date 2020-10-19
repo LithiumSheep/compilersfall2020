@@ -77,6 +77,7 @@ struct Node *g_translation_unit;
 %token<node> AST_EQ AST_NE AST_LT AST_LE AST_GT AST_GE
 %token<node> AST_ASSIGN
 %token<node> AST_VAR_DEC
+%token<node> AST_IF AST_WHILE
 
 %right TIMES DIVIDE
 %left PLUS MINUS
@@ -113,7 +114,7 @@ function
 statement
     : expression SEMICOLON /*{ $$ = node_build2(NODE_statement, $1, $2); }*/
     | var_dec_statement SEMICOLON /*{ $$ = node_build1(NODE_statement, $1); }*/
-    | if_statement { $$ = node_build1(NODE_statement, $1); }
+    | if_statement /*{ $$ = node_build1(NODE_statement, $1); }*/
     | while_statement { $$ = node_build1(NODE_statement, $1); }
     ;
 
@@ -128,22 +129,22 @@ identifier_list
     ;
 
 if_statement
-    : KW_IF LPAREN expression RPAREN LBRACE opt_statement_list RBRACE { $$ = node_build2(NODE_if_statement, $3, $6); }
-    | KW_IF LPAREN expression RPAREN LBRACE opt_statement_list RBRACE KW_ELSE LBRACE opt_statement_list RBRACE  { $$ = node_build3(NODE_if_statement, $3, $6, $10); }
+    : KW_IF LPAREN expression RPAREN LBRACE opt_statement_list RBRACE { $$ = node_build2(NODE_AST_IF, $3, $6); }
+    | KW_IF LPAREN expression RPAREN LBRACE opt_statement_list RBRACE KW_ELSE LBRACE opt_statement_list RBRACE  { $$ = node_build3(NODE_AST_IF, $3, $6, $10); }
     ;
 
 while_statement
-    : KW_WHILE LPAREN expression RPAREN LBRACE opt_statement_list RBRACE { $$ = node_build2(NODE_while_statement, $3, $6); }
+    : KW_WHILE LPAREN expression RPAREN LBRACE opt_statement_list RBRACE { $$ = node_build2(NODE_AST_WHILE, $3, $6); }
     ;
 
 opt_statement_list
-    : statement_list { $$ = node_build1(NODE_opt_statement_list, $1); }
-    | /* epsilon */ { $$ = node_build0(NODE_opt_statement_list); }
+    : statement_list { $$ = $1; }
     ;
 
 statement_list
-    : statement { $$ = node_build1(NODE_statement_list, $1); }
-    | statement statement_list { $$ = node_build2(NODE_statement_list, $1, $2); }
+    : statement { $$ = node_build1(NODE_opt_statement_list, $1); }
+    | statement_list statement { $$ = $1;  node_add_kid($1, $2); }
+    | /* epsilon */ { $$ = node_build0(NODE_opt_statement_list); }
     ;
 
 // TODO: opt_arg_list might need to use new "arg_list" non-terminal

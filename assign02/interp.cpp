@@ -36,6 +36,7 @@ Interp::Interp(struct Node *t) : m_tree(t) {
 Interp::~Interp() {
 }
 
+// TODO: exec with scope?
 struct Value Interp::exec() {
     struct Value result;
     struct Node *unit = m_tree;
@@ -94,6 +95,8 @@ struct Value Interp::eval(struct Node *n) {
 
         return val_create_void(); // assignment is a void val type
     }
+
+
 
     switch (tag) {
         case NODE_AST_PLUS:
