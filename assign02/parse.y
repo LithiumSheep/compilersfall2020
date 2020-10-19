@@ -69,6 +69,7 @@ struct Node *g_translation_unit;
 %type<node> identifier_list
 %type<node> opt_statement_list
 %type<node> statement_list
+%type<node> opt_arg_list
 
 // AST types
 %token<node> AST_PLUS AST_MINUS AST_TIMES AST_DIVIDE
@@ -105,7 +106,7 @@ statement_or_function
     ;
 
 function
-    : KW_FUNC IDENTIFIER LPAREN identifier_list RPAREN LBRACE opt_statement_list RBRACE { $$ = node_build3(NODE_function, $2, $4, $7); }
+    : KW_FUNC IDENTIFIER LPAREN opt_arg_list RPAREN LBRACE opt_statement_list RBRACE { $$ = node_build3(NODE_function, $2, $4, $7); }
     ;
 
 statement
@@ -120,8 +121,7 @@ var_dec_statement
     ;
 
 identifier_list
-    : /* epsilon */ { $$ = node_build0(NODE_identifier_list); }
-    | IDENTIFIER { $$ = node_build1(NODE_identifier_list, $1); }
+    : IDENTIFIER { $$ = node_build1(NODE_AST_VAR_DEC, $1); }
     | IDENTIFIER COMMA identifier_list { $$ = $3; node_add_kid($3, $1); }
     ;
 
@@ -144,7 +144,11 @@ statement_list
     | /* epsilon */ { $$ = node_build0(NODE_opt_statement_list); }
     ;
 
-// TODO: opt_arg_list might need to use new "arg_list" non-terminal
+opt_arg_list
+    : /* epsilon */ { $$ = node_build0(NODE_opt_arg_list); }
+    | IDENTIFIER { $$ = node_build1(NODE_opt_arg_list, $1); }
+    | IDENTIFIER COMMA identifier_list { $$ = $3; node_add_kid($3, $1); }
+    ;
 
 expression
     : assignment_expression /*{ $$ = node_build1(NODE_expression, $1); }*/
