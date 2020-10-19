@@ -26,7 +26,8 @@ public:
   struct Value exec();
 
 private:
-  Value eval(struct Node *n);
+  struct Value eval(struct Node *n);
+  struct Value exec_from_node(struct Node *n);
   bool val_is_truthy(Value val);
 };
 
@@ -81,6 +82,25 @@ struct Value Interp::eval(struct Node *n) {
         return i->second;
     }
 
+    // TODO: verify if statements are executing correctly
+    if (tag == NODE_AST_IF) {
+        struct Node *condition = node_get_kid(n, 0);
+        struct Node *if_clause = node_get_kid(n, 1);
+        struct Node *else_clause = node_get_kid(n, 2);
+
+        if (val_is_truthy(eval(condition))) {
+            if (node_get_num_kids(if_clause) > 0) {
+                exec_from_node(if_clause);
+            }
+        } else {
+            if (node_get_num_kids(else_clause) > 0) {
+                exec_from_node(if_clause);
+            }
+        }
+        // the result of evaluating an if or if/else statement is a VAL_VOID value
+        return val_create_void();
+    }
+
     // left and right operands follow
     struct Node *left = node_get_kid(n, 0);
     struct Node *right = node_get_kid(n, 1);
@@ -95,8 +115,6 @@ struct Value Interp::eval(struct Node *n) {
 
         return val_create_void(); // assignment is a void val type
     }
-
-
 
     switch (tag) {
         case NODE_AST_PLUS:
@@ -156,6 +174,11 @@ struct Value Interp::eval(struct Node *n) {
 bool Interp::val_is_truthy(Value val) {
     // TODO: more types of truthiness
     return val.ival >= 1;
+}
+
+struct Value Interp::exec_from_node(struct Node *n) {
+    // evaluate a list of statements underneath n
+
 }
 
 ////////////////////////////////////////////////////////////////////////
