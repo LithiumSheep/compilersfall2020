@@ -9,6 +9,8 @@ int create_token(int tag, const char *lexeme);
 
 // global variable pointing to string containing name of input file
 char *g_srcfile;
+int g_col;
+// TODO: add to g_col on tokens and whitespace, reset to 0 on newline characters
 %}
 
 %option yylineno

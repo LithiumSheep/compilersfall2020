@@ -79,12 +79,10 @@ struct Node *g_translation_unit;
 %token<node> AST_VAR_DEC
 %token<node> AST_IF AST_WHILE
 
-%right TIMES DIVIDE
-%left PLUS MINUS
+%right ASSIGN
+%left PLUS MINUS TIMES DIVIDE
 %left EQ NE LT LE GT GE
 %left AND OR
-
-// TODO: precendence of && over ||?
 
 %%
 
@@ -166,34 +164,34 @@ assignment_expression
     ;
 
 logical_or_expression
-    : logical_and_expression OR logical_or_expression { $$ = node_build2(NODE_AST_OR, $1, $3); }
+    : logical_or_expression OR logical_and_expression { $$ = node_build2(NODE_AST_OR, $1, $3); }
     | logical_and_expression /*{ $$ = node_build1(NODE_logical_or_expression, $1); }*/
     ;
 
 logical_and_expression
-    : relational_expression AND logical_and_expression { $$ = node_build2(NODE_AST_AND, $1, $3); }
+    : logical_and_expression AND relational_expression { $$ = node_build2(NODE_AST_AND, $1, $3); }
     | relational_expression /*{ $$ = node_build1(NODE_logical_and_expression, $1); }*/
     ;
 
 relational_expression
-    : additive_expression EQ relational_expression { $$ = node_build2(NODE_AST_EQ, $1, $3); }
-    | additive_expression NE relational_expression { $$ = node_build2(NODE_AST_NE, $1, $3); }
-    | additive_expression LT relational_expression { $$ = node_build2(NODE_AST_LT, $1, $3); }
-    | additive_expression LE relational_expression { $$ = node_build2(NODE_AST_LE, $1, $3); }
-    | additive_expression GT relational_expression { $$ = node_build2(NODE_AST_GT, $1, $3); }
-    | additive_expression GE relational_expression { $$ = node_build2(NODE_AST_GE, $1, $3); }
+    : relational_expression EQ additive_expression { $$ = node_build2(NODE_AST_EQ, $1, $3); }
+    | relational_expression NE additive_expression { $$ = node_build2(NODE_AST_NE, $1, $3); }
+    | relational_expression LT additive_expression { $$ = node_build2(NODE_AST_LT, $1, $3); }
+    | relational_expression LE additive_expression { $$ = node_build2(NODE_AST_LE, $1, $3); }
+    | relational_expression GT additive_expression { $$ = node_build2(NODE_AST_GT, $1, $3); }
+    | relational_expression GE additive_expression { $$ = node_build2(NODE_AST_GE, $1, $3); }
     | additive_expression
     ;
 
 additive_expression
-    : multiplicative_expression PLUS additive_expression { $$ = node_build2(NODE_AST_PLUS, $1, $3); }
-    | multiplicative_expression MINUS additive_expression { $$ = node_build2(NODE_AST_MINUS, $1, $3); }
+    : additive_expression PLUS multiplicative_expression { $$ = node_build2(NODE_AST_PLUS, $1, $3); }
+    | additive_expression MINUS multiplicative_expression { $$ = node_build2(NODE_AST_MINUS, $1, $3); }
     | multiplicative_expression /*{ $$ = node_build1(NODE_additive_expression, $1); }*/
     ;
 
 multiplicative_expression
-    : unary_expression TIMES multiplicative_expression { $$ = node_build2(NODE_AST_TIMES, $1, $3); }
-    | unary_expression DIVIDE multiplicative_expression { $$ = node_build2(NODE_AST_DIVIDE, $1, $3); }
+    : multiplicative_expression TIMES unary_expression { $$ = node_build2(NODE_AST_TIMES, $1, $3); }
+    | multiplicative_expression DIVIDE unary_expression { $$ = node_build2(NODE_AST_DIVIDE, $1, $3); }
     | unary_expression /*{ $$ = node_build1(NODE_multiplicative_expression, $1); }*/
     ;
 
