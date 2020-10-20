@@ -13,7 +13,6 @@ static void val_init(struct Value *val, enum ValueKind kind) {
   val->ival = 0L;
   val->fn = NULL;
   val->intrinsic_fn = NULL;
-  // TODO: clear other fields
 }
 
 struct Value val_create_void(void) {
@@ -59,8 +58,6 @@ struct Value val_create_intrinsic(IntrinsicFunction *intrinsic_fn) {
   return val;
 }
 
-// TODO: add constructor functions for other kinds of values
-
 char *val_stringify(struct Value val) {
   char *s = xmalloc(128);
   switch (val.kind) {
@@ -79,9 +76,6 @@ char *val_stringify(struct Value val) {
   case VAL_INTRINSIC:
     strcpy(s, "<intrinsic>");
     break;
-
-  // TODO: add cases for other kinds of values
-
   default:
     strcpy(s, "<unknown>");
     break;

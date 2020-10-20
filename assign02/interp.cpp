@@ -66,11 +66,14 @@ void Environment::set_val(const char* name, Value val) {
     if (val.kind == VAL_INT) {
         if (val_exists(name)) {
             vars[name] = val;
-        } else if (parent->val_exists(name)) {
+        } else if (parent != nullptr && parent->val_exists(name)) {
             parent->set_val(name, val);
+        } else {
+            err_fatal("Error: Variable '%s' has not been declared\n", name);
         }
+    } else {
+        vars[name] = val;
     }
-    vars[name] = val;
 }
 
 struct Interp {
@@ -143,7 +146,7 @@ struct Value Interp::eval_fn(struct Function *fn, struct Node* args, Environment
 
     // check number of args
     if (node_get_num_kids(expected_args) != node_get_num_kids(args)) {
-        err_fatal("Error: Invalid number of arguments for function \'%s\'\n", func_name);
+        err_fatal("Error: Invalid number of arguments for function '%s'\n", func_name);
     }
 
     int num_args = node_get_num_kids(expected_args);
@@ -246,7 +249,7 @@ struct Value Interp::eval_st(struct Node *statement, Environment *env) {
         const char* varname = node_get_str(left);
         struct Value val = eval_st(right, env);
         if (val.kind != VAL_INT) {
-            err_fatal("Error: Cannot assign non-int value to variable \'%s\'\n", varname);
+            err_fatal("Error: Cannot assign non-int value to variable '%s'\n", varname);
         }
 
         env->set_val(varname, val);
@@ -254,21 +257,18 @@ struct Value Interp::eval_st(struct Node *statement, Environment *env) {
         return val_create_void(); // assignment is a void val type
     }
 
-    Value lval = eval_st(left, env);
-    Value rval = eval_st(right, env);
-
     switch (tag) {
         case NODE_AST_PLUS:
-            return val_create_ival(lval.ival + rval.ival);
+            return val_create_ival(eval_st(left, env).ival + eval_st(right, env).ival);
         case NODE_AST_MINUS:
-            return val_create_ival(lval.ival - rval.ival);
+            return val_create_ival(eval_st(left, env).ival - eval_st(right, env).ival);
         case NODE_AST_TIMES:
-            return val_create_ival(lval.ival * rval.ival);
+            return val_create_ival(eval_st(left, env).ival * eval_st(right, env).ival);
         case NODE_AST_DIVIDE:
-            if (rval.ival == 0) {
-                err_fatal("Error: Cannot divide by 0");
+            if (eval_st(right, env).ival == 0) {
+                err_fatal("Error: Cannot divide by 0\n");
             }
-            return val_create_ival(lval.ival / rval.ival);
+            return val_create_ival(eval_st(left, env).ival / eval_st(right, env).ival);
         case NODE_AST_AND:
             if (val_is_truthy(eval_st(left, env)) && val_is_truthy(eval_st(right, env))) {
                 return val_create_true();
