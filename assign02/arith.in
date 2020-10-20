@@ -1,6 +1,4 @@
-var a, b, c;
+var a, b;
 a = 1;
 b = 2;
-c = 3;
 a + b;
-d;

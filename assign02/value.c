@@ -4,6 +4,7 @@
 #include <string.h>
 #include "util.h"
 #include "value.h"
+#include "node.h"
 
 // Initialize value by setting the kind field and clearing
 // all of the data fields.
@@ -94,4 +95,8 @@ struct Function function_create(struct Node *ast) {
     struct Function func;
     func.ast = ast;
     return func;
+}
+
+int fn_get_num_args(struct Function *fn) {
+    return node_get_num_kids(node_get_kid(fn->ast, 1));
 }

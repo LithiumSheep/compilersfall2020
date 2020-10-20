@@ -9,6 +9,7 @@ extern "C" {
 
 struct Node;
 struct Interp;
+struct Environment;
 
 // create an interpreter from a parse tree
 struct Interp *interp_create(struct Node *t);
@@ -18,6 +19,8 @@ void interp_destroy(struct Interp *interp);
 
 // execute interpreter
 struct Value interp_exec(struct Interp *interp);
+
+struct Environment *env_create(struct Environment *parent);
 
 #ifdef __cplusplus
 }
