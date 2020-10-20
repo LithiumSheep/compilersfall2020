@@ -155,7 +155,7 @@ statement_list
 expression
     : assignment_expression /*{ $$ = node_build1(NODE_expression, $1); }*/
     | func_call
-    // TODO: handle parentesized subexpression
+    | LPAREN expression RPAREN
     ;
 
 func_call
