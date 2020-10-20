@@ -88,3 +88,10 @@ char *val_stringify(struct Value val) {
 
   return s;
 }
+
+struct Function function_create(struct Node *ast) {
+    // ast will contain function name, arg list, and statements
+    struct Function func;
+    func.ast = ast;
+    return func;
+}

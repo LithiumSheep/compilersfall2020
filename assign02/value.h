@@ -22,6 +22,11 @@ enum ValueKind {
   // of values.
 };
 
+struct Function {
+    struct Node *ast;
+    // TODO: env
+};
+
 struct Value {
   enum ValueKind kind;
   long ival;
@@ -32,6 +37,7 @@ struct Value {
   // of values.
   struct Cons *cons;
 };
+
 
 struct Value val_create_void(void);
 struct Value val_create_error(void);
