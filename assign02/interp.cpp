@@ -23,6 +23,7 @@ public:
     ~Environment();
     void init_val(const char* name);
     Value find_val(const char* name);
+    bool val_exists(const char*name);
     void set_val(const char*, Value val);
 };
 
@@ -43,14 +44,29 @@ struct Value Environment::find_val(const char* name) {
     std::map<std::string, Value>::const_iterator i = vars.find(name);
     if (i == vars.end()) {
         // did not find the value
-        err_fatal("Undefined variable '%s'", name);
+        if (parent == nullptr) {
+            err_fatal("Undefined variable '%s'", name);
+        }
+        return parent->find_val(name);
     }
     return i->second;
 }
 
+bool Environment::val_exists(const char* name) {
+    std::map<std::string, Value>::const_iterator i = vars.find(name);
+    if (i == vars.end()) {
+        return false;
+    }
+    return true;
+}
+
 void Environment::set_val(const char* name, Value val) {
     if (val.kind == VAL_INT) {
-        find_val(name); // if name is not found, it will throw an error.  Value will be undefined during the set
+        if (val_exists(name)) {
+            vars[name] = val;
+        } else if (parent->val_exists(name)) {
+            parent->set_val(name, val);
+        }
     }
     vars[name] = val;
 }
@@ -107,132 +123,6 @@ struct Value Interp::eval_all(struct Node *statements, Environment *env) {
     return result;
 }
 
-/*struct Value Interp::eval(struct Node *statement) {
-    int tag = node_get_tag(statement);
-
-    if (tag == NODE_INT_LITERAL) {
-        return val_create_ival(strtol(node_get_str(statement), nullptr, 10));
-    }
-
-    if (tag == NODE_AST_VAR_DEC) {
-        int num_kids = node_get_num_kids(statement);
-        int index = 0;
-        while (index < num_kids) {
-            struct Node *var = node_get_kid(statement, index);
-            const char* name = node_get_str(var);
-            env.init_val(name);
-            env.init_val(name); // for all declared variables, assign to 0;
-            index++;
-        }
-        return val_create_void();
-    }
-
-    if (tag == NODE_IDENTIFIER) {
-        const char* name = node_get_str(statement);
-        return env.find_val(name);
-    }
-
-    if (tag == NODE_AST_IF) {
-        struct Node *condition = node_get_kid(statement, 0);
-        struct Node *if_clause = node_get_kid(statement, 1);
-        struct Node *else_clause = nullptr;
-        if (node_get_num_kids(statement) == 3) {    // there is an else clause
-            else_clause = node_get_kid(statement, 2);
-        }
-
-        if (val_is_truthy(eval(condition))) {
-            eval_all(if_clause);
-        } else {
-            if (else_clause) {
-                eval_all(else_clause);
-            }
-        }
-        // the result of evaluating an if or if/else statement is a VAL_VOID value
-        return val_create_void();
-    }
-
-    if (tag == NODE_AST_WHILE) {
-        struct Node *condition = node_get_kid(statement, 0);
-        struct Node *while_clause= node_get_kid(statement, 1);
-
-        while (val_is_truthy(eval(condition))) {
-            eval_all(while_clause);
-        }
-
-        return val_create_void();
-    }
-
-    // left and right operands follow
-    struct Node *left = node_get_kid(statement, 0);
-    struct Node *right = node_get_kid(statement, 1);
-
-    if (tag == NODE_AST_ASSIGN) {
-        const char* varname = node_get_str(left);
-        struct Value val = eval(right);
-        if (val.kind != VAL_INT) {
-            err_fatal("Cannot assign non-int value to variable");
-        }
-
-        env.set_val(varname, val);
-
-        return val_create_void(); // assignment is a void val type
-    }
-
-    switch (tag) {
-        case NODE_AST_PLUS:
-            return val_create_ival(eval(left).ival + eval(right).ival);
-        case NODE_AST_MINUS:
-            return val_create_ival(eval(left).ival - eval(right).ival);
-        case NODE_AST_TIMES:
-            return val_create_ival(eval(left).ival * eval(right).ival);
-        case NODE_AST_DIVIDE:
-            return val_create_ival(eval(left).ival / eval(right).ival);
-        case NODE_AST_AND:
-            if (val_is_truthy(eval(left)) && val_is_truthy(eval(right))) {
-                return val_create_true();
-            }
-            return val_create_false();
-        case NODE_AST_OR:
-            if (val_is_truthy(eval(left)) || val_is_truthy(eval(right))) {
-                return val_create_true();
-            }
-            return val_create_false();
-        case NODE_AST_EQ:
-            if (eval(left).ival == eval(right).ival) {
-                return val_create_true();
-            }
-            return val_create_false();
-        case NODE_AST_NE:
-            if (eval(left).ival != eval(right).ival) {
-                return val_create_true();
-            }
-            return val_create_false();
-        case NODE_AST_LT:
-            if (eval(left).ival < eval(right).ival) {
-                return val_create_true();
-            }
-            return val_create_false();
-        case NODE_AST_LE:
-            if (eval(left).ival <= eval(right).ival) {
-                return val_create_true();
-            }
-            return val_create_false();
-        case NODE_AST_GT:
-            if (eval(left).ival > eval(right).ival) {
-                return val_create_true();
-            }
-            return val_create_false();
-        case NODE_AST_GE:
-            if (eval(left).ival >= eval(right).ival) {
-                return val_create_true();
-            }
-            return val_create_false();
-        default:
-            err_fatal("Unknown operator: %d\n", tag);
-            return val_create_error();
-    }
-}*/
-
 bool Interp::val_is_truthy(Value val) {
     if (val.kind == VAL_FN) {
         return true;
@@ -246,19 +136,27 @@ struct Value Interp::eval_fn(struct Function *fn, struct Node* args, Environment
     struct Environment* local = env_create(parent);
 
     struct Node *expected_args = node_get_kid(func, 1);
-    struct Node *statements = node_get_kid(func, 1);
+    struct Node *statements = node_get_kid(func, 2);
 
     // check number of args
-
-    int num_stmts = node_get_num_kids(statements);
-    int index = 0;
-    if (num_stmts > 0) {
-        while (index < num_stmts) {
-            struct Node *statement = node_get_kid(statements, index);
-            //result = eval_st(statement, local);
-            index++;
-        }
+    if (node_get_num_kids(expected_args) != node_get_num_kids(args)) {
+        err_fatal("Argument counts don't match");
     }
+
+    int num_args = node_get_num_kids(expected_args);
+    int index = 0;
+    while (index < num_args) {
+        struct Node* arg = node_get_kid(expected_args, index);
+        const char* name = node_get_str(arg);
+        local->init_val(name);
+
+        struct Node *real = node_get_kid(args, index);
+        local->set_val(name, eval_st(real, parent));
+
+        index++;
+    }
+
+    result = eval_all(statements, local);
 
     return result;
 }
