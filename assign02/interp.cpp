@@ -262,7 +262,12 @@ struct Value Interp::eval_st(struct Node *statement, Environment *env) {
         case NODE_AST_TIMES:
             return val_create_ival(eval_st(left, env).ival * eval_st(right, env).ival);
         case NODE_AST_DIVIDE:
-            return val_create_ival(eval_st(left, env).ival / eval_st(right, env).ival);
+            long lval = eval_st(left, env).ival;
+            long rval = eval_st(right, env).ival;
+            if (rval == 0) {
+                err_fatal("Error: Cannot divide by 0");
+            }
+            return val_create_ival(lval / rval);
         case NODE_AST_AND:
             if (val_is_truthy(eval_st(left, env)) && val_is_truthy(eval_st(right, env))) {
                 return val_create_true();
