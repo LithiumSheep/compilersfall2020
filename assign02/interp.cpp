@@ -14,10 +14,49 @@
 // Interp class
 ////////////////////////////////////////////////////////////////////////
 
+struct Environment {
+private:
+    std::map<std::string, Value> vars;
+
+public:
+    Environment();
+    ~Environment();
+    void init_val(const char* name);
+    Value find_val(const char* name);
+    void set_val(const char*, Value val);
+};
+
+Environment::Environment() {
+
+}
+
+Environment::~Environment() {
+
+}
+
+void Environment::init_val(const char* name) {
+    // TODO: cannot re-set a value unless it's shadowing an outer scope
+    vars[name] = val_create_ival(0);
+}
+
+struct Value Environment::find_val(const char* name) {
+    std::map<std::string, Value>::const_iterator i = vars.find(name);
+    if (i == vars.end()) {
+        // did not find the value
+        err_fatal("Undefined variable '%s'", name);
+    }
+    return i->second;
+}
+
+void Environment::set_val(const char* name, Value val) {
+    find_val(name); // if name is not found, it will throw an error.  Value will be undefined during the set
+    vars[name] = val;
+}
+
 struct Interp {
 private:
   struct Node *m_tree;
-  std::map<std::string, Value> m_vars;
+  Environment env;
 
 public:
   Interp(struct Node *t);
@@ -37,47 +76,6 @@ Interp::Interp(struct Node *t) : m_tree(t) {
 Interp::~Interp() {
 }
 
-struct Environment {
-private:
-    std::map<std::string, Value> vars;
-
-public:
-    Environment();
-    ~Environment();
-    void init_val(std::string name);
-    Value find_val(std::string name);
-    void set_val(std::string name, Value val);
-};
-
-Environment::Environment() {
-
-}
-
-Environment::~Environment() {
-
-}
-
-void Environment::init_val(std::string name) {
-    // cannot re-set a value unless it's shadowing an outer scope
-    vars[name] = val_create_ival(0);
-}
-
-struct Value Environment::find_val(std::string name) {
-    std::map<std::string, Value>::const_iterator i = vars.find(name);
-    if (i == vars.end()) {
-        // did not find the value
-        //err_fatal("Undefined variable '%s'", name);
-    }
-    return i->second;
-}
-
-void Environment::set_val(std::string name, Value val) {
-    find_val(name); // if name is not found, it will throw an error.  Value will be undefined during the set
-    vars[name] = val;
-}
-
-
-// TODO: exec with scope?
 struct Value Interp::exec() {
     struct Value result = val_create_void();
     struct Node *unit = m_tree;
@@ -126,17 +124,20 @@ struct Value Interp::eval(struct Node *statement) {
 
     if (tag == NODE_AST_VAR_DEC) {
         int num_kids = node_get_num_kids(statement);
-        // TODO: for all declared variables, assign to 0;
+        int index = 0;
+        while (index < num_kids) {
+            struct Node *var = node_get_kid(statement, index);
+            const char* name = node_get_str(var);
+            env.init_val(name);
+            env.init_val(name); // for all declared variables, assign to 0;
+            index++;
+        }
         return val_create_void();
     }
 
     if (tag == NODE_IDENTIFIER) {
-        const char* lexeme = node_get_str(statement);
-        std::map<std::string, Value>::const_iterator i = m_vars.find(lexeme);
-        if (i == m_vars.end()) {
-            err_fatal("Undefined variable '%s'", lexeme);
-        }
-        return i->second;
+        const char* name = node_get_str(statement);
+        return env.find_val(name);
     }
 
     if (tag == NODE_AST_IF) {
@@ -174,12 +175,13 @@ struct Value Interp::eval(struct Node *statement) {
     struct Node *right = node_get_kid(statement, 1);
 
     if (tag == NODE_AST_ASSIGN) {
-        std::string varname = node_get_str(left);
+        const char* varname = node_get_str(left);
         struct Value val = eval(right);
         if (val.kind != VAL_INT) {
             err_fatal("Cannot assign non-int value to variable");
         }
-        m_vars[varname] = val;
+
+        env.set_val(varname, val);
 
         return val_create_void(); // assignment is a void val type
     }
