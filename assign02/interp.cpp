@@ -36,7 +36,9 @@ Environment::~Environment() {
 }
 
 void Environment::init_val(const char* name) {
-    // TODO: cannot re-set a value unless it's shadowing an outer scope
+    if (val_exists(name)) {
+        err_fatal("Error: Variable '%s' cannot be redefined\n", name);
+    }
     vars[name] = val_create_ival(0);
 }
 
@@ -45,7 +47,7 @@ struct Value Environment::find_val(const char* name) {
     if (i == vars.end()) {
         // did not find the value
         if (parent == nullptr) {
-            err_fatal("Undefined variable '%s'", name);
+            err_fatal("Undefined variable '%s'\n", name);
         }
         return parent->find_val(name);
     }
@@ -135,12 +137,13 @@ struct Value Interp::eval_fn(struct Function *fn, struct Node* args, Environment
     struct Node* func = fn->ast;
     struct Environment* local = env_create(parent);
 
+    const char* func_name = node_get_str(node_get_kid(func, 0));
     struct Node *expected_args = node_get_kid(func, 1);
     struct Node *statements = node_get_kid(func, 2);
 
     // check number of args
     if (node_get_num_kids(expected_args) != node_get_num_kids(args)) {
-        err_fatal("Argument counts don't match");
+        err_fatal("Error: Invalid number of arguments for function \'%s\'\n", func_name);
     }
 
     int num_args = node_get_num_kids(expected_args);
@@ -224,8 +227,13 @@ struct Value Interp::eval_st(struct Node *statement, Environment *env) {
     }
 
     if (tag == NODE_AST_FUNC_CALL) {
-        struct Node *fname = node_get_kid(statement, 0);
-        Value func = env->find_val(node_get_str(fname));
+        struct Node *function = node_get_kid(statement, 0);
+        const char *fname = node_get_str(function);
+        Value func = env->find_val(fname);
+        if (func.kind != VAL_FN) {
+            err_fatal("Error: Cannot call '%s' because it isn’t a function\n", fname);
+        }
+
         struct Node* args = node_get_kid(statement, 1);
         return eval_fn(func.fn, args, env);
     }
@@ -238,7 +246,7 @@ struct Value Interp::eval_st(struct Node *statement, Environment *env) {
         const char* varname = node_get_str(left);
         struct Value val = eval_st(right, env);
         if (val.kind != VAL_INT) {
-            err_fatal("Cannot assign non-int value to variable");
+            err_fatal("Error: Cannot assign non-int value to variable \'%s\'\n", varname);
         }
 
         env->set_val(varname, val);
