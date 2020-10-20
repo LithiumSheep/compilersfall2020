@@ -106,10 +106,12 @@ struct Value Interp::eval_all(struct Node *statements) {
     int num_stmts = node_get_num_kids(statements);
     int index = 0;
 
-    while (index < num_stmts) {
-        struct Node *statement = node_get_kid(statements, index);
-        result = eval(statement);
-        index++;
+    if (num_stmts > 0) {
+        while (index < num_stmts) {
+            struct Node *statement = node_get_kid(statements, index);
+            result = eval(statement);
+            index++;
+        }
     }
 
     return result;
@@ -146,24 +148,22 @@ struct Value Interp::eval(struct Node *statement) {
         }
 
         if (val_is_truthy(eval(condition))) {
-            exec_from_node(if_clause);
+            eval_all(if_clause);
         } else {
             if (else_clause) {
-                exec_from_node(if_clause);
+                eval_all(else_clause);
             }
         }
         // the result of evaluating an if or if/else statement is a VAL_VOID value
         return val_create_void();
     }
 
-
     if (tag == NODE_AST_WHILE) {
         struct Node *condition = node_get_kid(statement, 0);
-        struct Node *statements = node_get_kid(statement, 1);
+        struct Node *while_clause= node_get_kid(statement, 1);
 
-        // TODO: handle while loop
         while (val_is_truthy(eval(condition))) {
-            exec_from_node(statements);
+            eval_all(while_clause);
         }
 
         return val_create_void();

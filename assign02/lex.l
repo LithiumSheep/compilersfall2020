@@ -46,6 +46,7 @@ int g_col;
 "}"                          { return create_token(RBRACE, yytext); }
 ","                          { return create_token(COMMA, yytext); }
 ";"                          { return create_token(SEMICOLON, yytext); }
+"//".*                       { /* do nothing */ }
 .                            { yyerror("Unknown character: %c\n", yytext[0]); }
 
 %%

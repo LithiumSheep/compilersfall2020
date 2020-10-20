@@ -121,7 +121,7 @@ statement
     : expression SEMICOLON /*{ $$ = node_build2(NODE_statement, $1, $2); }*/
     | var_dec_statement SEMICOLON /*{ $$ = node_build1(NODE_statement, $1); }*/
     | if_statement /*{ $$ = node_build1(NODE_statement, $1); }*/
-    | while_statement { $$ = node_build1(NODE_statement, $1); }
+    | while_statement /*{ $$ = node_build1(NODE_statement, $1); }*/
     ;
 
 var_dec_statement
