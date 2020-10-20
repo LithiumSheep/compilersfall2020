@@ -49,7 +49,9 @@ struct Value Environment::find_val(const char* name) {
 }
 
 void Environment::set_val(const char* name, Value val) {
-    find_val(name); // if name is not found, it will throw an error.  Value will be undefined during the set
+    if (val.kind == VAL_INT) {
+        find_val(name); // if name is not found, it will throw an error.  Value will be undefined during the set
+    }
     vars[name] = val;
 }
 
@@ -67,7 +69,7 @@ private:
   //struct Value eval(struct Node *n);
   struct Value eval_all(struct Node *statements, Environment *env);
   struct Value eval_st(struct Node *statement, Environment *env);
-  struct Value eval_fn(struct Function *fn, Environment *parent);
+  struct Value eval_fn(struct Function *fn, struct Node *args, Environment *parent);
   bool val_is_truthy(Value val);
 };
 
@@ -238,13 +240,15 @@ bool Interp::val_is_truthy(Value val) {
     return val.ival >= 1;
 }
 
-struct Value Interp::eval_fn(struct Function *fn, Environment *parent) {
+struct Value Interp::eval_fn(struct Function *fn, struct Node* args, Environment *parent) {
     struct Value result = val_create_void();
     struct Node* func = fn->ast;
     struct Environment* local = env_create(parent);
 
-    struct Node *args = node_get_kid(func, 1);
+    struct Node *expected_args = node_get_kid(func, 1);
     struct Node *statements = node_get_kid(func, 1);
+
+    // check number of args
 
     int num_stmts = node_get_num_kids(statements);
     int index = 0;
@@ -266,6 +270,11 @@ struct Value Interp::eval_st(struct Node *statement, Environment *env) {
         return val_create_ival(strtol(node_get_str(statement), nullptr, 10));
     }
 
+    if (tag == NODE_IDENTIFIER) {
+        const char* name = node_get_str(statement);
+        return env->find_val(name);
+    }
+
     if (tag == NODE_AST_VAR_DEC) {
         int num_kids = node_get_num_kids(statement);
         int index = 0;
@@ -276,11 +285,6 @@ struct Value Interp::eval_st(struct Node *statement, Environment *env) {
             index++;
         }
         return val_create_void();
-    }
-
-    if (tag == NODE_IDENTIFIER) {
-        const char* name = node_get_str(statement);
-        return env->find_val(name);
     }
 
     if (tag == NODE_AST_IF) {
@@ -311,6 +315,21 @@ struct Value Interp::eval_st(struct Node *statement, Environment *env) {
         }
 
         return val_create_void();
+    }
+
+    if (tag == NODE_AST_FUNC_DEF) {
+        Function func = function_create(statement);
+        Value function = val_create_fn(&func);
+        const char* name = node_get_str(node_get_kid(statement, 0));
+        env->set_val(name, function);
+        return val_create_void();
+    }
+
+    if (tag == NODE_AST_FUNC_CALL) {
+        struct Node *fname = node_get_kid(statement, 0);
+        Value func = env->find_val(node_get_str(fname));
+        struct Node* args = node_get_kid(statement, 1);
+        return eval_fn(func.fn, args, env);
     }
 
     // left and right operands follow
