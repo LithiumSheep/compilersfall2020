@@ -214,6 +214,7 @@ unary_expression
 primary_expression
     : IDENTIFIER { $$ = $1; }
     | INT_LITERAL { $$ = $1; }
+    | func_call
     ;
 
 %%
