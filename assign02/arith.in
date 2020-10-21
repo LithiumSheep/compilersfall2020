@@ -1,7 +1,9 @@
-function add1(n) {
-  n+1;
+function weird() {
+  if (1) {
+   2;
+  } else {
+   3;
+  }
 }
-function apply(f, x) {
-  f(x);
-}
-apply(add1, 42);
+
+weird();

@@ -156,9 +156,10 @@ struct Value Interp::eval_fn(struct Function *fn, struct Node* args, Environment
     while (index < num_args) {
         struct Node* arg = node_get_kid(expected_args, index);
         const char* name = node_get_str(arg);
-        local->init_val(name);
 
         struct Node *real = node_get_kid(args, index);
+
+        local->init_val(name);
         local->set_val(name, eval_st(real, parent));
 
         index++;
