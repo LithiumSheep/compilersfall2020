@@ -1,21 +1,9 @@
-var e;
+var x, y;
 
-e = 4;
+x = 2;
 
-function d() {
-  e * e;
+function add1(a) {
+  a + 1;
 }
 
-function c() {
-  d();
-}
-
-function b() {
-  e = c();
-}
-
-function a() {
-  b();
-}
-
-e + c();
+y= add1(x);

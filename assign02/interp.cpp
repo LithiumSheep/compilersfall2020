@@ -253,7 +253,10 @@ struct Value Interp::eval_st(struct Node *statement, Environment *env) {
 
         env->set_val(varname, val);
 
-        return val_create_void(); // assignment is a void val type
+        // Feels like assignment should be a VAL_VOID type
+        // public test function01.in says otherwise though
+        // TODO: Confirm with prof
+        return val;
     }
 
     switch (tag) {
