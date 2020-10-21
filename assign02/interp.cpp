@@ -224,19 +224,18 @@ struct Value Interp::eval_st(struct Node *statement, Environment *env) {
     if (tag == NODE_AST_FUNC_DEF) {
         Function func = function_create(statement);
         Value function = val_create_fn(&func);
-        const char* name = node_get_str(node_get_kid(statement, 0));
-        env->set_val(name, function);
+        const char* func_name = node_get_str(node_get_kid(statement, 0));
+        env->set_val(func_name, function);
         return val_create_void();
     }
 
     if (tag == NODE_AST_FUNC_CALL) {
         struct Node *function = node_get_kid(statement, 0);
-        const char *fname = node_get_str(function);
-        Value func = env->find_val(fname);
+        const char *func_name = node_get_str(function);
+        Value func = env->find_val(func_name);
         if (func.kind != VAL_FN) {
-            err_fatal("Error: Cannot call '%s' because it isn’t a function\n", fname);
+            err_fatal("Error: Cannot call '%s' because it isn’t a function\n", func_name);
         }
-
         struct Node* args = node_get_kid(statement, 1);
         return eval_fn(func.fn, args, env);
     }
