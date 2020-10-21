@@ -144,12 +144,14 @@ struct Value Interp::eval_fn(struct Function *fn, struct Node* args, Environment
     struct Node *expected_args = node_get_kid(func, 1);
     struct Node *statements = node_get_kid(func, 2);
 
+    int num_args = node_get_num_kids(expected_args);
+    int num_actual = node_get_num_kids(args);
+
     // check number of args
-    if (node_get_num_kids(expected_args) != node_get_num_kids(args)) {
+    if (num_args != num_actual) {
         err_fatal("Error: Invalid number of arguments for function '%s'\n", func_name);
     }
 
-    int num_args = node_get_num_kids(expected_args);
     int index = 0;
     while (index < num_args) {
         struct Node* arg = node_get_kid(expected_args, index);

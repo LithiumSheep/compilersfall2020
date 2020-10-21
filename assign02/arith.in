@@ -1,9 +1,7 @@
-var x, y;
-
-x = 2;
-
-function add1(a) {
-  a + 1;
+function add1(n) {
+  n+1;
 }
-
-y= add1(x);
+function apply(f, x) {
+  f(x);
+}
+apply(add1, 42);
