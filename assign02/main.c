@@ -9,6 +9,8 @@
 
 int yyparse(void);
 
+void lexer_set_source_file(const char *filename);
+
 void print_usage(void) {
   err_fatal(
     "Usage: interp [options] <filename>\n"

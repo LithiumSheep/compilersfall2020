@@ -2,12 +2,14 @@
 #define VALUE_H
 
 #ifdef __cplusplus
+
 extern "C" {
 #endif // __cplusplus
 
 struct Interp;
 struct Function;
 struct Cons;
+struct Environment;
 
 typedef struct Value IntrinsicFunction(struct Value *args, int num_args, struct Interp *interp);
 
@@ -22,6 +24,10 @@ enum ValueKind {
   // of values.
 };
 
+struct Function {
+    struct Node *ast;
+};
+
 struct Value {
   enum ValueKind kind;
   long ival;
@@ -33,11 +39,17 @@ struct Value {
   struct Cons *cons;
 };
 
+
 struct Value val_create_void(void);
 struct Value val_create_error(void);
 struct Value val_create_ival(long ival);
+struct Value val_create_true();
+struct Value val_create_false();
 struct Value val_create_fn(struct Function *fn);
 struct Value val_create_intrinsic(IntrinsicFunction *intrinsic_fn);
+struct Function function_create(struct Node *ast);
+
+int fn_get_num_args(struct Function *fn);
 // You may add additional constructor functions for additional kinds of values.
 
 // This function returns a string representation of the given Value.
