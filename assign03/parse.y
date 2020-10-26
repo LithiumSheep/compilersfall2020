@@ -32,8 +32,10 @@ int yylex(void);
 
 %type<node> program
 /*
-%type<node> opt_declarations declarations declaration constdecl constdefn_list constdefn
-%type<node> typedecl typedefn_list typedefn vardecl type vardefn_list vardefn
+%type<node> opt_declarations declarations declaration
+%type<node> constdecl constdefn_list constdefn
+%type<node> typedecl typedefn_list typedefn
+%type<node> vardecl type vardefn_list vardefn
 %type<node> expression term factor primary
 %type<node> opt_instructions instructions instruction
 %type<node> assignstmt ifstmt repeatstmt whilestmt condition writestmt readstmt
@@ -42,12 +44,45 @@ int yylex(void);
 
 %%
 
-/* TODO: add grammar productions */
-
 program
-    /* FIXME: this is not the complete/correct production for program */
-  : TOK_PROGRAM TOK_BEGIN TOK_END TOK_DOT
-  ;
+    : TOK_PROGRAM TOK_IDENT TOK_SEMICOLON opt_declarations TOK_BEGIN opt_instructions TOK_END TOK_DOT
+    ;
+
+opt_declarations
+    : declarations
+    | /* epsilon */
+    ;
+
+declarations
+    : declarations declaration
+    | declaration
+    ;
+
+declaration
+    : vardecl TOK_SEMICOLON
+    ;
+
+vardecl
+    : TOK_VAR vardefn_list
+    ;
+
+vardefn_list
+    :
+    ;
+
+opt_instructions
+    : instructions
+    | /* epsilon */
+    ;
+
+instructions
+    : instructions instruction
+    | instruction
+    ;
+
+instruction
+    :
+    ;
 
 %%
 
