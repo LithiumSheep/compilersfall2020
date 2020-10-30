@@ -33,9 +33,7 @@ int yylex(void);
 %type<node> program
 %type<node> opt_declarations declarations declaration
 %type<node> constdecl constdefn_list constdefn
-/*
 %type<node> typedecl typedefn_list typedefn
-*/
 %type<node> vardecl vardefn_list vardefn
 %type<node> type named_type array_type record_type
 %type<node> opt_instructions instructions instruction
@@ -65,6 +63,7 @@ declarations
 
 declaration
     : constdecl { $$ = node_build1(NODE_constdecl, $1); }
+    | typedecl { $$ = node_build1(NODE_typedecl, $1); }
     | vardecl { $$ = node_build1(NODE_vardecl, $1); }
     ;
 
@@ -79,6 +78,19 @@ constdefn_list
 
 constdefn
     :  TOK_CONST TOK_IDENT TOK_EQUALS expression TOK_SEMICOLON { $$ = node_build2(NODE_constdefn, $2, $4); }
+    ;
+
+typedecl
+    : typedefn_list { $$ = $1; }
+    ;
+
+typedefn_list
+    : typedefn_list typedefn { $$ = $2; }
+    | constdefn { $$ = $1; }
+    ;
+
+typedefn
+    : TOK_TYPE TOK_IDENT TOK_EQUALS type TOK_SEMICOLON { $$ = node_build2(NODE_typedefn, $2, $4); }
     ;
 
 vardecl
