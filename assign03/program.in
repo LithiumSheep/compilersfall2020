@@ -1,5 +1,6 @@
 PROGRAM add;
   VAR a, b, sum: INTEGER;
+  VAR c: INTEGER;
 
 BEGIN
 

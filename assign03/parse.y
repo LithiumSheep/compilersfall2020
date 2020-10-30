@@ -53,13 +53,13 @@ program
     ;
 
 opt_declarations
-    : declarations { $$ = node_build1(NODE_declarations, $1); }
-    | /* epsilon */ { $$ = node_build0(NODE_declarations); }
+    : declarations
+    | /* epsilon */
     ;
 
 declarations
-    : declarations declaration
-    | declaration
+    : declarations declaration { $$ = $1, node_add_kid($1, $2); }
+    | declaration { $$ = node_build1(NODE_declarations, $1); }
     ;
 
 declaration
@@ -67,12 +67,12 @@ declaration
     ;
 
 vardecl
-    : TOK_VAR vardefn_list
+    : TOK_VAR vardefn_list { $$ = $2; }
     ;
 
 vardefn_list
-    : vardefn_list vardefn
-    | vardefn
+    : vardefn_list vardefn { $$ = $2; }
+    | vardefn { $$ = $1; }
     ;
 
 vardefn
@@ -80,7 +80,7 @@ vardefn
     ;
 
 identifier_list
-    : identifier_list TOK_COMMA TOK_IDENT { $$ = node_build1(NODE_identifier_list, $3); }
+    : identifier_list TOK_COMMA TOK_IDENT { $$ = $1; node_add_kid($1, $3); }
     | TOK_IDENT { $$ = node_build1(NODE_identifier_list, $1); }
     ;
 
