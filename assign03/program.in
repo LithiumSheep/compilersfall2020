@@ -1,7 +1,7 @@
 PROGRAM add;
   VAR a, b, sum: INTEGER;
-  VAR c: INTEGER;
   VAR months: ARRAY 10 OF INTEGER;
+  CONST n = 20;
 
 BEGIN
 

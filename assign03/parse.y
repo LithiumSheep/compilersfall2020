@@ -32,15 +32,15 @@ int yylex(void);
 
 %type<node> program
 %type<node> opt_declarations declarations declaration
-/*
 %type<node> constdecl constdefn_list constdefn
+/*
 %type<node> typedecl typedefn_list typedefn
 */
 %type<node> vardecl vardefn_list vardefn
 %type<node> type named_type array_type record_type
 %type<node> opt_instructions instructions instruction
-/*
 %type<node> expression term factor primary
+/*
 %type<node> assignstmt ifstmt repeatstmt whilestmt condition writestmt readstmt
 %type<node> designator expression_list
 */
@@ -64,8 +64,21 @@ declarations
     ;
 
 declaration
-    : vardecl { $$ = node_build1(NODE_vardecl, $1); }
-    // TODO: Add more
+    : constdecl { $$ = node_build1(NODE_constdecl, $1); }
+    | vardecl { $$ = node_build1(NODE_vardecl, $1); }
+    ;
+
+constdecl
+    : constdefn_list { $$ = $1; }
+    ;
+
+constdefn_list
+    : constdefn_list constdefn { $$ = $2; }
+    | constdefn { $$ = $1; }
+    ;
+
+constdefn
+    :  TOK_CONST TOK_IDENT TOK_EQUALS expression TOK_SEMICOLON { $$ = node_build2(NODE_constdefn, $2, $4); }
     ;
 
 vardecl
@@ -97,7 +110,7 @@ named_type
     ;
 
 array_type
-    : TOK_ARRAY TOK_INT_LITERAL TOK_OF type { $$ = node_build2(NODE_array_type, $2, $4); }
+    : TOK_ARRAY expression TOK_OF type { $$ = node_build2(NODE_array_type, $2, $4); }
     ;
 
 record_type
@@ -116,6 +129,27 @@ instructions
 
 instruction
     : TOK_BEGIN  { $$ = $1; }
+    ;
+
+expression
+    : expression TOK_PLUS term { $$ = node_build2(NODE_TOK_PLUS, $1, $3); }
+    | expression TOK_MINUS term { $$ = node_build2(NODE_TOK_MINUS, $1, $3); }
+    | term
+    ;
+
+term
+    : term TOK_TIMES factor { $$ = node_build2(NODE_TOK_TIMES, $1, $3); }
+    | term TOK_DIV factor { $$ = node_build2(NODE_TOK_DIV, $1, $3); }
+    | term TOK_MOD factor { $$ = node_build2(NODE_TOK_MOD, $1, $3); }
+    | factor
+    ;
+
+factor
+    : primary { $$ = $1; }
+    ;
+
+primary
+    : TOK_INT_LITERAL { $$ = $1; }
     ;
 
 %%
