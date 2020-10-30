@@ -36,7 +36,8 @@ int yylex(void);
 %type<node> constdecl constdefn_list constdefn
 %type<node> typedecl typedefn_list typedefn
 */
-%type<node> vardecl type vardefn_list vardefn
+%type<node> vardecl vardefn_list vardefn
+%type<node> type named_type array_type record_type
 %type<node> opt_instructions instructions instruction
 /*
 %type<node> expression term factor primary
@@ -64,6 +65,7 @@ declarations
 
 declaration
     : vardecl { $$ = node_build1(NODE_vardecl, $1); }
+    // TODO: Add more
     ;
 
 vardecl
@@ -85,8 +87,21 @@ identifier_list
     ;
 
 type
-    /* Fixme: type */
-    : TOK_IDENT { $$ = node_build1(NODE_type, $1); }
+    : named_type { $$ = $1; }
+    | array_type { $$ =  $1; }
+    | record_type { $$ = $1; }
+    ;
+
+named_type
+    : TOK_IDENT { $$ = node_build1(NODE_named_type, $1); }
+    ;
+
+array_type
+    : TOK_ARRAY TOK_INT_LITERAL TOK_OF type { $$ = node_build2(NODE_array_type, $2, $4); }
+    ;
+
+record_type
+    : TOK_RECORD vardefn_list TOK_END { $$ = node_build1(NODE_record_type, $2); }
     ;
 
 opt_instructions
