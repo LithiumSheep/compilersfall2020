@@ -31,26 +31,30 @@ int yylex(void);
 %token<node> TOK_RPAREN TOK_LBRACKET TOK_RBRACKET TOK_DOT TOK_COMMA
 
 %type<node> program
-/*
 %type<node> opt_declarations declarations declaration
+/*
 %type<node> constdecl constdefn_list constdefn
 %type<node> typedecl typedefn_list typedefn
-%type<node> vardecl type vardefn_list vardefn
-%type<node> expression term factor primary
-%type<node> opt_instructions instructions instruction
-%type<node> assignstmt ifstmt repeatstmt whilestmt condition writestmt readstmt
-%type<node> designator identifier_list expression_list
 */
+%type<node> vardecl type vardefn_list vardefn
+%type<node> opt_instructions instructions instruction
+/*
+%type<node> expression term factor primary
+%type<node> assignstmt ifstmt repeatstmt whilestmt condition writestmt readstmt
+%type<node> designator expression_list
+*/
+%type<node> identifier_list
 
 %%
 
 program
     : TOK_PROGRAM TOK_IDENT TOK_SEMICOLON opt_declarations TOK_BEGIN opt_instructions TOK_END TOK_DOT
+        { $$ = g_program = node_build2(NODE_program, $4, $6); }
     ;
 
 opt_declarations
-    : declarations
-    | /* epsilon */
+    : declarations { $$ = node_build1(NODE_declarations, $1); }
+    | /* epsilon */ { $$ = node_build0(NODE_declarations); }
     ;
 
 declarations
@@ -59,7 +63,7 @@ declarations
     ;
 
 declaration
-    : vardecl TOK_SEMICOLON
+    : vardecl { $$ = node_build1(NODE_vardecl, $1); }
     ;
 
 vardecl
@@ -67,21 +71,36 @@ vardecl
     ;
 
 vardefn_list
-    :
+    : vardefn_list vardefn
+    | vardefn
+    ;
+
+vardefn
+    : identifier_list TOK_COLON type TOK_SEMICOLON { $$ = node_build2(NODE_vardefn, $1, $3); }
+    ;
+
+identifier_list
+    : identifier_list TOK_COMMA TOK_IDENT { $$ = node_build1(NODE_identifier_list, $3); }
+    | TOK_IDENT { $$ = node_build1(NODE_identifier_list, $1); }
+    ;
+
+type
+    /* Fixme: type */
+    : TOK_IDENT { $$ = node_build1(NODE_type, $1); }
     ;
 
 opt_instructions
-    : instructions
-    | /* epsilon */
+    : instructions { $$ = node_build1(NODE_instructions, $1); }
+    | /* epsilon */ { $$ = node_build0(NODE_instructions); }
     ;
 
 instructions
-    : instructions instruction
-    | instruction
+    : instructions instruction { $$ = node_build1(NODE_instruction, $1); }
+    | instruction { $$ = node_build1(NODE_instruction, $1); }
     ;
 
 instruction
-    :
+    : TOK_BEGIN  { $$ = $1; }
     ;
 
 %%

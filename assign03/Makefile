@@ -22,7 +22,7 @@ CXXFLAGS = $(CFLAGS)
 	$(CC) $(CFLAGS) -c $<
 
 %.o : %.cpp
-	$(CXX) $(CXXFLAGS) -c $<
+	$(CXX) $(CXXFLAGS) -c -std=c++11 $<
 
 all : compiler
 

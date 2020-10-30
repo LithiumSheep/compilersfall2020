@@ -48,7 +48,6 @@ void yyerror(const char *fmt, ...);
 ":="                     { return create_token(TOK_ASSIGN, yytext); }
 ";"                      { return create_token(TOK_SEMICOLON, yytext); }
 ":"                      { return create_token(TOK_COLON, yytext); }
-"="                      { return create_token(TOK_EQUALS, yytext); }
 ","                      { return create_token(TOK_COMMA, yytext); }
 "."                      { return create_token(TOK_DOT, yytext); }
 "+"                      { return create_token(TOK_PLUS, yytext); }

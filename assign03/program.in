@@ -1,0 +1,6 @@
+PROGRAM add;
+  VAR a, b, sum: INTEGER;
+
+BEGIN
+
+END.
