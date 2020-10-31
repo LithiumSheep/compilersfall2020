@@ -86,7 +86,7 @@ typedecl
 
 typedefn_list
     : typedefn_list typedefn { $$ = $2; }
-    | constdefn { $$ = $1; }
+    | typedefn{ $$ = $1; }
     ;
 
 typedefn
