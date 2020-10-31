@@ -48,7 +48,7 @@ int yylex(void);
 
 program
     : TOK_PROGRAM TOK_IDENT TOK_SEMICOLON opt_declarations TOK_BEGIN opt_instructions TOK_END TOK_DOT
-        { $$ = g_program = node_build2(NODE_program, $4, $6); }
+        { $$ = g_program = node_build2(AST_PROGRAM, $4, $6); }
     ;
 
 opt_declarations
@@ -58,13 +58,13 @@ opt_declarations
 
 declarations
     : declarations declaration { $$ = $1, node_add_kid($1, $2); }
-    | declaration { $$ = node_build1(NODE_declarations, $1); }
+    | declaration { $$ = node_build1(AST_DECLARATIONS, $1); }
     ;
 
 declaration
-    : constdecl { $$ = node_build1(NODE_constdecl, $1); }
-    | typedecl { $$ = node_build1(NODE_typedecl, $1); }
-    | vardecl { $$ = node_build1(NODE_vardecl, $1); }
+    : constdecl { $$ = $1; }
+    | typedecl { $$ = $1; }
+    | vardecl { $$ = $1; }
     ;
 
 constdecl
@@ -77,7 +77,7 @@ constdefn_list
     ;
 
 constdefn
-    :  TOK_CONST TOK_IDENT TOK_EQUALS expression TOK_SEMICOLON { $$ = node_build2(NODE_constdefn, $2, $4); }
+    :  TOK_CONST TOK_IDENT TOK_EQUALS expression TOK_SEMICOLON { $$ = node_build2(AST_CONSTANT_DEF, $2, $4); }
     ;
 
 typedecl
@@ -90,7 +90,7 @@ typedefn_list
     ;
 
 typedefn
-    : TOK_TYPE TOK_IDENT TOK_EQUALS type TOK_SEMICOLON { $$ = node_build2(NODE_typedefn, $2, $4); }
+    : TOK_TYPE TOK_IDENT TOK_EQUALS type TOK_SEMICOLON { $$ = node_build2(AST_TYPE_DEF, $2, $4); }
     ;
 
 vardecl
@@ -103,12 +103,12 @@ vardefn_list
     ;
 
 vardefn
-    : identifier_list TOK_COLON type TOK_SEMICOLON { $$ = node_build2(NODE_vardefn, $1, $3); }
+    : identifier_list TOK_COLON type TOK_SEMICOLON { $$ = node_build2(AST_VAR_DEF, $1, $3); }
     ;
 
 identifier_list
     : identifier_list TOK_COMMA TOK_IDENT { $$ = $1; node_add_kid($1, $3); }
-    | TOK_IDENT { $$ = node_build1(NODE_identifier_list, $1); }
+    | TOK_IDENT { $$ = node_build1(AST_IDENTIFIER_LIST, $1); }
     ;
 
 type
@@ -118,15 +118,15 @@ type
     ;
 
 named_type
-    : TOK_IDENT { $$ = node_build1(NODE_named_type, $1); }
+    : TOK_IDENT { $$ = node_build1(AST_NAMED_TYPE, $1); }
     ;
 
 array_type
-    : TOK_ARRAY expression TOK_OF type { $$ = node_build2(NODE_array_type, $2, $4); }
+    : TOK_ARRAY expression TOK_OF type { $$ = node_build2(AST_ARRAY_TYPE, $2, $4); }
     ;
 
 record_type
-    : TOK_RECORD vardefn_list TOK_END { $$ = node_build1(NODE_record_type, $2); }
+    : TOK_RECORD vardefn_list TOK_END { $$ = node_build1(AST_RECORD_TYPE, $2); }
     ;
 
 opt_instructions
@@ -136,7 +136,7 @@ opt_instructions
 
 instructions
     : instructions instruction { $$ = $1; node_add_kid($1, $2); }
-    | instruction { $$ = node_build1(NODE_instructions, $1); }
+    | instruction { $$ = node_build1(AST_INSTRUCTIONS, $1); }
     ;
 
 instruction
@@ -149,37 +149,37 @@ instruction
     ;
 
 assignstmt
-    : designator TOK_ASSIGN expression { $$ = node_build2(NODE_TOK_ASSIGN, $1, $3); }
+    : designator TOK_ASSIGN expression { $$ = node_build2(AST_ASSIGN, $1, $3); }
     ;
 
 ifstmt
-    : TOK_IF condition TOK_THEN opt_instructions TOK_END { $$ = node_build2(NODE_TOK_IF, $2, $4); }
-    | TOK_IF condition TOK_THEN opt_instructions TOK_ELSE opt_instructions TOK_END { $$ = node_build3(NODE_TOK_IF, $2, $4, $6); }
+    : TOK_IF condition TOK_THEN opt_instructions TOK_END { $$ = node_build2(AST_IF, $2, $4); }
+    | TOK_IF condition TOK_THEN opt_instructions TOK_ELSE opt_instructions TOK_END { $$ = node_build3(AST_IF, $2, $4, $6); }
     ;
 
 repeatstmt
-    : TOK_REPEAT opt_instructions TOK_UNTIL condition TOK_END { $$ = node_build2(NODE_TOK_REPEAT, $2, $4); }
+    : TOK_REPEAT opt_instructions TOK_UNTIL condition TOK_END { $$ = node_build2(AST_REPEAT, $2, $4); }
     ;
 
 whilestmt
-    : TOK_WHILE condition TOK_DO opt_instructions TOK_END { $$ = node_build2(NODE_TOK_WHILE, $2, $4); }
+    : TOK_WHILE condition TOK_DO opt_instructions TOK_END { $$ = node_build2(AST_WHILE, $2, $4); }
     ;
 
 writestmt
-    : TOK_WRITE designator { $$ = node_build1(TOK_WRITE, $2); }
+    : TOK_WRITE designator { $$ = node_build1(AST_WRITE, $2); }
     ;
 
 readstmt
-    : TOK_READ designator { $$ = node_build1(TOK_READ, $2); }
+    : TOK_READ designator { $$ = node_build1(AST_READ, $2); }
     ;
 
 condition
-    : expression TOK_EQUALS expression { $$ = node_build2(NODE_TOK_EQUALS, $1, $3); }
-    | expression TOK_HASH expression { $$ = node_build2(NODE_TOK_HASH, $1, $3); }
-    | expression TOK_LT expression { $$ = node_build2(NODE_TOK_LT, $1, $3); }
-    | expression TOK_LTE expression { $$ = node_build2(NODE_TOK_LTE, $1, $3); }
-    | expression TOK_GT expression { $$ = node_build2(NODE_TOK_GT, $1, $3); }
-    | expression TOK_GTE expression { $$ = node_build2(NODE_TOK_GTE, $1, $3); }
+    : expression TOK_EQUALS expression { $$ = node_build2(AST_COMPARE_EQ, $1, $3); }
+    | expression TOK_HASH expression { $$ = node_build2(AST_COMPARE_NEQ, $1, $3); }
+    | expression TOK_LT expression { $$ = node_build2(AST_COMPARE_LT, $1, $3); }
+    | expression TOK_LTE expression { $$ = node_build2(AST_COMPARE_LTE, $1, $3); }
+    | expression TOK_GT expression { $$ = node_build2(AST_COMPARE_GT, $1, $3); }
+    | expression TOK_GTE expression { $$ = node_build2(AST_COMPARE_GTE, $1, $3); }
     ;
 
 designator
@@ -196,15 +196,15 @@ expression_list
 */
 
 expression
-    : expression TOK_PLUS term { $$ = node_build2(NODE_TOK_PLUS, $1, $3); }
-    | expression TOK_MINUS term { $$ = node_build2(NODE_TOK_MINUS, $1, $3); }
+    : expression TOK_PLUS term { $$ = node_build2(AST_ADD, $1, $3); }
+    | expression TOK_MINUS term { $$ = node_build2(AST_SUBTRACT, $1, $3); }
     | term
     ;
 
 term
-    : term TOK_TIMES factor { $$ = node_build2(NODE_TOK_TIMES, $1, $3); }
-    | term TOK_DIV factor { $$ = node_build2(NODE_TOK_DIV, $1, $3); }
-    | term TOK_MOD factor { $$ = node_build2(NODE_TOK_MOD, $1, $3); }
+    : term TOK_TIMES factor { $$ = node_build2(AST_MULTIPLY, $1, $3); }
+    | term TOK_DIV factor { $$ = node_build2(AST_DIVIDE, $1, $3); }
+    | term TOK_MOD factor { $$ = node_build2(AST_MODULUS, $1, $3); }
     | factor
     ;
 

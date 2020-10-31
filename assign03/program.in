@@ -1,16 +1,18 @@
-PROGRAM SumToN;
-  VAR i, sum, n: INTEGER;
+PROGRAM array02;
+
+    TYPE Row = RECORD arr: ARRAY 3 OF CHAR; END;
+    VAR board: ARRAY 3 OF Row;
+
+    VAR i, j : INTEGER;
 
 BEGIN
-  -- read integer from user
-  READ n;
-  -- compute sum from 1 to the integer
-  i := 1;
-  sum := 0;
-  WHILE i <= n DO
-    sum := sum + i;
-    i := i + 1;
-  END;
-  -- output the sum
-  WRITE sum;
+    i := 0;
+    WHILE i <= 3 DO
+        j := 0;
+        WHILE j <= 3 DO
+            READ board[i].arr[j];
+            j := j + 1;
+        END;
+        i := i + 1;
+    END;
 END.
