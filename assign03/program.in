@@ -1,13 +1,11 @@
 PROGRAM SumToN;
-  VAR i, sum, n: INTEGER;
+  VAR i: INTEGER;
 
 BEGIN
   i := 1;
-  sum := 0;
-  IF i <= n THEN
-    sum := sum + i;
+  REPEAT
     i := i + 1;
-  ELSE
-    i := 1;
+  UNTIL i >= 10
   END;
+
 END.
