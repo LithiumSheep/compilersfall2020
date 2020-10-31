@@ -38,7 +38,7 @@ int yylex(void);
 %type<node> type named_type array_type record_type
 %type<node> opt_instructions instructions instruction
 %type<node> expression term factor primary
-%type<node> assignstmt ifstmt repeatstmt condition
+%type<node> assignstmt ifstmt repeatstmt whilestmt condition
 /*
 %type<node> assignstmt ifstmt repeatstmt whilestmt condition writestmt readstmt
 */
@@ -56,7 +56,7 @@ program
 
 opt_declarations
     : declarations
-    | /* epsilon */
+    | /* epsilon */ {  }
     ;
 
 declarations
@@ -134,7 +134,7 @@ record_type
 
 opt_instructions
     : instructions
-    | /* epsilon */
+    | /* epsilon */ {  }
     ;
 
 instructions
@@ -146,6 +146,7 @@ instruction
     : assignstmt TOK_SEMICOLON
     | ifstmt TOK_SEMICOLON
     | repeatstmt TOK_SEMICOLON
+    | whilestmt TOK_SEMICOLON
     ;
 
 assignstmt
@@ -159,6 +160,10 @@ ifstmt
 
 repeatstmt
     : TOK_REPEAT opt_instructions TOK_UNTIL condition TOK_END { $$ = node_build2(NODE_TOK_REPEAT, $2, $4); }
+    ;
+
+whilestmt
+    : TOK_WHILE condition TOK_DO opt_instructions TOK_END { $$ = node_build2(NODE_TOK_WHILE, $2, $4); }
     ;
 
 condition
