@@ -1,9 +1,13 @@
-PROGRAM add;
-  VAR a, b, sum: INTEGER;
+PROGRAM SumToN;
+  VAR i, sum, n: INTEGER;
 
 BEGIN
-  -- compute the sum 3+4 and write it to the output
-  a := 3;
-  b := 4;
-  sum := a + b;
+  i := 1;
+  sum := 0;
+  IF i <= n THEN
+    sum := sum + i;
+    i := i + 1;
+  ELSE
+    i := 1;
+  END;
 END.

@@ -38,7 +38,7 @@ int yylex(void);
 %type<node> type named_type array_type record_type
 %type<node> opt_instructions instructions instruction
 %type<node> expression term factor primary
-%type<node> assignstmt
+%type<node> assignstmt ifstmt condition
 /*
 %type<node> assignstmt ifstmt repeatstmt whilestmt condition writestmt readstmt
 */
@@ -144,16 +144,31 @@ instructions
 
 instruction
     : assignstmt TOK_SEMICOLON
+    | ifstmt TOK_SEMICOLON
     ;
 
 assignstmt
     : designator TOK_ASSIGN expression { $$ = node_build2(NODE_TOK_ASSIGN, $1, $3); }
     ;
 
+ifstmt
+    : TOK_IF condition TOK_THEN opt_instructions TOK_END { $$ = node_build2(NODE_TOK_IF, $2, $4); }
+    | TOK_IF condition TOK_THEN opt_instructions TOK_ELSE opt_instructions TOK_END { $$ = node_build3(NODE_TOK_IF, $2, $4, $6); }
+    ;
+
+condition
+    : expression TOK_EQUALS expression { $$ = node_build2(NODE_TOK_EQUALS, $1, $3); }
+    | expression TOK_HASH expression { $$ = node_build2(NODE_TOK_HASH, $1, $3); }
+    | expression TOK_LT expression { $$ = node_build2(NODE_TOK_LT, $1, $3); }
+    | expression TOK_LTE expression { $$ = node_build2(NODE_TOK_LTE, $1, $3); }
+    | expression TOK_GT expression { $$ = node_build2(NODE_TOK_GT, $1, $3); }
+    | expression TOK_GTE expression { $$ = node_build2(NODE_TOK_GTE, $1, $3); }
+    ;
+
 designator
     : TOK_IDENT { $$ = $1; }
-    | designator TOK_LBRACKET expression TOK_RBRACKET {  }
-    | designator TOK_DOT TOK_IDENT {  }
+    | designator TOK_LBRACKET expression TOK_RBRACKET { $$ = node_build2(NODE_designator, $1, $3); }
+    | designator TOK_DOT TOK_IDENT { $$ = node_build2(NODE_designator, $1, $3); }
     ;
 
 /*
