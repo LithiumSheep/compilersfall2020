@@ -38,11 +38,14 @@ int yylex(void);
 %type<node> type named_type array_type record_type
 %type<node> opt_instructions instructions instruction
 %type<node> expression term factor primary
+%type<node> assignstmt
 /*
 %type<node> assignstmt ifstmt repeatstmt whilestmt condition writestmt readstmt
-%type<node> designator expression_list
 */
-%type<node> identifier_list
+%type<node> designator identifier_list
+/*
+%type<node> expression_list
+*/
 
 %%
 
@@ -130,18 +133,35 @@ record_type
     ;
 
 opt_instructions
-    : instructions { $$ = node_build1(NODE_instructions, $1); }
-    | /* epsilon */ { $$ = node_build0(NODE_instructions); }
+    : instructions
+    | /* epsilon */
     ;
 
 instructions
-    : instructions instruction { $$ = node_build1(NODE_instruction, $1); }
-    | instruction { $$ = node_build1(NODE_instruction, $1); }
+    : instructions instruction { $$ = $1; node_add_kid($1, $2); }
+    | instruction { $$ = node_build1(NODE_instructions, $1); }
     ;
 
 instruction
-    : TOK_BEGIN  { $$ = $1; }
+    : assignstmt TOK_SEMICOLON
     ;
+
+assignstmt
+    : designator TOK_ASSIGN expression { $$ = node_build2(NODE_TOK_ASSIGN, $1, $3); }
+    ;
+
+designator
+    : TOK_IDENT { $$ = $1; }
+    | designator TOK_LBRACKET expression TOK_RBRACKET {  }
+    | designator TOK_DOT TOK_IDENT {  }
+    ;
+
+/*
+expression_list
+    : expression_list TOK_COMMA expression { $$ = $1; node_add_kid($1, $3); }
+    | expression { $$ = node_build1(NODE_expression_list, $1); }
+    ;
+*/
 
 expression
     : expression TOK_PLUS term { $$ = node_build2(NODE_TOK_PLUS, $1, $3); }
@@ -162,6 +182,8 @@ factor
 
 primary
     : TOK_INT_LITERAL { $$ = $1; }
+    | designator { $$ = $1; }
+    | TOK_LPAREN expression TOK_RPAREN { $$ = $2; }
     ;
 
 %%
