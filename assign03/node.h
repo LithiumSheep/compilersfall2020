@@ -5,6 +5,8 @@
 
 #include <string>
 #include <vector>
+#include "symbol.h"
+#include "symtab.h"
 
 #endif // __cplusplus
 
@@ -63,7 +65,6 @@ public:
   void set_source_info(const SourceInfo &source_info);
   long get_ival() const;
   void set_ival(long ival);
-/*
   void set_symtab(SymbolTable *symtab);
   SymbolTable *get_symtab();
   void set_index(unsigned index);
@@ -71,7 +72,6 @@ public:
   void set_symbol(SymbolTable *symtab, unsigned index);
   void set_type(Type *type);
   Type *get_type();
-*/
 };
 
 extern "C" {
@@ -158,7 +158,6 @@ long node_get_ival(struct Node *n);
 // Set integer value of a Node.
 void node_set_ival(struct Node *n, long ival);
 
-/*
 // Set symbol table, entry
 void node_set_symbol(struct Node *n, struct SymbolTable *symtab, unsigned index);
 
@@ -170,7 +169,6 @@ unsigned node_get_index(struct Node *n);
 
 // Get Symbol table entry
 struct Symbol *node_get_symbol(struct Node *n);
-*/
 
 #ifdef __cplusplus
 }

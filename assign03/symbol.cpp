@@ -4,10 +4,14 @@
 
 #include "symbol.h"
 
-struct Symbol *symbol_create(char* name, Type type, Kind kind) {
+Type* Symbol::get_type() {
+    return m_type;
+}
+
+struct Symbol *symbol_create(char* name, Type* type, Kind kind) {
     Symbol *symbol = new Symbol();
-    symbol->name = name;
-    symbol->type = type;
-    symbol->kind = kind;
+    symbol->m_name = name;
+    symbol->m_type = type;
+    symbol->m_kind = kind;
     return symbol;
 }

@@ -83,7 +83,6 @@ void Node::set_ival(long ival) {
   m_ival = ival;
 }
 
-/*
 void Node::set_symtab(SymbolTable *symtab) {
   m_symtab = symtab;
 }
@@ -125,7 +124,6 @@ Type *Node::get_type() {
   // no type is associated with this node
   return nullptr;
 }
-*/
 
 ////////////////////////////////////////////////////////////////////////
 // C API for working with Nodes
@@ -287,7 +285,6 @@ void node_set_ival(struct Node *n, long ival) {
   n->set_ival(ival);
 }
 
-/*
 void node_set_symbol(struct Node *n, struct SymbolTable *symtab, unsigned index) {
   n->set_symtab(symtab);
   n->set_index(index);
@@ -313,4 +310,3 @@ struct Symbol *node_get_symbol(struct Node *n) {
   }
   return symtab_get_entry(symtab, n->get_index());
 }
-*/
