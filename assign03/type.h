@@ -5,10 +5,12 @@
 #ifndef ASSIGN03_TYPE_H
 #define ASSIGN03_TYPE_H
 
+#include <string>
+
 // TODO: Is this the right way to define Type by creating inherited classes of the base type which always has a name?
 
 struct Type {
-    virtual const char* describe();
+    virtual std::string describe();
 };
 
 struct PrimitiveType: Type {
@@ -17,7 +19,7 @@ struct PrimitiveType: Type {
 public:
     const char* name;
     const char* get_name();
-    const char* describe() override;
+    std::string describe() override;
 };
 
 struct ArrayType: Type {
@@ -27,7 +29,7 @@ public:
     Type* elementType;
     long get_size();
     Type* get_type();
-    const char* describe() override;
+    std::string describe() override;
 };
 
 struct RecordType: Type {

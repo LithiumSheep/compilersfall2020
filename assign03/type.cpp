@@ -3,6 +3,7 @@
 //
 
 #include "type.h"
+#include "cpputil.h"
 #include <iostream>
 #include <string>
 
@@ -33,15 +34,16 @@ Type* type_create_array(long size, Type* elementType) {
 
 Type* type_create_record(const char* name);
 
-const char *Type::describe() {
+std::string Type::describe() {
     return "";
 }
 
-const char *PrimitiveType::describe() {
+std::string PrimitiveType::describe() {
     return get_name();
 }
 
-const char *ArrayType::describe() {
-    std::string descrip = "ARRAY " + std::to_string(get_size()) + " OF " + get_type()->describe();
-    return strdup(descrip.c_str());
+std::string ArrayType::describe() {
+    return cpputil::format("ARRAY %ld OF %s", get_size(), get_type()->describe().c_str());
 }
+
+// TODO: Describe record types
