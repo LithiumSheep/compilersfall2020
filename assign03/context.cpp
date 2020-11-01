@@ -20,7 +20,7 @@ struct Context {
 private:
     Node *root;
     SymbolTable *symtab;
-    bool fprint;
+    bool flag_print;
 
 public:
   Context(struct Node *ast);
@@ -111,7 +111,7 @@ public:
 Context::Context(struct Node *ast) {
     root = ast;
     symtab = new SymbolTable();
-    fprint = false;
+    flag_print = false;
 }
 
 Context::~Context() {
@@ -119,18 +119,19 @@ Context::~Context() {
 
 void Context::set_flag(char flag) {
   if (flag == 's') {
-      fprint = true;
+      flag_print = true;
   }
 }
 
 void Context::build_symtab() {
-  // TODO: implement
-  SymbolTableBuilder *visitor = new SymbolTableBuilder();
-  visitor->visit(root);
 
-  if (fprint) {
+    // give symtabbuilder a symtab in constructor?
+    SymbolTableBuilder *visitor = new SymbolTableBuilder();
+    visitor->visit(root);
+
+    if (flag_print) {
       // print symbol table
-  }
+    }
 }
 
 // TODO: implementation of additional Context member functions
