@@ -1,5 +1,5 @@
 PROGRAM array02;
-    VAR a: INTEGER;
+    VAR a, b, sum: INTEGER;
 
 BEGIN
     a := 1;

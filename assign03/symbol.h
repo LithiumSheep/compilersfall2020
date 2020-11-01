@@ -15,12 +15,14 @@ enum Kind {
 struct Symbol {
 public:
     // TODO: depth?
-    char* m_name;
+    const char* m_name;
     Type* m_type;
     int m_kind;
     Type* get_type();
 };
 
-Symbol *symbol_create(char* name, Type type, Kind kind);
+Symbol *symbol_create(const char* name, Type* type, Kind kind);
+
+const char* get_name_for_kind(int kind);
 
 #endif //ASSIGN03_SYMBOL_H

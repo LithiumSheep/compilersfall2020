@@ -18,6 +18,7 @@ public:
     void insert(const char* name, Symbol);
     Symbol lookup_local(const char* name);
     Symbol lookup_global(const char* name);
+    void print_sym_tab();
 private:
     bool s_exists(const char* name);
 };

@@ -38,6 +38,9 @@ private:
     SymbolTable* symtab;
     Type* integer_type;
 public:
+    SymbolTable* get_symtab() {
+        return symtab;
+    }
     SymbolTableBuilder(SymbolTable* symbolTable) {
         symtab = symbolTable;
         integer_type = type_create_primitive("INTEGER");
@@ -81,7 +84,15 @@ public:
         Node* left = node_get_kid(ast, 0);
         int num_kids = node_get_num_kids(left);
 
-        printf("Set %d kids to type %s", num_kids, type->get_name());
+        for (int i = 0; i < num_kids; i++) {
+            Node* id = node_get_kid(left, i);
+            const char* name = node_get_str(id);
+            // set entry in symtab for name, type
+            Symbol* sym = symbol_create(name, type, VARIABLE);
+            symtab->insert(name, *sym);
+        }
+
+        printf("Set %d kids to type %s\n", num_kids, type->get_name());
     }
 
     void visit_int_literal(struct Node *ast) override {
@@ -139,6 +150,7 @@ void Context::build_symtab() {
 
     if (flag_print) {
       // print symbol table
+      visitor->get_symtab()->print_sym_tab();
     }
 }
 

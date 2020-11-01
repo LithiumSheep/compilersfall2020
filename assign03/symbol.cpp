@@ -8,10 +8,21 @@ Type* Symbol::get_type() {
     return m_type;
 }
 
-struct Symbol *symbol_create(char* name, Type* type, Kind kind) {
+struct Symbol *symbol_create(const char* name, Type* type, Kind kind) {
     Symbol *symbol = new Symbol();
     symbol->m_name = name;
     symbol->m_type = type;
     symbol->m_kind = kind;
     return symbol;
+}
+
+const char* get_name_for_kind(int kind) {
+    if (kind == VARIABLE) {
+        return "VAR";
+    }
+    if (kind == TYPE) {
+        return "TYPE";
+    }
+    // error otherwise
+    // record?
 }
