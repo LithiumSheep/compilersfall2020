@@ -1,6 +1,11 @@
-PROGRAM array02;
-    VAR months: ARRAY 12 OF INTEGER;
+PROGRAM arr;
+  VAR months: ARRAY 12 OF INTEGER;
 
 BEGIN
-    a := 1;
+  months[0] := 31;
+  months[1] := 28;
+  months[2] := 31;
+  months[3] := 30;
+
+  WRITE months[3];
 END.

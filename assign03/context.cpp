@@ -35,6 +35,8 @@ public:
 
 class SymbolTableBuilder : public ASTVisitor {
 private:
+    // TODO: Handle symbol depth
+    // TODO: Handle type checking
     SymbolTable* symtab;
     Type* integer_type;
 public:
@@ -113,12 +115,15 @@ public:
     }
 
     void visit_var_ref(struct Node *ast) override {
+        ASTVisitor::visit_record_type(ast);
+        /*
         const char* varname = node_get_str(ast);
 
         // create symbol with current scope
         // Symbol *sym = m_cur_scope->lookup(varname)
 
         // report errors here or annotate
+         */
     }
 
     void visit_identifier(struct Node *ast) override {
@@ -126,12 +131,15 @@ public:
     }
 
     void visit_add(struct Node *ast) override {
+        ASTVisitor::visit_record_type(ast);
+        /*
         recur_on_children(ast);
 
         // left_type = ast->get_kid(0)->get_type()
         // right_type = ast->get_kid(1)->get_type()
 
         // type check
+         */
     }
 };
 

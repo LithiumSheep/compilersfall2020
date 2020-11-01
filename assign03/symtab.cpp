@@ -44,6 +44,7 @@ void SymbolTable::print_sym_tab() {
         Symbol sym = i->second;
 
         //TODO: Depth
+        long depth = 0;
 
         // kind
         std::string kind_name = get_name_for_kind(sym.m_kind);
@@ -52,6 +53,6 @@ void SymbolTable::print_sym_tab() {
         //type
         std::string type_name = sym.get_type()->describe();
         // depth,kind,name,type
-        printf("%s,%s,%s\n", kind_name.c_str(), name.c_str(), type_name.c_str());
+        printf("%ld,%s,%s,%s\n", depth, kind_name.c_str(), name.c_str(), type_name.c_str());
     }
 }

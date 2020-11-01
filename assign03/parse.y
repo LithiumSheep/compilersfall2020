@@ -183,9 +183,9 @@ condition
     ;
 
 designator
-    : TOK_IDENT { $$ = $1; }
-    | designator TOK_LBRACKET expression TOK_RBRACKET { $$ = node_build2(NODE_designator, $1, $3); }
-    | designator TOK_DOT TOK_IDENT { $$ = node_build2(NODE_designator, $1, $3); }
+    : TOK_IDENT { $$ = node_build1(AST_VAR_REF, $1); }
+    | designator TOK_LBRACKET expression TOK_RBRACKET { $$ = node_build2(AST_ARRAY_ELEMENT_REF, $1, $3); }
+    | designator TOK_DOT TOK_IDENT { $$ = node_build2(AST_FIELD_REF, $1, $3); }
     ;
 
 /*

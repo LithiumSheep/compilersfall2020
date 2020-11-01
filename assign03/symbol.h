@@ -14,7 +14,6 @@ enum Kind {
 
 struct Symbol {
 public:
-    // TODO: depth?
     const char* m_name;
     Type* m_type;
     int m_kind;
