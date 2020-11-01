@@ -1,5 +1,5 @@
 PROGRAM array02;
-    VAR a, b, sum: INTEGER;
+    VAR months: ARRAY 12 OF INTEGER;
 
 BEGIN
     a := 1;

@@ -61,12 +61,26 @@ public:
         const char* type_str = node_get_str(type);
         Type* named_type = type_create_primitive(type_str);
 
+        // perform checks
+        // if primitive (INTEGER, CHAR), ok
+        // else if type name, perform lookup, then set type
+
         ast->set_type(named_type);
         // set the type of the current node
     }
 
     void visit_array_type(struct Node *ast) override {
-        ASTVisitor::visit_array_type(ast);
+        recur_on_children(ast);
+
+        Node* right = node_get_kid(ast, 1);
+        Type* type = right->get_type();
+
+        // get left size
+        Node* left = node_get_kid(ast, 0);
+        long size = strtol(node_get_str(left), nullptr, 10);
+
+        Type* arrayType = type_create_array(size, type);
+        ast->set_type(arrayType);
     }
 
     void visit_record_type(struct Node *ast) override {
@@ -91,8 +105,6 @@ public:
             Symbol* sym = symbol_create(name, type, VARIABLE);
             symtab->insert(name, *sym);
         }
-
-        printf("Set %d kids to type %s\n", num_kids, type->get_name());
     }
 
     void visit_int_literal(struct Node *ast) override {

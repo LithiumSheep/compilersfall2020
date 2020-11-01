@@ -3,12 +3,14 @@
 //
 
 #include "type.h"
+#include <iostream>
+#include <string>
 
-const char * Type::get_name() {
+const char * PrimitiveType::get_name() {
     return name;
 }
 
-int ArrayType::get_size() {
+long ArrayType::get_size() {
     return size;
 }
 
@@ -17,17 +19,29 @@ Type* ArrayType::get_type() {
 }
 
 Type* type_create_primitive(const char* name) {
-    Type* primitive = new Type();
+    PrimitiveType* primitive = new PrimitiveType();
     primitive->name = name;
     return primitive;
 }
 
-Type* type_create_array(const char* name, int size, Type* elementType) {
+Type* type_create_array(long size, Type* elementType) {
     ArrayType* arr = new ArrayType();
-    arr->name = name;
     arr->size = size;
     arr->elementType = elementType;
     return arr;
 }
 
 Type* type_create_record(const char* name);
+
+const char *Type::describe() {
+    return "";
+}
+
+const char *PrimitiveType::describe() {
+    return get_name();
+}
+
+const char *ArrayType::describe() {
+    std::string descrip = "ARRAY " + std::to_string(get_size()) + " OF " + get_type()->describe();
+    return strdup(descrip.c_str());
+}

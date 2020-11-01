@@ -50,7 +50,7 @@ void SymbolTable::print_sym_tab() {
         // name
         std::string name = i->first;
         //type
-        std::string type_name = sym.get_type()->get_name();
+        std::string type_name = sym.get_type()->describe();
         // depth,kind,name,type
         printf("%s,%s,%s\n", kind_name.c_str(), name.c_str(), type_name.c_str());
     }
