@@ -35,11 +35,9 @@ private:
   SourceInfo m_source_info;
   long m_ival;
   std::string m_strval;
-/*
   SymbolTable *m_symtab;
   unsigned m_index; // index of symbol table entry
   Type *m_type;
-*/
 
   // copy ctor and assignment operator disallowed
   Node(const Node &);

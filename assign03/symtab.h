@@ -15,9 +15,11 @@ struct SymbolTable {
 private:
     std::map<std::string, Symbol> tab;
 public:
-    void define();
+    void insert(const char* name, Symbol);
     Symbol lookup_local(const char* name);
     Symbol lookup_global(const char* name);
+private:
+    bool s_exists(const char* name);
 };
 
 

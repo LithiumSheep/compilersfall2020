@@ -5,6 +5,10 @@
 #include "symtab.h"
 #include "util.h"
 
+void SymbolTable::insert(const char *name, Symbol symbol) {
+    // init vs set?
+    tab[name] = symbol;
+}
 
 Symbol SymbolTable::lookup_local(const char *name) {
     std::map<std::string, Symbol>::const_iterator i = tab.find(name);
@@ -24,4 +28,12 @@ Symbol SymbolTable::lookup_global(const char *name) {
         //return parent->find_val(name);
     }
     return i->second;
+}
+
+bool SymbolTable::s_exists(const char* name) {
+    std::map<std::string, Symbol>::const_iterator i = tab.find(name);
+    if (i == tab.end()) {
+        return false;
+    }
+    return true;
 }

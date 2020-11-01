@@ -9,12 +9,12 @@
 
 enum Kind {
     VARIABLE = 0,
-    TYPE,
-    //PROCEDURE
+    TYPE
 };
 
 struct Symbol {
 public:
+    // TODO: depth?
     char* name;
     Type type;
     int kind;
