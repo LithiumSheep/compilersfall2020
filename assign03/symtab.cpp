@@ -41,9 +41,17 @@ bool SymbolTable::s_exists(const char* name) {
 void SymbolTable::print_sym_tab() {
     std::map<std::string, Symbol>::const_iterator i;
     for (i = tab.begin(); i != tab.end(); i++) {
-        std::string name = i->first;
         Symbol sym = i->second;
+
+        //TODO: Depth
+
+        // kind
+        std::string kind_name = get_name_for_kind(sym.m_kind);
+        // name
+        std::string name = i->first;
+        //type
+        std::string type_name = sym.get_type()->get_name();
         // depth,kind,name,type
-        printf("%s,%s,%s\n", get_name_for_kind(sym.m_kind), name.c_str(), sym.get_type()->get_name());
+        printf("%s,%s,%s\n", kind_name.c_str(), name.c_str(), type_name.c_str());
     }
 }
