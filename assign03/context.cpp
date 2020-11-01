@@ -34,7 +34,15 @@ public:
 };
 
 class SymbolTableBuilder : public ASTVisitor {
+private:
+    SymbolTable* symtab;
+    Type* integer_type;
 public:
+    SymbolTableBuilder(SymbolTable* symbolTable) {
+        symtab = symbolTable;
+        integer_type = type_create_primitive("INTEGER");
+    }
+
     void visit_constant_def(struct Node *ast) override {
         ASTVisitor::visit_constant_def(ast);
     }
@@ -78,7 +86,7 @@ public:
 
     void visit_int_literal(struct Node *ast) override {
         // set type to integer
-        ast->set_type(type_create_primitive("INTEGER"));
+        ast->set_type(integer_type);
     }
 
     void visit_var_ref(struct Node *ast) override {
@@ -126,7 +134,7 @@ void Context::set_flag(char flag) {
 void Context::build_symtab() {
 
     // give symtabbuilder a symtab in constructor?
-    SymbolTableBuilder *visitor = new SymbolTableBuilder();
+    SymbolTableBuilder *visitor = new SymbolTableBuilder(symtab);
     visitor->visit(root);
 
     if (flag_print) {
