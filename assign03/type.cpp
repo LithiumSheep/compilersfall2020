@@ -12,7 +12,7 @@ int ArrayType::get_size() {
     return size;
 }
 
-Type ArrayType::get_type() {
+Type* ArrayType::get_type() {
     return elementType;
 }
 
@@ -22,10 +22,11 @@ Type* type_create_primitive(const char* name) {
     return primitive;
 }
 
-Type* type_create_array(const char* name, int size) {
+Type* type_create_array(const char* name, int size, Type* elementType) {
     ArrayType* arr = new ArrayType();
     arr->name = name;
     arr->size = size;
+    arr->elementType = elementType;
     return arr;
 }
 
