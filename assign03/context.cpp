@@ -5,11 +5,9 @@
 #include "util.h"
 #include "cpputil.h"
 #include "node.h"
-/*
 #include "type.h"
 #include "symbol.h"
 #include "symtab.h"
-*/
 #include "ast.h"
 #include "astvisitor.h"
 #include "context.h"
@@ -20,7 +18,9 @@
 
 struct Context {
 private:
-  // TODO: fields
+    Node *root;
+    SymbolTable *symtab;
+    bool fprint;
 
 public:
   Context(struct Node *ast);
@@ -40,18 +40,26 @@ public:
 ////////////////////////////////////////////////////////////////////////
 
 Context::Context(struct Node *ast) {
-  // TODO: implement
+    root = ast;
+    symtab = new SymbolTable();
+    fprint = false;
 }
 
 Context::~Context() {
 }
 
 void Context::set_flag(char flag) {
-  // TODO: implement
+  if (flag == 's') {
+      fprint = true;
+  }
 }
 
 void Context::build_symtab() {
   // TODO: implement
+
+  if (fprint) {
+      // print symbol table
+  }
 }
 
 // TODO: implementation of additional Context member functions

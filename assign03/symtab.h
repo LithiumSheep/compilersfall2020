@@ -5,17 +5,19 @@
 #ifndef ASSIGN03_SYMTAB_H
 #define ASSIGN03_SYMTAB_H
 
+#include <map>
+#include <string>
 #include <vector>
 #include "symbol.h"
 
 
 struct SymbolTable {
 private:
-    std::vector<Symbol> tab;
+    std::map<std::string, Symbol> tab;
 public:
     void define();
-    Symbol *lookup_local(char* name);
-    Symbol *lookup_global(char* name);
+    Symbol lookup_local(const char* name);
+    Symbol lookup_global(const char* name);
 };
 
 

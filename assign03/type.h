@@ -19,8 +19,10 @@ class PrimitiveType: Type {
 class ArrayType: Type {
 private:
     int size;
+    Type elementType;
 public:
     int get_size();
+    Type get_type();
 };
 
 class RecordType: Type {
