@@ -33,7 +33,76 @@ public:
   // TODO: additional methods
 };
 
-// TODO: helper classes (e.g., SymbolTableBuilder)
+class SymbolTableBuilder : public ASTVisitor {
+public:
+    void visit_constant_def(struct Node *ast) override {
+        ASTVisitor::visit_constant_def(ast);
+    }
+
+    void visit_type_def(struct Node *ast) override {
+        ASTVisitor::visit_type_def(ast);
+    }
+
+    void visit_named_type(struct Node *ast) override {
+        // set the current type to the child type
+        Node* type = node_get_kid(ast, 0);
+
+        const char* type_str = node_get_str(type);
+        Type* named_type = type_create_primitive(type_str);
+
+        ast->set_type(named_type);
+        // set the type of the current node
+    }
+
+    void visit_array_type(struct Node *ast) override {
+        ASTVisitor::visit_array_type(ast);
+    }
+
+    void visit_record_type(struct Node *ast) override {
+        ASTVisitor::visit_record_type(ast);
+    }
+
+    void visit_var_def(struct Node *ast) override {
+        recur_on_children(ast);
+
+        // find out type on right
+        Node* right = node_get_kid(ast, 1);
+        Type* type = right->get_type();
+
+        // get left identifier(s)
+        Node* left = node_get_kid(ast, 0);
+        int num_kids = node_get_num_kids(left);
+
+        printf("Set %d kids to type %s", num_kids, type->get_name());
+    }
+
+    void visit_int_literal(struct Node *ast) override {
+        // set type to integer
+        ast->set_type(type_create_primitive("INTEGER"));
+    }
+
+    void visit_var_ref(struct Node *ast) override {
+        const char* varname = node_get_str(ast);
+
+        // create symbol with current scope
+        // Symbol *sym = m_cur_scope->lookup(varname)
+
+        // report errors here or annotate
+    }
+
+    void visit_identifier(struct Node *ast) override {
+        ASTVisitor::visit_identifier(ast);
+    }
+
+    void visit_add(struct Node *ast) override {
+        recur_on_children(ast);
+
+        // left_type = ast->get_kid(0)->get_type()
+        // right_type = ast->get_kid(1)->get_type()
+
+        // type check
+    }
+};
 
 ////////////////////////////////////////////////////////////////////////
 // Context class implementation
@@ -56,7 +125,7 @@ void Context::set_flag(char flag) {
 
 void Context::build_symtab() {
   // TODO: implement
-  ASTVisitor *visitor = new ASTVisitor();
+  SymbolTableBuilder *visitor = new SymbolTableBuilder();
   visitor->visit(root);
 
   if (fprint) {

@@ -5,12 +5,12 @@
 #ifndef ASSIGN03_TYPE_H
 #define ASSIGN03_TYPE_H
 
+// TODO: Is this the right way to define Type by creating inherited classes of the base type which always has a name?
 
 struct Type {
-private:
-    char* name;
 public:
-    char* get_name();
+    const char* name;
+    const char* get_name();
 };
 
 struct PrimitiveType: Type {
@@ -18,9 +18,9 @@ struct PrimitiveType: Type {
 
 struct ArrayType: Type {
 private:
+public:
     int size;
     Type elementType;
-public:
     int get_size();
     Type get_type();
 };
@@ -30,10 +30,10 @@ private:
     // list of fields
 };
 
-Type create_primitive(char* name);
+Type* type_create_primitive(const char* name);
 
-Type type_create_array(char* name, int size);
+Type* type_create_array(const char* name, int size);
 
-Type type_create_record(char* name);
+Type* type_create_record(const char* name);
 
 #endif //ASSIGN03_TYPE_H
