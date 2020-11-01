@@ -6,17 +6,17 @@
 #define ASSIGN03_TYPE_H
 
 
-class Type {
+struct Type {
 private:
     char* name;
 public:
     char* get_name();
 };
 
-class PrimitiveType: Type {
+struct PrimitiveType: Type {
 };
 
-class ArrayType: Type {
+struct ArrayType: Type {
 private:
     int size;
     Type elementType;
@@ -25,7 +25,7 @@ public:
     Type get_type();
 };
 
-class RecordType: Type {
+struct RecordType: Type {
 private:
     // list of fields
 };

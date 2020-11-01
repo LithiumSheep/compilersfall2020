@@ -56,6 +56,8 @@ void Context::set_flag(char flag) {
 
 void Context::build_symtab() {
   // TODO: implement
+  ASTVisitor *visitor = new ASTVisitor();
+  visitor->visit(root);
 
   if (fprint) {
       // print symbol table

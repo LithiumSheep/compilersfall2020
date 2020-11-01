@@ -53,7 +53,7 @@ program
 
 opt_declarations
     : declarations
-    | /* epsilon */ {  }
+    | /* epsilon */ { $$ = node_build0(AST_DECLARATIONS);  }
     ;
 
 declarations
@@ -131,7 +131,7 @@ record_type
 
 opt_instructions
     : instructions
-    | /* epsilon */ {  }
+    | /* epsilon */ { $$ = node_build0(AST_INSTRUCTIONS); }
     ;
 
 instructions

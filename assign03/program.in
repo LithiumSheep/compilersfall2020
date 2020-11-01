@@ -2,5 +2,5 @@ PROGRAM array02;
     VAR a: INTEGER;
 
 BEGIN
-
+    a := 1;
 END.

@@ -13,13 +13,13 @@ enum Kind {
     //PROCEDURE
 };
 
-class Symbol {
+struct Symbol {
 public:
     char* name;
     Type type;
     int kind;
 };
 
-struct Symbol *symbol_create(char* name, Type type, Kind kind);
+Symbol *symbol_create(char* name, Type type, Kind kind);
 
 #endif //ASSIGN03_SYMBOL_H
