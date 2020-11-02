@@ -3,9 +3,8 @@
 //
 
 #include "symtab.h"
-#include "util.h"
 
-void SymbolTable::insert(const char *name, Symbol symbol) {
+void SymbolTable::insert(Symbol symbol) {
     // init vs set?
     tab.push_back(symbol);
 }

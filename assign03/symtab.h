@@ -16,7 +16,7 @@ private:
     std::vector<Symbol> tab;
     // TODO: pointer to parent table
 public:
-    void insert(const char* name, Symbol);
+    void insert(Symbol symbol);
     Symbol lookup_local(const char* name);
     Symbol lookup_global(const char* name);
     void print_sym_tab();

@@ -32,5 +32,4 @@ const char* get_name_for_kind(int kind) {
         return "TYPE";
     }
     // error otherwise
-    // record?
 }
