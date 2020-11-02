@@ -2,48 +2,40 @@
 // Created by Jesse Li on 10/31/20.
 //
 
-#include "type.h"
 #include "cpputil.h"
-#include <iostream>
+#include "type.h"
 #include <string>
 
-const char * PrimitiveType::get_name() {
-    return name;
-}
-
-long ArrayType::get_size() {
-    return size;
-}
-
-Type* ArrayType::get_type() {
-    return elementType;
-}
 
 Type* type_create_primitive(const char* name) {
-    PrimitiveType* primitive = new PrimitiveType();
+    Type* primitive = new Type();
+    primitive->realType = PRIMITIVE;
     primitive->name = name;
     return primitive;
 }
 
 Type* type_create_array(long size, Type* elementType) {
-    ArrayType* arr = new ArrayType();
-    arr->size = size;
-    arr->elementType = elementType;
+    Type* arr = new Type();
+    arr->realType = ARRAY;
+    arr->arraySize = size;
+    arr->arrayElementType = elementType;
     return arr;
 }
 
-Type* type_create_record(const char* name);
-
-std::string Type::describe() {
-    return "";
+Type* type_create_record(const char* name) {
+    Type* record = new Type();
+    record->realType = RECORD;
+    record->name = name;
+    return record;
 }
 
-std::string PrimitiveType::describe() {
-    return get_name();
+std::string Type::to_string() {
+    if (realType == ARRAY) {
+        return cpputil::format("ARRAY %ld OF %s", arraySize, arrayElementType->to_string().c_str());
+    } else if (realType == RECORD) {
+        // needs to print out types/symbols inside Record, then "RECORD (field_type x field_type x ...);
+        return "RECORD";
+    } else {
+        return name;    // expected to be the name of the primitive
+    }
 }
-
-std::string ArrayType::describe() {
-    return cpputil::format("ARRAY %ld OF %s", get_size(), get_type()->describe().c_str());
-}
-
-// TODO: Describe record types

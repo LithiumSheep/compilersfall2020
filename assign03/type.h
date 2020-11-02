@@ -7,36 +7,23 @@
 
 #include <string>
 
-// TODO: Is this the right way to define Type by creating inherited classes of the base type which always has a name?
+enum RealType {
+    PRIMITIVE = 0,
+    ARRAY,
+    RECORD
+};
 
 struct Type {
-    virtual std::string describe();
     // contain all variables for all types
     // use enum for the explicit type, e.g. PRIMITIVE, ARRAY, RECORD
-};
+    int realType;
 
-struct PrimitiveType: Type {
-    // INTEGER
-    // CHAR
-public:
+    long arraySize;
+    Type* arrayElementType;
+
     const char* name;
-    const char* get_name();
-    std::string describe() override;
-};
-
-struct ArrayType: Type {
-private:
 public:
-    long size;
-    Type* elementType;
-    long get_size();
-    Type* get_type();
-    std::string describe() override;
-};
-
-struct RecordType: Type {
-private:
-    // list of fields
+    std::string to_string();
 };
 
 Type* type_create_primitive(const char* name);

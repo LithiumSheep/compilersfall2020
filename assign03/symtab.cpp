@@ -51,7 +51,7 @@ void SymbolTable::print_sym_tab() {
         // name
         std::string name = i->first;
         //type
-        std::string type_name = sym.get_type()->describe();
+        std::string type_name = sym.get_type()->to_string();
         // depth,kind,name,type
         printf("%ld,%s,%s,%s\n", depth, kind_name.c_str(), name.c_str(), type_name.c_str());
     }
