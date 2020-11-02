@@ -85,7 +85,19 @@ public:
     }
 
     void visit_type_def(struct Node *ast) override {
-        ASTVisitor::visit_type_def(ast);
+        recur_on_children(ast);
+
+        // find out type on right
+        Node* right = node_get_kid(ast, 1);
+        Type* type = right->get_type();
+
+        // get left identifier
+        Node* left = node_get_kid(ast, 0);
+        const char* name = node_get_str(left);
+
+        // set entry in symtab for name, type
+        Symbol* sym = symbol_create(name, type, TYPE);
+        symtab->insert(*sym);
     }
 
     void visit_named_type(struct Node *ast) override {
@@ -97,7 +109,7 @@ public:
 
         // perform checks
         // if primitive (INTEGER, CHAR), ok
-        // else if type name, perform lookup, then set type
+        // TODO: else if type name, perform lookup, then set type
 
         ast->set_type(named_type);
         // set the type of the current node
