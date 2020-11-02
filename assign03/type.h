@@ -23,6 +23,8 @@ struct Type {
 
     const char* name;
 public:
+    Type(int realType);
+    ~Type();
     std::string to_string();
 };
 

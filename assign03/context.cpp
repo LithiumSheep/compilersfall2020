@@ -43,13 +43,58 @@ public:
     SymbolTable* get_symtab() {
         return symtab;
     }
+
     SymbolTableBuilder(SymbolTable* symbolTable) {
         symtab = symbolTable;
         integer_type = type_create_primitive("INTEGER");
     }
 
     void visit_constant_def(struct Node *ast) override {
-        ASTVisitor::visit_constant_def(ast);
+        recur_on_children(ast);
+
+        printf("Visiting constant_def\n");
+
+        int tag = node_get_tag(ast);
+        const char* tag_name = ast_get_tag_name(tag);
+
+        printf("Node has tag %s", tag_name);
+
+        int num_kids = node_get_num_kids(ast);
+
+        printf("num_kids: %d", num_kids);
+
+        // find out type on right
+        Node* right = node_get_kid(ast, 1);
+        Type* type = right->get_type();
+
+        printf("Right side determined to be type %s\n", type->to_string().c_str());
+
+        // get left identifier
+        Node* left = node_get_kid(ast, 0);
+        const char* name = node_get_str(left);  // TODO: segfault?
+        // set entry in symtab for name, type
+        Symbol* sym = symbol_create(name, type, CONST);
+        symtab->insert(*sym);
+    }
+
+    void visit_var_def(struct Node *ast) override {
+        recur_on_children(ast);
+
+        // find out type on right
+        Node* right = node_get_kid(ast, 1);
+        Type* type = right->get_type();
+
+        // get left identifier(s)
+        Node* left = node_get_kid(ast, 0);
+        int num_kids = node_get_num_kids(left);
+
+        for (int i = 0; i < num_kids; i++) {
+            Node* id = node_get_kid(left, i);
+            const char* name = node_get_str(id);
+            // set entry in symtab for name, type
+            Symbol* sym = symbol_create(name, type, VARIABLE);
+            symtab->insert(*sym);
+        }
     }
 
     void visit_type_def(struct Node *ast) override {
@@ -90,26 +135,6 @@ public:
         // Records will have their own "scope"
         // records store their fields in an ordered list aka <vector>
         // records print their "inner fields" before printing the record type line
-    }
-
-    void visit_var_def(struct Node *ast) override {
-        recur_on_children(ast);
-
-        // find out type on right
-        Node* right = node_get_kid(ast, 1);
-        Type* type = right->get_type();
-
-        // get left identifier(s)
-        Node* left = node_get_kid(ast, 0);
-        int num_kids = node_get_num_kids(left);
-
-        for (int i = 0; i < num_kids; i++) {
-            Node* id = node_get_kid(left, i);
-            const char* name = node_get_str(id);
-            // set entry in symtab for name, type
-            Symbol* sym = symbol_create(name, type, VARIABLE);
-            symtab->insert(name, *sym);
-        }
     }
 
     void visit_int_literal(struct Node *ast) override {

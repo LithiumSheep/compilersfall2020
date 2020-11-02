@@ -25,11 +25,11 @@ struct Symbol *symbol_create(const char* name, Type* type, Kind kind) {
 }
 
 const char* get_name_for_kind(int kind) {
-    if (kind == VARIABLE) {
-        return "VAR";
-    }
     if (kind == TYPE) {
         return "TYPE";
+    } else if (kind == CONST) {
+        return "CONST";
+    } else {
+        return "VAR";
     }
-    // error otherwise
 }

@@ -48,7 +48,7 @@ void SymbolTable::print_sym_tab() {
         long depth = 0;
 
         // kind
-        std::string kind_name = get_name_for_kind(sym.m_kind);
+        std::string kind_name = get_name_for_kind(sym.get_kind());
         // name
         std::string name = sym.get_name();
         //type

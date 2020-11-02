@@ -1,11 +1,8 @@
-PROGRAM arr;
-  VAR months: ARRAY 12 OF INTEGER;
+PROGRAM const02;
+  CONST N = 20;
+  -- a named constant should be allowed as an array size
 
 BEGIN
-  months[0] := 31;
-  months[1] := 28;
-  months[2] := 31;
-  months[3] := 30;
 
-  WRITE months[3];
+
 END.

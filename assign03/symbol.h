@@ -9,6 +9,7 @@
 
 enum Kind {
     VARIABLE = 0,
+    CONST,
     TYPE
 };
 
