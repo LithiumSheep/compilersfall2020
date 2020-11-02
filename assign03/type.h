@@ -8,7 +8,7 @@
 #include <string>
 
 enum RealType {
-    PRIMITIVE = 0,
+    PRIMITIVE,
     ARRAY,
     RECORD
 };
@@ -16,6 +16,7 @@ enum RealType {
 struct Type {
     // contain all variables for all types
     // use enum for the explicit type, e.g. PRIMITIVE, ARRAY, RECORD
+public:
     int realType;
 
     long arraySize;

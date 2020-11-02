@@ -2,7 +2,6 @@
 // Created by Jesse Li on 10/31/20.
 //
 
-#include <string>
 #include "type.h"
 
 Type::Type(int realType) : realType(realType) {}

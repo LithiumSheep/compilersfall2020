@@ -52,26 +52,13 @@ public:
     void visit_constant_def(struct Node *ast) override {
         recur_on_children(ast);
 
-        printf("Visiting constant_def\n");
-
-        int tag = node_get_tag(ast);
-        const char* tag_name = ast_get_tag_name(tag);
-
-        printf("Node has tag %s", tag_name);
-
-        int num_kids = node_get_num_kids(ast);
-
-        printf("num_kids: %d", num_kids);
-
         // find out type on right
         Node* right = node_get_kid(ast, 1);
         Type* type = right->get_type();
 
-        printf("Right side determined to be type %s\n", type->to_string().c_str());
-
         // get left identifier
         Node* left = node_get_kid(ast, 0);
-        const char* name = node_get_str(left);  // TODO: segfault?
+        const char* name = node_get_str(left);
         // set entry in symtab for name, type
         Symbol* sym = symbol_create(name, type, CONST);
         symtab->insert(*sym);
@@ -137,11 +124,6 @@ public:
         // records print their "inner fields" before printing the record type line
     }
 
-    void visit_int_literal(struct Node *ast) override {
-        // set type to integer
-        ast->set_type(integer_type);
-    }
-
     void visit_var_ref(struct Node *ast) override {
         ASTVisitor::visit_var_ref(ast);
 
@@ -155,10 +137,6 @@ public:
          */
     }
 
-    void visit_identifier(struct Node *ast) override {
-        ASTVisitor::visit_identifier(ast);
-    }
-
     void visit_add(struct Node *ast) override {
         ASTVisitor::visit_add(ast);
         /*
@@ -169,6 +147,15 @@ public:
 
         // type check
          */
+    }
+
+    void visit_identifier(struct Node *ast) override {
+        ASTVisitor::visit_identifier(ast);
+    }
+
+    void visit_int_literal(struct Node *ast) override {
+        // set type to integer
+        ast->set_type(integer_type);
     }
 };
 

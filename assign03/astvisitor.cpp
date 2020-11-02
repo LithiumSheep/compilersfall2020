@@ -128,6 +128,7 @@ void ASTVisitor::visit(struct Node *ast) {
     visit_identifier(ast);
     break;
     case NODE_TOK_INT_LITERAL:
+        visit_int_literal(ast);
        break;
   default:
     assert(false); // unknown AST node type
