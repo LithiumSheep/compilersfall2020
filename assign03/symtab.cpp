@@ -3,20 +3,21 @@
 //
 
 #include "symtab.h"
+#include "util.h"
 
 void SymbolTable::insert(Symbol symbol) {
     // init vs set?
     tab.push_back(symbol);
 }
-/*
-Symbol SymbolTable::lookup_local(const char *name) {
-    std::map<std::string, Symbol>::const_iterator i = tab.find(name);
-    if (i == tab.end()) {
-        err_fatal("Undefined variable '%s'\n", name);
-    }
-    return i->second;
-}
 
+Symbol SymbolTable::lookup_local(const char *name) {
+    // searching for names in the current scope
+    // redefining a name in local scope is an error
+
+    // for loop
+    err_fatal("Undefined variable '%s'\n", name);
+}
+/*
 Symbol SymbolTable::lookup_global(const char *name) {
     std::vector<Symbol>::iterator i = tab.begin();
     if (i == tab.end()) {

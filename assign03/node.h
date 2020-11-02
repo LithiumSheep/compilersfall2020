@@ -65,11 +65,16 @@ public:
   void set_source_info(const SourceInfo &source_info);
   long get_ival() const;
   void set_ival(long ival);
+
+  // TODO: don't need to store SymbolTable and index in Node
   void set_symtab(SymbolTable *symtab);
   SymbolTable *get_symtab();
   void set_index(unsigned index);
   unsigned get_index() const;
   void set_symbol(SymbolTable *symtab, unsigned index);
+
+  // TODO: instead, store pointer to Symbol
+
   void set_type(Type *type);
   Type *get_type();
 };
