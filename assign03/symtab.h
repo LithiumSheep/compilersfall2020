@@ -14,6 +14,8 @@
 struct SymbolTable {
 private:
     std::map<std::string, Symbol> tab;
+    // TODO: table would best be implemented as a vector
+    // TODO: pointer to parent table
 public:
     void insert(const char* name, Symbol);
     Symbol lookup_local(const char* name);

@@ -87,6 +87,9 @@ public:
 
     void visit_record_type(struct Node *ast) override {
         ASTVisitor::visit_record_type(ast);
+        // Records will have their own "scope"
+        // records store their fields in an ordered list aka <vector>
+        // records print their "inner fields" before printing the record type line
     }
 
     void visit_var_def(struct Node *ast) override {
@@ -115,7 +118,8 @@ public:
     }
 
     void visit_var_ref(struct Node *ast) override {
-        ASTVisitor::visit_record_type(ast);
+        ASTVisitor::visit_var_ref(ast);
+
         /*
         const char* varname = node_get_str(ast);
 
@@ -131,7 +135,7 @@ public:
     }
 
     void visit_add(struct Node *ast) override {
-        ASTVisitor::visit_record_type(ast);
+        ASTVisitor::visit_add(ast);
         /*
         recur_on_children(ast);
 

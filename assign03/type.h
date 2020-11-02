@@ -11,6 +11,8 @@
 
 struct Type {
     virtual std::string describe();
+    // contain all variables for all types
+    // use enum for the explicit type, e.g. PRIMITIVE, ARRAY, RECORD
 };
 
 struct PrimitiveType: Type {
