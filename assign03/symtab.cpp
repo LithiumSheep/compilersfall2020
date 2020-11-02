@@ -7,9 +7,9 @@
 
 void SymbolTable::insert(const char *name, Symbol symbol) {
     // init vs set?
-    tab[name] = symbol;
+    tab.push_back(symbol);
 }
-
+/*
 Symbol SymbolTable::lookup_local(const char *name) {
     std::map<std::string, Symbol>::const_iterator i = tab.find(name);
     if (i == tab.end()) {
@@ -19,7 +19,7 @@ Symbol SymbolTable::lookup_local(const char *name) {
 }
 
 Symbol SymbolTable::lookup_global(const char *name) {
-    std::map<std::string, Symbol>::const_iterator i = tab.find(name);
+    std::vector<Symbol>::iterator i = tab.begin();
     if (i == tab.end()) {
         // did not find the value
         //if (parent == nullptr) {
@@ -27,29 +27,31 @@ Symbol SymbolTable::lookup_global(const char *name) {
         //}
         //return parent->find_val(name);
     }
-    return i->second;
+    return i;
 }
+*/
 
 bool SymbolTable::s_exists(const char* name) {
-    std::map<std::string, Symbol>::const_iterator i = tab.find(name);
-    if (i == tab.end()) {
-        return false;
+    std::vector<Symbol>::iterator i;
+    for (i = tab.begin(); i != tab.end(); i++) {
+        if (i->get_name() == name) {
+            return true;
+        }
     }
-    return true;
+    // then search parent
+
+    return false;
 }
 
 void SymbolTable::print_sym_tab() {
-    std::map<std::string, Symbol>::const_iterator i;
-    for (i = tab.begin(); i != tab.end(); i++) {
-        Symbol sym = i->second;
-
+    for (auto sym : tab) {
         //TODO: Depth
         long depth = 0;
 
         // kind
         std::string kind_name = get_name_for_kind(sym.m_kind);
         // name
-        std::string name = i->first;
+        std::string name = sym.get_name();
         //type
         std::string type_name = sym.get_type()->to_string();
         // depth,kind,name,type

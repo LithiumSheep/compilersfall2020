@@ -4,8 +4,16 @@
 
 #include "symbol.h"
 
+const char* Symbol::get_name() {
+    return m_name;
+}
+
 Type* Symbol::get_type() {
     return m_type;
+}
+
+int Symbol::get_kind() {
+    return m_kind;
 }
 
 struct Symbol *symbol_create(const char* name, Type* type, Kind kind) {

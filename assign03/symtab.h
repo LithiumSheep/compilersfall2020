@@ -13,8 +13,7 @@
 
 struct SymbolTable {
 private:
-    std::map<std::string, Symbol> tab;
-    // TODO: table would best be implemented as a vector
+    std::vector<Symbol> tab;
     // TODO: pointer to parent table
 public:
     void insert(const char* name, Symbol);
