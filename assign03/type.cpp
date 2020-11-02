@@ -2,6 +2,7 @@
 // Created by Jesse Li on 10/31/20.
 //
 
+#include "cpputil.h"
 #include "type.h"
 
 Type::Type(int realType) : realType(realType) {}
@@ -30,7 +31,7 @@ std::string Type::to_string() {
         case PRIMITIVE:
             return name;
         case ARRAY:
-            return "ARRAY size OF type";
+            return cpputil::format("ARRAY %ld OF %s", arraySize, arrayElementType->to_string().c_str());
         case RECORD:
             return "RECORD";
         default:
