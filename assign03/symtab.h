@@ -15,14 +15,14 @@ struct SymbolTable {
 private:
     std::vector<Symbol> tab;
     SymbolTable* parent;
+    int depth;
 public:
+    SymbolTable(SymbolTable* outer);
     void insert(Symbol symbol);
-
-    Symbol lookup_local(const char* name);
+    Symbol lookup(const char* name);
 
     // find types created in the outer scope while creating fields in records
     Symbol lookup_global(const char* name);
-
     void print_sym_tab();
 private:
     bool s_exists(const char* name);
