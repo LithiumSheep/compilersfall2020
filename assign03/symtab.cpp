@@ -54,6 +54,11 @@ void SymbolTable::print_sym_tab() {
         //TODO: Depth
         //using SymbolTable.depth
 
+        if (sym.get_kind() == RECORD) {
+            // print record internals first
+            // record.get_sym_tab().print_sym_tab();
+        }
+
         // kind
         std::string kind_name = get_name_for_kind(sym.get_kind());
         // name
