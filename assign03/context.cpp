@@ -78,6 +78,7 @@ public:
         // get left identifier
         Node* left = node_get_kid(ast, 0);
         const char* name = node_get_str(left);
+
         // set entry in symtab for name, type
         Symbol* sym = symbol_create(name, type, CONST);
         if (scope->s_exists(name)) {
@@ -161,7 +162,7 @@ public:
 
         // get left size
         Node* left = node_get_kid(ast, 0);
-        long size = strtol(node_get_str(left), nullptr, 10);
+        long size = node_get_ival(left);
 
         Type* arrayType = type_create_array(size, type);
         ast->set_type(arrayType);
@@ -209,6 +210,9 @@ public:
     }
 
     void visit_identifier(struct Node *ast) override {
+        ASTVisitor::visit_identifier(ast);
+
+        // TODO: Consts can be deferenced and have a long value set to the node
         const char* identifier = node_get_str(ast);
     }
 
