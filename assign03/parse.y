@@ -72,8 +72,8 @@ constdecl
     ;
 
 constdefn_list
-    : constdefn_list constdefn { $$ = $2; }
-    | constdefn { $$ = $1; }
+    : constdefn_list constdefn { $$ = $1; node_add_kid($1, $2); }
+    | constdefn { $$ = node_build1(AST_CONSTANT_DECLARATIONS, $1); }
     ;
 
 constdefn
@@ -85,8 +85,8 @@ typedecl
     ;
 
 typedefn_list
-    : typedefn_list typedefn { $$ = $2; }
-    | typedefn{ $$ = $1; }
+    : typedefn_list typedefn { $$ = $1; node_add_kid($1, $2); }
+    | typedefn { $$ = node_build1(AST_TYPE_DECLARATIONS, $1); }
     ;
 
 typedefn
@@ -94,16 +94,16 @@ typedefn
     ;
 
 vardecl
-    : TOK_VAR vardefn_list { $$ = $2; }
+    : vardefn_list { $$ = $1; }
     ;
 
 vardefn_list
-    : vardefn_list vardefn { $$ = $2; }
-    | vardefn { $$ = $1; }
+    : vardefn_list vardefn { $$ = $1; node_add_kid($1, $2); }
+    | vardefn { $$ = node_build1(AST_VAR_DECLARATIONS, $1); }
     ;
 
 vardefn
-    : identifier_list TOK_COLON type TOK_SEMICOLON { $$ = node_build2(AST_VAR_DEF, $1, $3); }
+    : TOK_VAR identifier_list TOK_COLON type TOK_SEMICOLON { $$ = node_build2(AST_VAR_DEF, $2, $4); }
     ;
 
 identifier_list

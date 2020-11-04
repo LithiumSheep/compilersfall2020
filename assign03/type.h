@@ -33,6 +33,6 @@ Type* type_create_primitive(const char* name);
 
 Type* type_create_array(long size, Type* elementType);
 
-Type* type_create_record(const char* name);
+Type* type_create_record();
 
 #endif //ASSIGN03_TYPE_H

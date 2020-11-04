@@ -1,6 +1,8 @@
 PROGRAM person;
-    TYPE Empty = ARRAY 0 OF INTEGER;
-    VAR a, b: Empty;
+    CONST x = 10;
+    VAR a, b: INTEGER;
+    VAR c: CHAR;
+    CONST y = 20;
 
 BEGIN
 

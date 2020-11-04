@@ -177,7 +177,7 @@ public:
 
 Context::Context(struct Node *ast) {
     root = ast;
-    symtab = new SymbolTable();
+    symtab = new SymbolTable(nullptr);
     flag_print = false;
 }
 

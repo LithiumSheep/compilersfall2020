@@ -20,9 +20,8 @@ Type* type_create_array(long size, Type* elementType) {
     return arr;
 }
 
-Type* type_create_record(const char* name) {
+Type* type_create_record() {
     Type* record = new Type(RECORD);
-    record->name = name;
     return record;
 }
 
