@@ -18,7 +18,7 @@ SymbolTable::SymbolTable(SymbolTable *outer) {
 
 void SymbolTable::insert(Symbol symbol) {
     if (s_exists(symbol.get_name())) {
-        err_fatal("Symbol with name %s already exists", symbol.get_name());
+        err_fatal("Name '%s' is already defined", symbol.get_name());
     }
     tab.push_back(symbol);
 }
@@ -48,13 +48,14 @@ SymbolTable* SymbolTable::get_parent() {
 }
 
 bool SymbolTable::s_exists(const char* name) {
-    std::vector<Symbol>::iterator i;
-    for (i = tab.begin(); i != tab.end(); i++) {
-        if (i->get_name() == name) {
+    for (auto sym : tab) {
+        if (std::strcmp(name, sym.get_name()) == 0) {
             return true;
         }
     }
-    // then search parent
+    if (parent) {
+        return parent->s_exists(name);
+    }
 
     return false;
 }

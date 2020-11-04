@@ -1,7 +1,9 @@
 #include <cassert>
 #include <cstdio>
+#include <cstdarg>
 #include <cstdlib>
 #include <cstring>
+#include <string>
 #include <set>
 #include "util.h"
 #include "cpputil.h"
@@ -30,6 +32,7 @@ public:
   void set_flag(char flag);
 
   void build_symtab();
+  void print_err(Node* node, const char *fmt, ...);
 
   // TODO: additional methods
 };
@@ -41,6 +44,20 @@ private:
     Type* integer_type;
     Type* char_type;
 public:
+
+    void print_err(Node* node, const char* fmt, ...) {
+
+        SourceInfo info = node_get_source_info(node);
+        //std::string error_start_str = cpputil::format("%s:%d:%d: Error: %s", info.filename, info.line, info.col, fmt);
+
+        fprintf(stderr, "%s:%d:%d: Error: ", info.filename, info.line, info.col);
+
+        va_list args;
+        va_start(args, fmt);
+        err_fatal(fmt, args);
+        va_end(args);
+    }
+
     SymbolTable* get_symtab() {
         return scope;
     }
