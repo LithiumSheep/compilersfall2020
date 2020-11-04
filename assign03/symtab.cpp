@@ -2,6 +2,7 @@
 // Created by Jesse Li on 10/31/20.
 //
 
+#include <cstring>
 #include "symtab.h"
 #include "util.h"
 
@@ -27,7 +28,7 @@ Symbol SymbolTable::lookup(const char *name) {
 
     // for loop
     for (auto sym : tab) {
-        if (strcmp(name, sym.get_name()) == 0) {
+        if (std::strcmp(name, sym.get_name()) == 0) {
             return sym;
         }
     }

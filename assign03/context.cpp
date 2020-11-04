@@ -1,6 +1,7 @@
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <set>
 #include "util.h"
 #include "cpputil.h"
@@ -108,9 +109,9 @@ public:
         const char* type_str = node_get_str(type);
         Type* named_type;
 
-        if (strcmp(type_str, "INTEGER") == 0) {
+        if (std::strcmp(type_str, "INTEGER") == 0) {
             named_type = integer_type;
-        } else if (strcmp(type_str, "CHAR") == 0) {
+        } else if (std::strcmp(type_str, "CHAR") == 0) {
             named_type = char_type;
         } else {
             // perform lookup
