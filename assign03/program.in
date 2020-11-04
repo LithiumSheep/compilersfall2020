@@ -1,6 +1,9 @@
 PROGRAM person;
-    VAR a: INTEGER;
-    VAR b: CHAR;
+  TYPE Person = RECORD
+    name: ARRAY 10 OF CHAR;
+    age: INTEGER;
+  END;
+  VAR p: Person;
 
 BEGIN
 

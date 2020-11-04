@@ -32,7 +32,7 @@ std::string Type::to_string() {
         case ARRAY:
             return cpputil::format("ARRAY %ld OF %s", arraySize, arrayElementType->to_string().c_str());
         case RECORD:
-            return "RECORD";
+            return "RECORD ()";
         default:
             return "<<unknown>>";
     }
