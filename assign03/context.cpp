@@ -38,6 +38,9 @@ public:
 // Known issues:
 // bug: Modifying enum start value in enums Kind and RealType change the behavior of record printing (???)
 // unimplemented: Consts can be dereferenced and used in subsequent declarations
+// unimplemented: Consts can be checked for variable references and throw an error
+// unimplemented: array and field references are not being type checked
+// unimolemented: READ and WRITE operands are not being checked
 //
 
 class SymbolTableBuilder : public ASTVisitor {
@@ -193,8 +196,6 @@ public:
     }
 
     void visit_var_ref(struct Node *ast) override {
-        ASTVisitor::visit_var_ref(ast);
-
         Node* ident = node_get_kid(ast, 0);
         const char* varname = node_get_str(ident);
 
@@ -204,6 +205,10 @@ public:
             SourceInfo info = node_get_source_info(ident);
             err_fatal("%s:%d:%d: Error: Undefined variable '%s'\n", info.filename, info.line, info.col, varname);
         }
+        Symbol sym = scope->lookup(varname);
+        ast->set_str(varname);
+        ast->set_type(sym.get_type());
+        ast->set_source_info(node_get_source_info(ident));
     }
 
     void visit_identifier(struct Node *ast) override {
