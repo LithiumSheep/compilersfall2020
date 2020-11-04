@@ -23,7 +23,6 @@ public:
     std::vector<Symbol> get_symbols();
     SymbolTable* get_parent();
     void print_sym_tab();
-private:
     bool s_exists(const char* name);
 };
 

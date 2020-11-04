@@ -80,7 +80,12 @@ public:
         const char* name = node_get_str(left);
         // set entry in symtab for name, type
         Symbol* sym = symbol_create(name, type, CONST);
-        scope->insert(*sym);
+        if (scope->s_exists(name)) {
+            SourceInfo info = node_get_source_info(left);
+            err_fatal("%s:%d:%d: Error: Name '%s' is already defined\n", info.filename, info.line, info.col, name);
+        } else {
+            scope->insert(*sym);
+        }
     }
 
     void visit_var_def(struct Node *ast) override {
@@ -99,7 +104,12 @@ public:
             const char* name = node_get_str(id);
             // set entry in symtab for name, type
             Symbol* sym = symbol_create(name, type, VARIABLE);
-            scope->insert(*sym);
+            if (scope->s_exists(name)) {
+                SourceInfo info = node_get_source_info(left);
+                err_fatal("%s:%d:%d: Error: Name '%s' is already defined\n", info.filename, info.line, info.col, name);
+            } else {
+                scope->insert(*sym);
+            }
         }
     }
 
@@ -116,7 +126,12 @@ public:
 
         // set entry in symtab for name, type
         Symbol* sym = symbol_create(name, type, TYPE);
-        scope->insert(*sym);
+        if (scope->s_exists(name)) {
+            SourceInfo info = node_get_source_info(left);
+            err_fatal("%s:%d:%d: Error: Name '%s' is already defined\n", info.filename, info.line, info.col, name);
+        } else {
+            scope->insert(*sym);
+        }
     }
 
     void visit_named_type(struct Node *ast) override {
@@ -194,10 +209,12 @@ public:
     }
 
     void visit_identifier(struct Node *ast) override {
-        ASTVisitor::visit_identifier(ast);
+        const char* identifier = node_get_str(ast);
     }
 
     void visit_int_literal(struct Node *ast) override {
+        // set literal value
+        ast->set_ival(strtol(node_get_str(ast), nullptr, 10));
         // set type to integer
         ast->set_type(integer_type);
     }

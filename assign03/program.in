@@ -1,7 +1,13 @@
-PROGRAM const01;
-    CONST one = 1;
-    VAR one : INTEGER;
+PROGRAM const02;
+  CONST N = 20;
+  -- a named constant should be allowed as an array size
+  VAR arr : ARRAY N OF INTEGER;
+  VAR i : INTEGER;
+
 BEGIN
-    one := one;
-    WRITE one;
+  i := 0;
+  WHILE i < N DO
+    READ arr[i];
+  END;
+
 END.
