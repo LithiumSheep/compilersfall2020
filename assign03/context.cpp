@@ -195,14 +195,15 @@ public:
     void visit_var_ref(struct Node *ast) override {
         ASTVisitor::visit_var_ref(ast);
 
-        /*
-        const char* varname = node_get_str(ast);
+        Node* ident = node_get_kid(ast, 0);
+        const char* varname = node_get_str(ident);
 
-        // create symbol with current scope
-        // Symbol *sym = m_cur_scope->lookup(varname)
-
-        // report errors here or annotate
-         */
+        if (scope->s_exists(varname)) {
+            // if name references a TYPE or RECORD, is also wrong
+        } else {
+            SourceInfo info = node_get_source_info(ident);
+            err_fatal("%s:%d:%d: Error: Undefined variable '%s'\n", info.filename, info.line, info.col, varname);
+        }
     }
 
     void visit_identifier(struct Node *ast) override {
