@@ -37,6 +37,14 @@ Symbol SymbolTable::lookup(const char *name) {
     err_fatal("Undefined variable '%s'\n", name);
 }
 
+std::vector<Symbol> SymbolTable::get_symbols() {
+    return tab;
+}
+
+SymbolTable* SymbolTable::get_parent() {
+    return parent;
+}
+
 bool SymbolTable::s_exists(const char* name) {
     std::vector<Symbol>::iterator i;
     for (i = tab.begin(); i != tab.end(); i++) {
@@ -56,7 +64,7 @@ void SymbolTable::print_sym_tab() {
 
         if (sym.get_kind() == RECORD) {
             // print record internals first
-            // record.get_sym_tab().print_sym_tab();
+            sym.get_type()->symtab->print_sym_tab();
         }
 
         // kind

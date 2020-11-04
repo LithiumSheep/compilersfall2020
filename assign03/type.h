@@ -6,6 +6,9 @@
 #define ASSIGN03_TYPE_H
 
 #include <string>
+#include "symtab.h"
+
+struct SymbolTable;
 
 enum RealType {
     PRIMITIVE,
@@ -23,6 +26,8 @@ public:
     Type* arrayElementType;
 
     const char* name;
+
+    SymbolTable* symtab;
 public:
     Type(int realType);
     ~Type();
@@ -33,6 +38,6 @@ Type* type_create_primitive(const char* name);
 
 Type* type_create_array(long size, Type* elementType);
 
-Type* type_create_record();
+Type* type_create_record(SymbolTable* symbolTable);
 
 #endif //ASSIGN03_TYPE_H

@@ -20,8 +20,9 @@ Type* type_create_array(long size, Type* elementType) {
     return arr;
 }
 
-Type* type_create_record() {
+Type* type_create_record(SymbolTable* symbolTable) {
     Type* record = new Type(RECORD);
+    record->symtab = symbolTable;
     return record;
 }
 
@@ -31,8 +32,19 @@ std::string Type::to_string() {
             return name;
         case ARRAY:
             return cpputil::format("ARRAY %ld OF %s", arraySize, arrayElementType->to_string().c_str());
-        case RECORD:
-            return "RECORD ()";
+        case RECORD: {
+            std::string record_str = "RECORD (";
+            std::vector<Symbol> symbols = symtab->get_symbols();
+            for (int i = 0; i < symbols.size(); i++) {
+                if (i == 0) {
+                    record_str += symbols[i].get_type()->to_string();
+                } else {
+                    record_str += " x " + symbols[i].get_type()->to_string();
+                }
+            }
+            record_str += ")";
+            return record_str;
+        }
         default:
             return "<<unknown>>";
     }

@@ -7,8 +7,10 @@
 
 #include "type.h"
 
+struct Type;
+
 enum Kind {
-    VARIABLE = 0,
+    VARIABLE,
     CONST,
     TYPE
 };

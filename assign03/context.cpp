@@ -19,7 +19,7 @@
 struct Context {
 private:
     Node *root;
-    SymbolTable *symtab;
+    SymbolTable *global;
     bool flag_print;
 
 public:
@@ -37,15 +37,15 @@ class SymbolTableBuilder : public ASTVisitor {
 private:
     // TODO: Handle symbol depth
     // TODO: Handle type checking
-    SymbolTable* symtab;
+    SymbolTable* scope;
     Type* integer_type;
 public:
     SymbolTable* get_symtab() {
-        return symtab;
+        return scope;
     }
 
     SymbolTableBuilder(SymbolTable* symbolTable) {
-        symtab = symbolTable;
+        scope = symbolTable;
         integer_type = type_create_primitive("INTEGER");
     }
 
@@ -61,7 +61,7 @@ public:
         const char* name = node_get_str(left);
         // set entry in symtab for name, type
         Symbol* sym = symbol_create(name, type, CONST);
-        symtab->insert(*sym);
+        scope->insert(*sym);
     }
 
     void visit_var_def(struct Node *ast) override {
@@ -80,7 +80,7 @@ public:
             const char* name = node_get_str(id);
             // set entry in symtab for name, type
             Symbol* sym = symbol_create(name, type, VARIABLE);
-            symtab->insert(*sym);
+            scope->insert(*sym);
         }
     }
 
@@ -97,7 +97,7 @@ public:
 
         // set entry in symtab for name, type
         Symbol* sym = symbol_create(name, type, TYPE);
-        symtab->insert(*sym);
+        scope->insert(*sym);
     }
 
     void visit_named_type(struct Node *ast) override {
@@ -134,7 +134,14 @@ public:
         // records store their fields in an ordered list aka <vector>
         // records print their "inner fields" before printing the record type line
 
-        Type* recordType = type_create_record();
+        SymbolTable* nestedSymTab = new SymbolTable(scope);
+        scope = nestedSymTab;
+
+        recur_on_children(ast); // will populate the nested scope with values
+
+        scope = scope->get_parent();    // bring it back to parent scope
+
+        Type* recordType = type_create_record(nestedSymTab);
         ast->set_type(recordType);
     }
 
@@ -179,7 +186,7 @@ public:
 
 Context::Context(struct Node *ast) {
     root = ast;
-    symtab = new SymbolTable(nullptr);
+    global = new SymbolTable(nullptr);
     flag_print = false;
 }
 
@@ -195,7 +202,7 @@ void Context::set_flag(char flag) {
 void Context::build_symtab() {
 
     // give symtabbuilder a symtab in constructor?
-    SymbolTableBuilder *visitor = new SymbolTableBuilder(symtab);
+    SymbolTableBuilder *visitor = new SymbolTableBuilder(global);
     visitor->visit(root);
 
     if (flag_print) {
