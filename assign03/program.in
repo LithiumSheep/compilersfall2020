@@ -6,5 +6,12 @@ PROGRAM person;
   VAR p: Person;
 
 BEGIN
+  READ p.name;
+  READ p.age;
 
+  IF p.age >= 18 THEN
+    WRITE 1;
+  ELSE
+    WRITE 0;
+  END;
 END.

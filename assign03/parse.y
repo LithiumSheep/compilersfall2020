@@ -166,7 +166,7 @@ whilestmt
     ;
 
 writestmt
-    : TOK_WRITE designator { $$ = node_build1(AST_WRITE, $2); }
+    : TOK_WRITE expression { $$ = node_build1(AST_WRITE, $2); }
     ;
 
 readstmt
