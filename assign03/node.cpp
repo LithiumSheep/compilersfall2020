@@ -298,8 +298,6 @@ unsigned node_get_index(struct Node *n) {
   return n->get_index();
 }
 
-// TODO: Do we need to define this extern function?
-
 // Assume that this function exists, and can retrieve a pointer to
 // a Symbol from a SymbolTable, given its index.
 //extern "C" struct Symbol *symtab_get_entry(struct SymbolTable *symtab, unsigned index);

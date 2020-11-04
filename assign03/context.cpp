@@ -33,13 +33,15 @@ public:
 
   void build_symtab();
   void print_err(Node* node, const char *fmt, ...);
-
-  // TODO: additional methods
 };
+
+// Known issues:
+// bug: Modifying enum start value in enums Kind and RealType change the behavior of record printing (???)
+// unimplemented: Consts can be dereferenced and used in subsequent declarations
+//
 
 class SymbolTableBuilder : public ASTVisitor {
 private:
-    // TODO: Handle type checking
     SymbolTable* scope;
     Type* integer_type;
     Type* char_type;
@@ -194,18 +196,6 @@ public:
         // Symbol *sym = m_cur_scope->lookup(varname)
 
         // report errors here or annotate
-         */
-    }
-
-    void visit_add(struct Node *ast) override {
-        ASTVisitor::visit_add(ast);
-        /*
-        recur_on_children(ast);
-
-        // left_type = ast->get_kid(0)->get_type()
-        // right_type = ast->get_kid(1)->get_type()
-
-        // type check
          */
     }
 
