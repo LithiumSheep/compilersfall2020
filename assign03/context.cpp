@@ -39,6 +39,7 @@ private:
     // TODO: Handle type checking
     SymbolTable* scope;
     Type* integer_type;
+    Type* char_type;
 public:
     SymbolTable* get_symtab() {
         return scope;
@@ -47,6 +48,7 @@ public:
     SymbolTableBuilder(SymbolTable* symbolTable) {
         scope = symbolTable;
         integer_type = type_create_primitive("INTEGER");
+        char_type = type_create_primitive("CHAR");
     }
 
     void visit_constant_def(struct Node *ast) override {
@@ -101,18 +103,22 @@ public:
     }
 
     void visit_named_type(struct Node *ast) override {
-        // set the current type to the child type
         Node* type = node_get_kid(ast, 0);
 
         const char* type_str = node_get_str(type);
-        Type* named_type = type_create_primitive(type_str);
+        Type* named_type;
 
-        // perform checks
-        // if primitive (INTEGER, CHAR), ok
-        // TODO: else if type name, perform lookup, then set type
-
-        ast->set_type(named_type);
+        if (strcmp(type_str, "INTEGER") == 0) {
+            named_type = integer_type;
+        } else if (strcmp(type_str, "CHAR") == 0) {
+            named_type = char_type;
+        } else {
+            // perform lookup
+            Symbol typeSymbol = scope->lookup(type_str);
+            named_type = typeSymbol.get_type();
+        }
         // set the type of the current node
+        ast->set_type(named_type);
     }
 
     void visit_array_type(struct Node *ast) override {

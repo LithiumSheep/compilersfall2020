@@ -27,7 +27,7 @@ Symbol SymbolTable::lookup(const char *name) {
 
     // for loop
     for (auto sym : tab) {
-        if (sym.get_name() == name) {
+        if (strcmp(name, sym.get_name()) == 0) {
             return sym;
         }
     }
