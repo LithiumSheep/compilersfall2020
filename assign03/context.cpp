@@ -36,7 +36,6 @@ public:
 
 class SymbolTableBuilder : public ASTVisitor {
 private:
-    // TODO: Handle symbol depth
     // TODO: Handle type checking
     SymbolTable* scope;
     Type* integer_type;

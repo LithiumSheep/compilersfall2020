@@ -40,9 +40,6 @@ int yylex(void);
 %type<node> expression term factor primary
 %type<node> assignstmt ifstmt repeatstmt whilestmt condition writestmt readstmt
 %type<node> designator identifier_list
-/*
-%type<node> expression_list
-*/
 
 %%
 

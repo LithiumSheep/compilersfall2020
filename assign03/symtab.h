@@ -22,9 +22,6 @@ public:
     Symbol lookup(const char* name);
     std::vector<Symbol> get_symbols();
     SymbolTable* get_parent();
-
-    // find types created in the outer scope while creating fields in records
-    Symbol lookup_global(const char* name);
     void print_sym_tab();
 private:
     bool s_exists(const char* name);

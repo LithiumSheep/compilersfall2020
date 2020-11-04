@@ -3,6 +3,7 @@
 //
 
 #include <cstring>
+#include <string>
 #include "symtab.h"
 #include "util.h"
 
@@ -60,8 +61,6 @@ bool SymbolTable::s_exists(const char* name) {
 
 void SymbolTable::print_sym_tab() {
     for (auto sym : tab) {
-        //TODO: Depth
-        //using SymbolTable.depth
 
         if (sym.get_kind() == RECORD) {
             // print record internals first
@@ -74,6 +73,7 @@ void SymbolTable::print_sym_tab() {
         std::string name = sym.get_name();
         //type
         std::string type_name = sym.get_type()->to_string();
+
         // depth,kind,name,type
         printf("%d,%s,%s,%s\n", depth, kind_name.c_str(), name.c_str(), type_name.c_str());
     }

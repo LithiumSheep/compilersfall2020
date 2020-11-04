@@ -10,7 +10,7 @@
 struct Type;
 
 enum Kind {
-    VARIABLE,
+    VARIABLE = 0,
     CONST,
     TYPE
 };
@@ -25,7 +25,7 @@ public:
     int get_kind();
 };
 
-Symbol *symbol_create(const char* name, Type* type, Kind kind);
+Symbol *symbol_create(const char* name, Type* type, int kind);
 
 const char* get_name_for_kind(int kind);
 

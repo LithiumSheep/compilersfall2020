@@ -1,17 +1,6 @@
-PROGRAM person;
-  TYPE Person = RECORD
-    name: ARRAY 10 OF CHAR;
-    age: INTEGER;
-  END;
-  VAR p: Person;
+PROGRAM array04;
+VAR a : ARRAY 10 OF INTEGER;
 
 BEGIN
-  READ p.name;
-  READ p.age;
-
-  IF p.age >= 18 THEN
-    WRITE 1;
-  ELSE
-    WRITE 0;
-  END;
+  a[-1] := 42;
 END.

@@ -11,7 +11,7 @@
 struct SymbolTable;
 
 enum RealType {
-    PRIMITIVE,
+    PRIMITIVE = 0,
     ARRAY,
     RECORD
 };
