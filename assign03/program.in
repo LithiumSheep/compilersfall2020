@@ -1,8 +1,6 @@
 PROGRAM person;
-    CONST x = 10;
-    VAR a, b: INTEGER;
-    VAR c: CHAR;
-    CONST y = 20;
+    VAR a: INTEGER;
+    VAR b: CHAR;
 
 BEGIN
 

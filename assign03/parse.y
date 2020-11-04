@@ -94,7 +94,7 @@ typedefn
     ;
 
 vardecl
-    : vardefn_list { $$ = $1; }
+    : TOK_VAR vardefn_list { $$ = $2; }
     ;
 
 vardefn_list
@@ -103,7 +103,7 @@ vardefn_list
     ;
 
 vardefn
-    : TOK_VAR identifier_list TOK_COLON type TOK_SEMICOLON { $$ = node_build2(AST_VAR_DEF, $2, $4); }
+    : identifier_list TOK_COLON type TOK_SEMICOLON { $$ = node_build2(AST_VAR_DEF, $1, $3); }
     ;
 
 identifier_list
