@@ -149,8 +149,14 @@ public:
             named_type = char_type;
         } else {
             // perform lookup
-            Symbol typeSymbol = scope->lookup(type_str);
-            named_type = typeSymbol.get_type();
+            if (scope->s_exists(type_str)) {
+                Symbol typeSymbol = scope->lookup(type_str);
+                named_type = typeSymbol.get_type();
+            } else {
+                SourceInfo info = node_get_source_info(type);
+                err_fatal("%s:%d:%d: Error: Unknown type '%s'\n", info.filename, info.line, info.col, type_str);
+                named_type = nullptr;
+            }
         }
         // set the type of the current node
         ast->set_type(named_type);
