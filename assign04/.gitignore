@@ -1,0 +1,9 @@
+/*.o
+/compiler
+/depend.mak
+/grammar_symbols.[hc]
+/lex.yy.c
+/parse.tab.[hc]
+/*.pdf
+/*.gv
+/scripts
