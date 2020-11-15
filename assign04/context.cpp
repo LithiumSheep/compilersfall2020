@@ -16,6 +16,7 @@
 #include "context.h"
 #include "cfg.h"
 #include "highlevel.h"
+#include "x86_64.h"
 
 ////////////////////////////////////////////////////////////////////////
 // Classes
@@ -52,6 +53,9 @@ class HighLevelCodeGen : public ASTVisitor {
 private:
     long m_vreg = 0;  // begin vreg at %r10
     InstructionSequence* code;
+    Operand rsp = Operand(OPERAND_MREG, MREG_RSP);
+    Operand printf_label = Operand("printf");
+    Operand scanf_label = Operand("scanf");
 
 public:
     HighLevelCodeGen() {
@@ -75,16 +79,48 @@ public:
     void visit_read(struct Node *ast) override {
         ASTVisitor::visit_read(ast);
 
+        // loadaddr lhs by offset
+        // localaddr vr0, $8
+
+        // readint into vreg
+        // readint vr1
+
+        // storeint into loaded addr
+        // str (vr0), vr1
     }
 
     void visit_write(struct Node *ast) override {
         ASTVisitor::visit_write(ast);
 
+        // loadaddr lhs by offset
+        // localaddr vr0, $4
+
+        // loadint from addr to vreg
+        // ldi vr1, (vr0)
+
+        // writeint
+        // writeint vr1
+    }
+
+    void visit_assign(struct Node *ast) override {
+        ASTVisitor::visit_assign(ast);
+
+        // loadaddr lhs by offset
+        // localaddr vr0, $0
+
+        // load rhs operand (could be in register, or could be iconst
+        // ldci vr1, $val
+
+        // storeint into loaded addr
+        // sti (vr0), vr1
     }
 
     void visit_identifier(struct Node *ast) override {
         ASTVisitor::visit_identifier(ast);
 
+        // loadaddr lhs by offset
+        // localaddr vr0, $8
+        // set Operand to Node
     }
 
     void visit_int_literal(struct Node *ast) override {
@@ -104,6 +140,7 @@ private:
     SymbolTable* scope;
     Type* integer_type;
     Type* char_type;
+    int curr_offset;
 public:
 
     void print_err(Node* node, const char* fmt, ...) {
