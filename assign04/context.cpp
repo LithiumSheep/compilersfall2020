@@ -14,6 +14,8 @@
 #include "ast.h"
 #include "astvisitor.h"
 #include "context.h"
+#include "cfg.h"
+#include "highlevel.h"
 
 ////////////////////////////////////////////////////////////////////////
 // Classes
@@ -33,6 +35,8 @@ public:
 
   void build_symtab();
   void print_err(Node* node, const char *fmt, ...);
+
+  void build_hlevel();
 };
 
 // Known issues:
@@ -42,6 +46,58 @@ public:
 // unimplemented: array and field references are not being type checked
 // unimolemented: READ and WRITE operands are not being checked
 //
+
+class HighLevelCodeGen : public ASTVisitor {
+
+private:
+    long m_vreg = 0;  // begin vreg at %r10
+    InstructionSequence* code;
+
+public:
+    HighLevelCodeGen() {
+        code = new InstructionSequence();
+    }
+
+    long next_vreg() {
+        return m_vreg++;
+    }
+
+    void reset_vreg() {
+        m_vreg = -1;
+    }
+
+    InstructionSequence* get_iseq() {
+        return code;
+    }
+
+public:
+
+    void visit_read(struct Node *ast) override {
+        ASTVisitor::visit_read(ast);
+
+    }
+
+    void visit_write(struct Node *ast) override {
+        ASTVisitor::visit_write(ast);
+
+    }
+
+    void visit_identifier(struct Node *ast) override {
+        ASTVisitor::visit_identifier(ast);
+
+    }
+
+    void visit_int_literal(struct Node *ast) override {
+        ASTVisitor::visit_int_literal(ast);
+
+        long vreg = next_vreg();
+        Operand destreg(OPERAND_VREG, vreg);
+        Operand immval(OPERAND_INT_LITERAL, ast->get_ival());
+        auto *ins = new Instruction(HINS_LOAD_INT, destreg, immval);
+        code->add_instruction(ins);
+        // set operand on ast
+    }
+};
 
 class SymbolTableBuilder : public ASTVisitor {
 private:
@@ -257,6 +313,15 @@ void Context::build_symtab() {
     }
 }
 
+void Context::build_hlevel() {
+    auto *hlcodegen = new HighLevelCodeGen();
+    hlcodegen->visit(root);
+
+    // TODO: print highlevel to <filename>.txt
+    auto *hlprinter = new PrintHighLevelInstructionSequence(hlcodegen->get_iseq());
+    hlprinter->print();
+}
+
 // TODO: implementation of additional Context member functions
 
 // TODO: implementation of member functions for helper classes
@@ -282,4 +347,8 @@ void context_build_symtab(struct Context *ctx) {
 }
 
 void context_check_types(struct Context *ctx) {
+}
+
+void context_gen_hlevel(struct Context *ctx) {
+    ctx->build_hlevel();
 }

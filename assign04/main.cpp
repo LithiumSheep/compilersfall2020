@@ -69,18 +69,18 @@ int main(int argc, char **argv) {
   lexer_set_source_file(filename);
 
   yyparse();
+  struct Context *ctx = context_create(g_program);
 
   if (mode == PRINT_AST) {
     treeprint(g_program, ast_get_tag_name);
   } else if (mode == PRINT_AST_GRAPH) {
     ast_print_graph(g_program);
-  } else {
-    struct Context *ctx = context_create(g_program);
-    if (mode == PRINT_SYMBOL_TABLE) {
+  } else if (mode == PRINT_SYMBOL_TABLE) {
       context_set_flag(ctx, 's'); // tell Context to print symbol table info
-    }
-    context_build_symtab(ctx);
   }
+
+  context_build_symtab(ctx);
+  context_gen_hlevel(ctx);
 
   return 0;
 }
