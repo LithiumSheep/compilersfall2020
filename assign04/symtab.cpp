@@ -74,8 +74,9 @@ void SymbolTable::print_sym_tab() {
         std::string name = sym.get_name();
         //type
         std::string type_name = sym.get_type()->to_string();
+        //offset
 
         // depth,kind,name,type
-        printf("%d,%s,%s,%s\n", depth, kind_name.c_str(), name.c_str(), type_name.c_str());
+        printf("%d,%s,%s,%s,%d\n", depth, kind_name.c_str(), name.c_str(), type_name.c_str(), sym.get_offset());
     }
 }

@@ -1,5 +1,6 @@
 PROGRAM error02;
-  VAR a, b: INTEGER;
+  VAR a, b, c: INTEGER;
+  VAR d: INTEGER;
 
 BEGIN
   a := 1;

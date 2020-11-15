@@ -140,7 +140,8 @@ private:
     SymbolTable* scope;
     Type* integer_type;
     Type* char_type;
-    int curr_offset;
+    int integer_size = 8;
+    int curr_offset = 0;
 public:
 
     void print_err(Node* node, const char* fmt, ...) {
@@ -158,6 +159,14 @@ public:
 
     SymbolTable* get_symtab() {
         return scope;
+    }
+
+    int get_curr_offset() {
+        return curr_offset;
+    }
+
+    void incr_curr_offset(int offset) {
+        curr_offset += offset;
     }
 
     SymbolTableBuilder(SymbolTable* symbolTable) {
@@ -178,7 +187,14 @@ public:
         const char* name = node_get_str(left);
 
         // set entry in symtab for name, type
-        Symbol* sym = symbol_create(name, type, CONST);
+        int offset = get_curr_offset();
+        Symbol* sym = symbol_create(name, type, CONST, offset);
+        if (type == integer_type) {
+            incr_curr_offset(integer_size);
+        } else {
+            // TODO: figure out offset for CHAR, TYPE, or RECORD, which may vary
+        }
+
         if (scope->s_exists(name)) {
             SourceInfo info = node_get_source_info(left);
             err_fatal("%s:%d:%d: Error: Name '%s' is already defined\n", info.filename, info.line, info.col, name);
@@ -202,7 +218,13 @@ public:
             Node* id = node_get_kid(left, i);
             const char* name = node_get_str(id);
             // set entry in symtab for name, type
-            Symbol* sym = symbol_create(name, type, VARIABLE);
+            int offset = get_curr_offset();
+            Symbol* sym = symbol_create(name, type, VARIABLE, offset);
+            if (type == integer_type) {
+                incr_curr_offset(integer_size);
+            } else {
+                // TODO: figure out offset for CHAR, TYPE, or RECORD, which may vary
+            }
             if (scope->s_exists(name)) {
                 SourceInfo info = node_get_source_info(left);
                 err_fatal("%s:%d:%d: Error: Name '%s' is already defined\n", info.filename, info.line, info.col, name);
@@ -224,7 +246,13 @@ public:
         const char* name = node_get_str(left);
 
         // set entry in symtab for name, type
-        Symbol* sym = symbol_create(name, type, TYPE);
+        int offset = get_curr_offset();
+        Symbol* sym = symbol_create(name, type, TYPE, offset);
+        if (type == integer_type) {
+            incr_curr_offset(integer_size);
+        } else {
+            // TODO: figure out offset for CHAR, TYPE, or RECORD, which may vary
+        }
         if (scope->s_exists(name)) {
             SourceInfo info = node_get_source_info(left);
             err_fatal("%s:%d:%d: Error: Name '%s' is already defined\n", info.filename, info.line, info.col, name);

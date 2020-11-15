@@ -20,12 +20,14 @@ public:
     const char* m_name;
     Type* m_type;
     int m_kind;
+    int m_offset;
     const char* get_name();
     Type* get_type();
     int get_kind();
+    int get_offset();
 };
 
-Symbol *symbol_create(const char* name, Type* type, int kind);
+Symbol *symbol_create(const char* name, Type* type, int kind, int offset);
 
 const char* get_name_for_kind(int kind);
 

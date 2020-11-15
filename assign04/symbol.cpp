@@ -16,11 +16,16 @@ int Symbol::get_kind() {
     return m_kind;
 }
 
-struct Symbol *symbol_create(const char* name, Type* type, int kind) {
+int Symbol::get_offset() {
+    return m_offset;
+}
+
+struct Symbol *symbol_create(const char* name, Type* type, int kind, int offset) {
     Symbol *symbol = new Symbol();
     symbol->m_name = name;
     symbol->m_type = type;
     symbol->m_kind = kind;
+    symbol->m_offset = offset;
     return symbol;
 }
 
