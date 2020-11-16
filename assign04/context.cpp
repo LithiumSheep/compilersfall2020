@@ -127,9 +127,9 @@ public:
         ASTVisitor::visit_int_literal(ast);
 
         long vreg = next_vreg();
-        Operand destreg(OPERAND_VREG, vreg);
-        Operand immval(OPERAND_INT_LITERAL, ast->get_ival());
-        auto *ins = new Instruction(HINS_LOAD_INT, destreg, immval);
+        Operand destreg(OPERAND_VREG, vreg);    // $vr0
+        Operand immval(OPERAND_INT_LITERAL, ast->get_ival());   // $1
+        auto *ins = new Instruction(HINS_LOAD_INT, immval, destreg);    // movq $1, %vr1
         code->add_instruction(ins);
         // set operand on ast
     }
