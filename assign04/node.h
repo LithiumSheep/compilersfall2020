@@ -41,7 +41,7 @@ private:
   SymbolTable *m_symtab;
   unsigned m_index; // index of symbol table entry
   Type *m_type;
-  Operand *m_operand;
+  Operand m_operand;
 
   // copy ctor and assignment operator disallowed
   Node(const Node &);
@@ -74,8 +74,8 @@ public:
   void set_symbol(SymbolTable *symtab, unsigned index);
   void set_type(Type *type);
   Type *get_type();
-  void set_operand(Operand *op);
-  Operand *get_operand();
+  void set_operand(Operand &op);
+  Operand get_operand();
 };
 
 extern "C" {
