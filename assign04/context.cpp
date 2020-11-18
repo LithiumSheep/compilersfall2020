@@ -106,7 +106,6 @@ public:
         long readreg = next_vreg();
         Operand readdest(OPERAND_VREG, readreg);
         auto *readins = new Instruction(HINS_READ_INT, readdest);
-        readins->set_comment(cpputil::format("readi vr%ld", readreg));
         code->add_instruction(readins);
 
         // storeint into loaded addr
@@ -115,7 +114,6 @@ public:
         Operand destreg = varref->get_operand();    // don't use this one
         Operand toaddr(OPERAND_VREG_MEMREF, destreg.get_base_reg());   // use this one
         auto *storeins = new Instruction(HINS_STORE_INT, toaddr, readdest);
-        storeins->set_comment(cpputil::format("sti (vr%d), vr%d", toaddr.get_base_reg(), readdest.get_base_reg()));
         code->add_instruction(storeins);
 
         reset_vreg();
@@ -132,13 +130,11 @@ public:
         Operand fromreg = varref->get_operand();    // don't use this one
         Operand fromaddr(OPERAND_VREG_MEMREF, fromreg.get_base_reg()); // use this one
         auto *loadins = new Instruction(HINS_LOAD_INT, writedest, fromaddr);
-        loadins->set_comment(cpputil::format("ldi vr%ld, (vr%d)", loadreg, fromreg.get_base_reg()));
         code->add_instruction(loadins);
 
         // writeint
         // writei vr1
         auto *writeins = new Instruction(HINS_WRITE_INT, writedest);
-        writeins->set_comment(cpputil::format("writei vr%ld", loadreg));
         code->add_instruction(writeins);
 
         reset_vreg();
@@ -159,7 +155,6 @@ public:
         Operand refop(OPERAND_VREG_MEMREF, l_vreg.get_base_reg());
 
         auto *storeins = new Instruction(HINS_STORE_INT, refop, valop);
-        storeins->set_comment(cpputil::format("str (vr%d), vr%d", refop.get_base_reg(), valop.get_base_reg()));
         code->add_instruction(storeins);
 
         reset_vreg();
@@ -192,7 +187,6 @@ public:
         Operand ldest(OPERAND_VREG, lreg);
         Operand lfrom(OPERAND_VREG_MEMREF, l_op.get_base_reg());
         auto* lload = new Instruction(HINS_LOAD_INT, ldest, lfrom);
-        lload->set_comment(cpputil::format("ldi vr%d, (vr%d)", ldest.get_base_reg(), lfrom.get_base_reg()));
         code->add_instruction(lload);
 
         // ldi vr4, (vr2)
@@ -200,14 +194,12 @@ public:
         Operand rdest(OPERAND_VREG, rreg);
         Operand rfrom(OPERAND_VREG_MEMREF, r_op.get_base_reg());
         auto* rload = new Instruction(HINS_LOAD_INT, rdest, rfrom);
-        rload->set_comment(cpputil::format("ldi vr%d, (vr%d)", rdest.get_base_reg(), rfrom.get_base_reg()));
         code->add_instruction(rload);
 
         // divi vr5, vr3, vr4
         long result_reg = next_vreg();
         Operand divdest(OPERAND_VREG, result_reg);
         auto* divins = new Instruction(HINS_INT_DIV, divdest, ldest, rdest);
-        divins->set_comment(cpputil::format("divi vr%d, vr%d, vr%d", divdest.get_base_reg(), ldest.get_base_reg(), rdest.get_base_reg()));
         code->add_instruction(divins);
 
         ast->set_operand(divdest);
@@ -242,7 +234,6 @@ public:
         Operand addroffset(OPERAND_INT_LITERAL, offset);
 
         auto *loadaddrins = new Instruction(HINS_LOCALADDR, destreg, addroffset);
-        loadaddrins->set_comment(cpputil::format("localaddr vr%ld, $%d", vreg, offset));
         code->add_instruction(loadaddrins);
 
         // set Operand to Node
@@ -258,7 +249,6 @@ public:
         Operand destreg(OPERAND_VREG, vreg);    // $vr0
         Operand immval(OPERAND_INT_LITERAL, ast->get_ival());   // $1
         auto *ins = new Instruction(HINS_LOAD_INT, destreg, immval);    // movq vr0, lit1
-        ins->set_comment(cpputil::format("movq vr%ld, $%ld", vreg, ast->get_ival()));
         code->add_instruction(ins);
         ast->set_operand(destreg);
 
