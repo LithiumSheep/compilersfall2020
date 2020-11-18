@@ -48,6 +48,217 @@ public:
 // unimplemented: array and field references are not being type checked
 // unimolemented: READ and WRITE operands are not being checked
 //
+class SymbolTableBuilder : public ASTVisitor {
+private:
+    SymbolTable* scope;
+    Type* integer_type;
+    Type* char_type;
+    int integer_size = 8;
+    int curr_offset = 0;
+public:
+
+    void print_err(Node* node, const char* fmt, ...) {
+
+        SourceInfo info = node_get_source_info(node);
+        //std::string error_start_str = cpputil::format("%s:%d:%d: Error: %s", info.filename, info.line, info.col, fmt);
+
+        fprintf(stderr, "%s:%d:%d: Error: ", info.filename, info.line, info.col);
+
+        va_list args;
+        va_start(args, fmt);
+        err_fatal(fmt, args);
+        va_end(args);
+    }
+
+    SymbolTable* get_symtab() {
+        return scope;
+    }
+
+    int get_curr_offset() {
+        return curr_offset;
+    }
+
+    void incr_curr_offset(int offset) {
+        curr_offset += offset;
+    }
+
+    SymbolTableBuilder(SymbolTable* symbolTable) {
+        scope = symbolTable;
+        integer_type = type_create_primitive("INTEGER");
+        char_type = type_create_primitive("CHAR");
+    }
+
+    void visit_constant_def(struct Node *ast) override {
+        recur_on_children(ast);
+
+        // find out type on right
+        Node* right = node_get_kid(ast, 1);
+        Type* type = right->get_type();
+
+        // get left identifier
+        Node* left = node_get_kid(ast, 0);
+        const char* name = node_get_str(left);
+
+        // set entry in symtab for name, type
+        int offset = get_curr_offset();
+        Symbol* sym = symbol_create(name, type, CONST, offset);
+        if (type == integer_type) {
+            incr_curr_offset(integer_size);
+        } else {
+            // TODO: figure out offset for CHAR, TYPE, or RECORD, which may vary
+        }
+
+        if (scope->s_exists(name)) {
+            SourceInfo info = node_get_source_info(left);
+            err_fatal("%s:%d:%d: Error: Name '%s' is already defined\n", info.filename, info.line, info.col, name);
+        } else {
+            scope->insert(*sym);
+        }
+    }
+
+    void visit_var_def(struct Node *ast) override {
+        recur_on_children(ast);
+
+        // find out type on right
+        Node* right = node_get_kid(ast, 1);
+        Type* type = right->get_type();
+
+        // get left identifier(s)
+        Node* left = node_get_kid(ast, 0);
+        int num_kids = node_get_num_kids(left);
+
+        for (int i = 0; i < num_kids; i++) {
+            Node* id = node_get_kid(left, i);
+            const char* name = node_get_str(id);
+            // set entry in symtab for name, type
+            int offset = get_curr_offset();
+            Symbol* sym = symbol_create(name, type, VARIABLE, offset);
+            if (type == integer_type) {
+                incr_curr_offset(integer_size);
+            } else {
+                // TODO: figure out offset for CHAR, TYPE, or RECORD, which may vary
+            }
+            if (scope->s_exists(name)) {
+                SourceInfo info = node_get_source_info(left);
+                err_fatal("%s:%d:%d: Error: Name '%s' is already defined\n", info.filename, info.line, info.col, name);
+            } else {
+                scope->insert(*sym);
+            }
+        }
+    }
+
+    void visit_type_def(struct Node *ast) override {
+        recur_on_children(ast);
+
+        // find out type on right
+        Node* right = node_get_kid(ast, 1);
+        Type* type = right->get_type();
+
+        // get left identifier
+        Node* left = node_get_kid(ast, 0);
+        const char* name = node_get_str(left);
+
+        // set entry in symtab for name, type
+        int offset = get_curr_offset();
+        Symbol* sym = symbol_create(name, type, TYPE, offset);
+        if (type == integer_type) {
+            incr_curr_offset(integer_size);
+        } else {
+            // TODO: figure out offset for CHAR, TYPE, or RECORD, which may vary
+        }
+        if (scope->s_exists(name)) {
+            SourceInfo info = node_get_source_info(left);
+            err_fatal("%s:%d:%d: Error: Name '%s' is already defined\n", info.filename, info.line, info.col, name);
+        } else {
+            scope->insert(*sym);
+        }
+    }
+
+    void visit_named_type(struct Node *ast) override {
+        Node* type = node_get_kid(ast, 0);
+
+        const char* type_str = node_get_str(type);
+        Type* named_type;
+
+        if (std::strcmp(type_str, "INTEGER") == 0) {
+            named_type = integer_type;
+        } else if (std::strcmp(type_str, "CHAR") == 0) {
+            named_type = char_type;
+        } else {
+            // perform lookup
+            if (scope->s_exists(type_str)) {
+                Symbol typeSymbol = scope->lookup(type_str);
+                named_type = typeSymbol.get_type();
+            } else {
+                SourceInfo info = node_get_source_info(type);
+                err_fatal("%s:%d:%d: Error: Unknown type '%s'\n", info.filename, info.line, info.col, type_str);
+                named_type = nullptr;
+            }
+        }
+        // set the type of the current node
+        ast->set_type(named_type);
+    }
+
+    void visit_array_type(struct Node *ast) override {
+        recur_on_children(ast);
+
+        Node* right = node_get_kid(ast, 1);
+        Type* type = right->get_type();
+
+        // get left size
+        Node* left = node_get_kid(ast, 0);
+        long size = node_get_ival(left);
+
+        Type* arrayType = type_create_array(size, type);
+        ast->set_type(arrayType);
+    }
+
+    void visit_record_type(struct Node *ast) override {
+        // Records will have their own "scope"
+        // records store their fields in an ordered list aka <vector>
+        // records print their "inner fields" before printing the record type line
+
+        SymbolTable* nestedSymTab = new SymbolTable(scope);
+        scope = nestedSymTab;
+
+        recur_on_children(ast); // will populate the nested scope with values
+
+        scope = scope->get_parent();    // bring it back to parent scope
+
+        Type* recordType = type_create_record(nestedSymTab);
+        ast->set_type(recordType);
+    }
+
+    void visit_var_ref(struct Node *ast) override {
+        Node* ident = node_get_kid(ast, 0);
+        const char* varname = node_get_str(ident);
+
+        if (scope->s_exists(varname)) {
+            // if name references a TYPE or RECORD, is also wrong
+        } else {
+            SourceInfo info = node_get_source_info(ident);
+            err_fatal("%s:%d:%d: Error: Undefined variable '%s'\n", info.filename, info.line, info.col, varname);
+        }
+        Symbol sym = scope->lookup(varname);
+        ast->set_str(varname);
+        ast->set_type(sym.get_type());
+        ast->set_source_info(node_get_source_info(ident));
+    }
+
+    void visit_identifier(struct Node *ast) override {
+        ASTVisitor::visit_identifier(ast);
+
+        // TODO: Consts can be deferenced and have a long value set to the node
+        const char* identifier = node_get_str(ast);
+    }
+
+    void visit_int_literal(struct Node *ast) override {
+        // set literal value
+        ast->set_ival(strtol(node_get_str(ast), nullptr, 10));
+        // set type to integer
+        ast->set_type(integer_type);
+    }
+};
 
 class HighLevelCodeGen : public ASTVisitor {
 
@@ -290,6 +501,7 @@ public:
 
     void visit_modulus(struct Node *ast) override {
         ASTVisitor::visit_modulus(ast);
+        // TODO:
     }
 
     void visit_var_ref(struct Node *ast) override {
@@ -336,218 +548,6 @@ public:
         ast->set_operand(destreg);
 
         // do we need to reset virtual registers?
-    }
-};
-
-class SymbolTableBuilder : public ASTVisitor {
-private:
-    SymbolTable* scope;
-    Type* integer_type;
-    Type* char_type;
-    int integer_size = 8;
-    int curr_offset = 0;
-public:
-
-    void print_err(Node* node, const char* fmt, ...) {
-
-        SourceInfo info = node_get_source_info(node);
-        //std::string error_start_str = cpputil::format("%s:%d:%d: Error: %s", info.filename, info.line, info.col, fmt);
-
-        fprintf(stderr, "%s:%d:%d: Error: ", info.filename, info.line, info.col);
-
-        va_list args;
-        va_start(args, fmt);
-        err_fatal(fmt, args);
-        va_end(args);
-    }
-
-    SymbolTable* get_symtab() {
-        return scope;
-    }
-
-    int get_curr_offset() {
-        return curr_offset;
-    }
-
-    void incr_curr_offset(int offset) {
-        curr_offset += offset;
-    }
-
-    SymbolTableBuilder(SymbolTable* symbolTable) {
-        scope = symbolTable;
-        integer_type = type_create_primitive("INTEGER");
-        char_type = type_create_primitive("CHAR");
-    }
-
-    void visit_constant_def(struct Node *ast) override {
-        recur_on_children(ast);
-
-        // find out type on right
-        Node* right = node_get_kid(ast, 1);
-        Type* type = right->get_type();
-
-        // get left identifier
-        Node* left = node_get_kid(ast, 0);
-        const char* name = node_get_str(left);
-
-        // set entry in symtab for name, type
-        int offset = get_curr_offset();
-        Symbol* sym = symbol_create(name, type, CONST, offset);
-        if (type == integer_type) {
-            incr_curr_offset(integer_size);
-        } else {
-            // TODO: figure out offset for CHAR, TYPE, or RECORD, which may vary
-        }
-
-        if (scope->s_exists(name)) {
-            SourceInfo info = node_get_source_info(left);
-            err_fatal("%s:%d:%d: Error: Name '%s' is already defined\n", info.filename, info.line, info.col, name);
-        } else {
-            scope->insert(*sym);
-        }
-    }
-
-    void visit_var_def(struct Node *ast) override {
-        recur_on_children(ast);
-
-        // find out type on right
-        Node* right = node_get_kid(ast, 1);
-        Type* type = right->get_type();
-
-        // get left identifier(s)
-        Node* left = node_get_kid(ast, 0);
-        int num_kids = node_get_num_kids(left);
-
-        for (int i = 0; i < num_kids; i++) {
-            Node* id = node_get_kid(left, i);
-            const char* name = node_get_str(id);
-            // set entry in symtab for name, type
-            int offset = get_curr_offset();
-            Symbol* sym = symbol_create(name, type, VARIABLE, offset);
-            if (type == integer_type) {
-                incr_curr_offset(integer_size);
-            } else {
-                // TODO: figure out offset for CHAR, TYPE, or RECORD, which may vary
-            }
-            if (scope->s_exists(name)) {
-                SourceInfo info = node_get_source_info(left);
-                err_fatal("%s:%d:%d: Error: Name '%s' is already defined\n", info.filename, info.line, info.col, name);
-            } else {
-                scope->insert(*sym);
-            }
-        }
-    }
-
-    void visit_type_def(struct Node *ast) override {
-        recur_on_children(ast);
-
-        // find out type on right
-        Node* right = node_get_kid(ast, 1);
-        Type* type = right->get_type();
-
-        // get left identifier
-        Node* left = node_get_kid(ast, 0);
-        const char* name = node_get_str(left);
-
-        // set entry in symtab for name, type
-        int offset = get_curr_offset();
-        Symbol* sym = symbol_create(name, type, TYPE, offset);
-        if (type == integer_type) {
-            incr_curr_offset(integer_size);
-        } else {
-            // TODO: figure out offset for CHAR, TYPE, or RECORD, which may vary
-        }
-        if (scope->s_exists(name)) {
-            SourceInfo info = node_get_source_info(left);
-            err_fatal("%s:%d:%d: Error: Name '%s' is already defined\n", info.filename, info.line, info.col, name);
-        } else {
-            scope->insert(*sym);
-        }
-    }
-
-    void visit_named_type(struct Node *ast) override {
-        Node* type = node_get_kid(ast, 0);
-
-        const char* type_str = node_get_str(type);
-        Type* named_type;
-
-        if (std::strcmp(type_str, "INTEGER") == 0) {
-            named_type = integer_type;
-        } else if (std::strcmp(type_str, "CHAR") == 0) {
-            named_type = char_type;
-        } else {
-            // perform lookup
-            if (scope->s_exists(type_str)) {
-                Symbol typeSymbol = scope->lookup(type_str);
-                named_type = typeSymbol.get_type();
-            } else {
-                SourceInfo info = node_get_source_info(type);
-                err_fatal("%s:%d:%d: Error: Unknown type '%s'\n", info.filename, info.line, info.col, type_str);
-                named_type = nullptr;
-            }
-        }
-        // set the type of the current node
-        ast->set_type(named_type);
-    }
-
-    void visit_array_type(struct Node *ast) override {
-        recur_on_children(ast);
-
-        Node* right = node_get_kid(ast, 1);
-        Type* type = right->get_type();
-
-        // get left size
-        Node* left = node_get_kid(ast, 0);
-        long size = node_get_ival(left);
-
-        Type* arrayType = type_create_array(size, type);
-        ast->set_type(arrayType);
-    }
-
-    void visit_record_type(struct Node *ast) override {
-        // Records will have their own "scope"
-        // records store their fields in an ordered list aka <vector>
-        // records print their "inner fields" before printing the record type line
-
-        SymbolTable* nestedSymTab = new SymbolTable(scope);
-        scope = nestedSymTab;
-
-        recur_on_children(ast); // will populate the nested scope with values
-
-        scope = scope->get_parent();    // bring it back to parent scope
-
-        Type* recordType = type_create_record(nestedSymTab);
-        ast->set_type(recordType);
-    }
-
-    void visit_var_ref(struct Node *ast) override {
-        Node* ident = node_get_kid(ast, 0);
-        const char* varname = node_get_str(ident);
-
-        if (scope->s_exists(varname)) {
-            // if name references a TYPE or RECORD, is also wrong
-        } else {
-            SourceInfo info = node_get_source_info(ident);
-            err_fatal("%s:%d:%d: Error: Undefined variable '%s'\n", info.filename, info.line, info.col, varname);
-        }
-        Symbol sym = scope->lookup(varname);
-        ast->set_str(varname);
-        ast->set_type(sym.get_type());
-        ast->set_source_info(node_get_source_info(ident));
-    }
-
-    void visit_identifier(struct Node *ast) override {
-        ASTVisitor::visit_identifier(ast);
-
-        // TODO: Consts can be deferenced and have a long value set to the node
-        const char* identifier = node_get_str(ast);
-    }
-
-    void visit_int_literal(struct Node *ast) override {
-        // set literal value
-        ast->set_ival(strtol(node_get_str(ast), nullptr, 10));
-        // set type to integer
-        ast->set_type(integer_type);
     }
 };
 
