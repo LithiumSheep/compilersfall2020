@@ -1,10 +1,9 @@
-PROGRAM error02;
-  VAR a, b, c: INTEGER;
-  VAR d: INTEGER;
+PROGRAM arith10;
+  VAR x, y, z : INTEGER;
 
 BEGIN
-  a := 1;
-  b := 2;
-  WRITE a;
-  WRITE b;
+  READ x;
+  READ y;
+  --z := x DIV y;
+  --WRITE z;
 END.

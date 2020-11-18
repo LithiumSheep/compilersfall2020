@@ -51,7 +51,8 @@ public:
 class HighLevelCodeGen : public ASTVisitor {
 
 private:
-    long m_vreg = 0;  // begin vreg at %r10
+    long m_vreg = -1;
+    long m_vreg_max = 0;
     InstructionSequence* code;
     Operand rsp = Operand(OPERAND_MREG, MREG_RSP);
     Operand printf_label = Operand("printf");
@@ -63,7 +64,11 @@ public:
     }
 
     long next_vreg() {
-        return m_vreg++;
+        m_vreg += 1;
+        if (m_vreg_max < (m_vreg)) {
+            m_vreg_max = m_vreg;
+        }
+        return m_vreg;
     }
 
     void reset_vreg() {
@@ -76,17 +81,40 @@ public:
 
 public:
 
+    void visit_declarations(struct Node *ast) override {
+        //ASTVisitor::visit_declarations(ast);
+        // fixme: Does codegen need to visit any declarations?
+    }
+
+    void visit_instructions(struct Node *ast) override {
+        ASTVisitor::visit_instructions(ast);
+        // for any given instruction, if the parent is the a node AST_INSTRUCTIONS, we can call reset_vregs();
+        // reset vregs
+    }
+
+    bool check_parent_node(struct Node *ast) {
+        return true;
+    }
+
     void visit_read(struct Node *ast) override {
         ASTVisitor::visit_read(ast);
 
-        // loadaddr lhs by offset
-        // localaddr vr0, $8
-
         // readint into vreg
         // readint vr1
+        long readreg = next_vreg();
+        Operand readdest(OPERAND_VREG, readreg);
+        auto *readins = new Instruction(HINS_READ_INT, readdest);
+        code->add_instruction(readins);
 
         // storeint into loaded addr
-        // str (vr0), vr1
+        // sti (vr0), vr1
+        Node *varref = node_get_kid(ast, 0);
+        Operand destreg = varref->get_operand();    // don't use this one
+        Operand destregaddr(OPERAND_VREG_MEMREF, destreg.get_base_reg());   // use this one
+        auto *storeins = new Instruction(HINS_STORE_INT, destregaddr, readdest);
+        code->add_instruction(storeins);
+
+        reset_vreg();
     }
 
     void visit_write(struct Node *ast) override {
@@ -94,12 +122,17 @@ public:
 
         // loadaddr lhs by offset
         // localaddr vr0, $4
+        //long addrreg = next_vreg();
+
 
         // loadint from addr to vreg
         // ldi vr1, (vr0)
+        //long loadreg = next_vreg();
+
 
         // writeint
         // writeint vr1
+
     }
 
     void visit_assign(struct Node *ast) override {
@@ -115,23 +148,52 @@ public:
         // sti (vr0), vr1
     }
 
+    void visit_var_ref(struct Node *ast) override {
+        ASTVisitor::visit_var_ref(ast);
+
+        // set Operand on Node
+        Node *identifier = node_get_kid(ast, 0);
+        Operand op = identifier->get_operand();
+        ast->set_operand(op);
+    }
+
     void visit_identifier(struct Node *ast) override {
         ASTVisitor::visit_identifier(ast);
 
         // loadaddr lhs by offset
         // localaddr vr0, $8
+        long vreg = next_vreg();
+        Operand destreg(OPERAND_VREG, vreg);
+
+        const std::string varname = ast->get_str();
+        printf("visit_indentifier[%s]\n", varname.c_str());
+        // get offset from symbol
+        // instruction is an offset ref
+        int offset = 0;
+        Operand addroffset(OPERAND_INT_LITERAL, offset);
+
+        auto *loadaddrins = new Instruction(HINS_LOCALADDR, destreg, addroffset);
+        code->add_instruction(loadaddrins);
+
         // set Operand to Node
+        ast->set_operand(destreg);
+
+        // don't reset virtual registers
     }
 
     void visit_int_literal(struct Node *ast) override {
         ASTVisitor::visit_int_literal(ast);
 
+        printf("visit_int_literal[%ld]", ast->get_ival());
+
         long vreg = next_vreg();
         Operand destreg(OPERAND_VREG, vreg);    // $vr0
         Operand immval(OPERAND_INT_LITERAL, ast->get_ival());   // $1
-        auto *ins = new Instruction(HINS_LOAD_INT, immval, destreg);    // movq $1, %vr1
+        auto *ins = new Instruction(HINS_LOAD_INT, destreg, immval);    // movq vr0, lit1
         code->add_instruction(ins);
-        // set operand on ast
+        ast->set_operand(destreg);
+
+        // do we need to reset virtual registers?
     }
 };
 
