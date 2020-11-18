@@ -87,9 +87,9 @@ public:
     }
 
     void visit_instructions(struct Node *ast) override {
+        // fixme: Call reset_vregs before instructions are visited
         ASTVisitor::visit_instructions(ast);
-        // for any given instruction, if the parent is the a node AST_INSTRUCTIONS, we can call reset_vregs();
-        // reset vregs
+        // additinally, for any given instruction, if the parent is the a node AST_INSTRUCTIONS, we can call reset_vregs();
     }
 
     bool check_parent_node(struct Node *ast) {
@@ -162,6 +162,8 @@ public:
 
     void visit_identifier(struct Node *ast) override {
         ASTVisitor::visit_identifier(ast);
+
+        // Fixme: finish implementation
 
         // loadaddr lhs by offset
         // localaddr vr0, $8
