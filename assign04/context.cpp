@@ -551,6 +551,30 @@ public:
     }
 };
 
+class AssemblyCodeGen {
+    // needs to know about storage requirements
+    // needs to know highest virtual register value
+    // needs HINS instruction sequence
+
+private:
+    InstructionSequence* assembly;
+    InstructionSequence* hins;
+    PrintHighLevelInstructionSequence* print_helper;
+public:
+    AssemblyCodeGen(InstructionSequence* highlevelins) {
+        hins = highlevelins;
+        assembly = new InstructionSequence();
+        print_helper = new PrintHighLevelInstructionSequence(nullptr);
+    }
+    InstructionSequence* get_assembly_ins() {
+        return assembly;
+    }
+private:
+    std::string get_hins_comment(Instruction* hin) {
+        return print_helper->format_instruction(hin);
+    }
+};
+
 ////////////////////////////////////////////////////////////////////////
 // Context class implementation
 ////////////////////////////////////////////////////////////////////////
