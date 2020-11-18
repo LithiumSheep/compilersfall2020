@@ -149,6 +149,26 @@ public:
         // sti (vr0), vr1
     }
 
+    void visit_add(struct Node *ast) override {
+        ASTVisitor::visit_add(ast);
+    }
+
+    void visit_subtract(struct Node *ast) override {
+        ASTVisitor::visit_subtract(ast);
+    }
+
+    void visit_multiply(struct Node *ast) override {
+        ASTVisitor::visit_multiply(ast);
+    }
+
+    void visit_divide(struct Node *ast) override {
+        ASTVisitor::visit_divide(ast);
+    }
+
+    void visit_modulus(struct Node *ast) override {
+        ASTVisitor::visit_modulus(ast);
+    }
+
     void visit_var_ref(struct Node *ast) override {
         ASTVisitor::visit_var_ref(ast);
 
