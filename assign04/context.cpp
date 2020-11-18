@@ -106,6 +106,7 @@ public:
         long readreg = next_vreg();
         Operand readdest(OPERAND_VREG, readreg);
         auto *readins = new Instruction(HINS_READ_INT, readdest);
+        readins->set_comment(cpputil::format("readi vr%ld", readreg));
         code->add_instruction(readins);
 
         // storeint into loaded addr
@@ -114,6 +115,7 @@ public:
         Operand destreg = varref->get_operand();    // don't use this one
         Operand toaddr(OPERAND_VREG_MEMREF, destreg.get_base_reg());   // use this one
         auto *storeins = new Instruction(HINS_STORE_INT, toaddr, readdest);
+        storeins->set_comment(cpputil::format("sti (vr%d), vr%d", toaddr.get_base_reg(), readdest.get_base_reg()));
         code->add_instruction(storeins);
 
         reset_vreg();
@@ -130,11 +132,13 @@ public:
         Operand fromreg = varref->get_operand();    // don't use this one
         Operand fromaddr(OPERAND_VREG_MEMREF, fromreg.get_base_reg()); // use this one
         auto *loadins = new Instruction(HINS_LOAD_INT, writedest, fromaddr);
+        loadins->set_comment(cpputil::format("ldi vr%ld, (vr%d)", loadreg, fromreg.get_base_reg()));
         code->add_instruction(loadins);
 
         // writeint
         // writei vr1
         auto *writeins = new Instruction(HINS_WRITE_INT, writedest);
+        writeins->set_comment(cpputil::format("writei vr%ld", loadreg));
         code->add_instruction(writeins);
 
         reset_vreg();
@@ -143,11 +147,21 @@ public:
     void visit_assign(struct Node *ast) override {
         ASTVisitor::visit_assign(ast);
 
-        // load rhs operand (could be in register, or could be iconst
-        // ldci vr1, $val
-
         // storeint into loaded addr
         // sti (vr0), vr1
+        Node* lhs = node_get_kid(ast, 0);
+        Node* rhs = node_get_kid(ast, 1);
+
+        Operand r_vreg = rhs->get_operand();
+        Operand valop(OPERAND_VREG, r_vreg.get_base_reg());
+
+        Operand l_vreg = lhs->get_operand();
+        Operand refop(OPERAND_VREG_MEMREF, l_vreg.get_base_reg());
+
+        auto *storeins = new Instruction(HINS_STORE_INT, refop, valop);
+        code->add_instruction(storeins);
+
+        reset_vreg();
     }
 
     void visit_add(struct Node *ast) override {
@@ -164,6 +178,8 @@ public:
 
     void visit_divide(struct Node *ast) override {
         ASTVisitor::visit_divide(ast);
+
+
     }
 
     void visit_modulus(struct Node *ast) override {
@@ -195,6 +211,7 @@ public:
         Operand addroffset(OPERAND_INT_LITERAL, offset);
 
         auto *loadaddrins = new Instruction(HINS_LOCALADDR, destreg, addroffset);
+        loadaddrins->set_comment(cpputil::format("localaddr vr%ld, $%d", vreg, offset));
         code->add_instruction(loadaddrins);
 
         // set Operand to Node
@@ -210,6 +227,7 @@ public:
         Operand destreg(OPERAND_VREG, vreg);    // $vr0
         Operand immval(OPERAND_INT_LITERAL, ast->get_ival());   // $1
         auto *ins = new Instruction(HINS_LOAD_INT, destreg, immval);    // movq vr0, lit1
+        ins->set_comment(cpputil::format("movq vr%ld, $%ld", vreg, ast->get_ival()));
         code->add_instruction(ins);
         ast->set_operand(destreg);
 
