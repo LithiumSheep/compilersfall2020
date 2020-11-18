@@ -54,13 +54,14 @@ class HighLevelCodeGen : public ASTVisitor {
 private:
     long m_vreg = -1;
     long m_vreg_max = 0;
+    SymbolTable m_symtab;
     InstructionSequence* code;
     Operand rsp = Operand(OPERAND_MREG, MREG_RSP);
     Operand printf_label = Operand("printf");
     Operand scanf_label = Operand("scanf");
 
 public:
-    HighLevelCodeGen() {
+    HighLevelCodeGen(const SymbolTable &mSymtab) : m_symtab(mSymtab) {
         code = new InstructionSequence();
     }
 
@@ -181,17 +182,16 @@ public:
     void visit_identifier(struct Node *ast) override {
         ASTVisitor::visit_identifier(ast);
 
-        // Fixme: finish implementation
-
         // loadaddr lhs by offset
         // localaddr vr0, $8
         long vreg = next_vreg();
         Operand destreg(OPERAND_VREG, vreg);
 
-        const std::string varname = ast->get_str();
+        const char* varname = node_get_str(ast);
         // get offset from symbol
         // instruction is an offset ref
-        int offset = 0;
+        Symbol sym = m_symtab.lookup(varname);
+        int offset = sym.get_offset();
         Operand addroffset(OPERAND_INT_LITERAL, offset);
 
         auto *loadaddrins = new Instruction(HINS_LOCALADDR, destreg, addroffset);
@@ -465,7 +465,7 @@ void Context::build_symtab() {
 }
 
 void Context::build_hlevel() {
-    auto *hlcodegen = new HighLevelCodeGen();
+    auto *hlcodegen = new HighLevelCodeGen(global);
     hlcodegen->visit(root);
 
     // TODO: print highlevel to <filename>.txt
