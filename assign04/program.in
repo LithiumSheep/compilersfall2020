@@ -5,5 +5,5 @@ BEGIN
   READ x;
   READ y;
   --z := x DIV y;
-  --WRITE z;
+  WRITE z;
 END.

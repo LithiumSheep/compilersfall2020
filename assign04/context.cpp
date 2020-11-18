@@ -100,7 +100,7 @@ public:
         ASTVisitor::visit_read(ast);
 
         // readint into vreg
-        // readint vr1
+        // readi vr1
         long readreg = next_vreg();
         Operand readdest(OPERAND_VREG, readreg);
         auto *readins = new Instruction(HINS_READ_INT, readdest);
@@ -110,8 +110,8 @@ public:
         // sti (vr0), vr1
         Node *varref = node_get_kid(ast, 0);
         Operand destreg = varref->get_operand();    // don't use this one
-        Operand destregaddr(OPERAND_VREG_MEMREF, destreg.get_base_reg());   // use this one
-        auto *storeins = new Instruction(HINS_STORE_INT, destregaddr, readdest);
+        Operand toaddr(OPERAND_VREG_MEMREF, destreg.get_base_reg());   // use this one
+        auto *storeins = new Instruction(HINS_STORE_INT, toaddr, readdest);
         code->add_instruction(storeins);
 
         reset_vreg();
@@ -120,19 +120,22 @@ public:
     void visit_write(struct Node *ast) override {
         ASTVisitor::visit_write(ast);
 
-        // loadaddr lhs by offset
-        // localaddr vr0, $4
-        //long addrreg = next_vreg();
-
-
         // loadint from addr to vreg
         // ldi vr1, (vr0)
-        //long loadreg = next_vreg();
-
+        long loadreg = next_vreg();
+        Operand writedest(OPERAND_VREG, loadreg);
+        Node *varref = node_get_kid(ast, 0);
+        Operand fromreg = varref->get_operand();    // don't use this one
+        Operand fromaddr(OPERAND_VREG_MEMREF, fromreg.get_base_reg()); // use this one
+        auto *loadins = new Instruction(HINS_LOAD_INT, writedest, fromaddr);
+        code->add_instruction(loadins);
 
         // writeint
-        // writeint vr1
+        // writei vr1
+        auto *writeins = new Instruction(HINS_WRITE_INT, writedest);
+        code->add_instruction(writeins);
 
+        reset_vreg();
     }
 
     void visit_assign(struct Node *ast) override {
