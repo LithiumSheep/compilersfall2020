@@ -162,19 +162,102 @@ public:
 
     void visit_add(struct Node *ast) override {
         ASTVisitor::visit_add(ast);
+
+        Node* lhs = node_get_kid(ast, 0);
+        Node* rhs = node_get_kid(ast, 0);
+
+        Operand l_op = lhs->get_operand();
+        Operand r_op = rhs->get_operand();
+
+        // ldi vr3, (vr1)
+        long lreg = next_vreg();
+        Operand ldest(OPERAND_VREG, lreg);
+        Operand lfrom(OPERAND_VREG_MEMREF, l_op.get_base_reg());
+        auto* lload = new Instruction(HINS_LOAD_INT, ldest, lfrom);
+        code->add_instruction(lload);
+
+        // ldi vr4, (vr2)
+        long rreg = next_vreg();
+        Operand rdest(OPERAND_VREG, rreg);
+        Operand rfrom(OPERAND_VREG_MEMREF, r_op.get_base_reg());
+        auto* rload = new Instruction(HINS_LOAD_INT, rdest, rfrom);
+        code->add_instruction(rload);
+
+        // addi vr5, vr3, vr4
+        long result_reg = next_vreg();
+        Operand adddest(OPERAND_VREG, result_reg);
+        auto* divins = new Instruction(HINS_INT_ADD, adddest, ldest, rdest);
+        code->add_instruction(divins);
+
+        ast->set_operand(adddest);
     }
 
     void visit_subtract(struct Node *ast) override {
         ASTVisitor::visit_subtract(ast);
+
+        Node* lhs = node_get_kid(ast, 0);
+        Node* rhs = node_get_kid(ast, 0);
+
+        Operand l_op = lhs->get_operand();
+        Operand r_op = rhs->get_operand();
+
+        // ldi vr3, (vr1)
+        long lreg = next_vreg();
+        Operand ldest(OPERAND_VREG, lreg);
+        Operand lfrom(OPERAND_VREG_MEMREF, l_op.get_base_reg());
+        auto* lload = new Instruction(HINS_LOAD_INT, ldest, lfrom);
+        code->add_instruction(lload);
+
+        // ldi vr4, (vr2)
+        long rreg = next_vreg();
+        Operand rdest(OPERAND_VREG, rreg);
+        Operand rfrom(OPERAND_VREG_MEMREF, r_op.get_base_reg());
+        auto* rload = new Instruction(HINS_LOAD_INT, rdest, rfrom);
+        code->add_instruction(rload);
+
+        // subi vr5, vr3, vr4
+        long result_reg = next_vreg();
+        Operand subdest(OPERAND_VREG, result_reg);
+        auto* divins = new Instruction(HINS_INT_SUB, subdest, ldest, rdest);
+        code->add_instruction(divins);
+
+        ast->set_operand(subdest);
     }
 
     void visit_multiply(struct Node *ast) override {
         ASTVisitor::visit_multiply(ast);
+
+        Node* lhs = node_get_kid(ast, 0);
+        Node* rhs = node_get_kid(ast, 0);
+
+        Operand l_op = lhs->get_operand();
+        Operand r_op = rhs->get_operand();
+
+        // ldi vr3, (vr1)
+        long lreg = next_vreg();
+        Operand ldest(OPERAND_VREG, lreg);
+        Operand lfrom(OPERAND_VREG_MEMREF, l_op.get_base_reg());
+        auto* lload = new Instruction(HINS_LOAD_INT, ldest, lfrom);
+        code->add_instruction(lload);
+
+        // ldi vr4, (vr2)
+        long rreg = next_vreg();
+        Operand rdest(OPERAND_VREG, rreg);
+        Operand rfrom(OPERAND_VREG_MEMREF, r_op.get_base_reg());
+        auto* rload = new Instruction(HINS_LOAD_INT, rdest, rfrom);
+        code->add_instruction(rload);
+
+        // muli vr5, vr3, vr4
+        long result_reg = next_vreg();
+        Operand muldest(OPERAND_VREG, result_reg);
+        auto* divins = new Instruction(HINS_INT_MUL, muldest, ldest, rdest);
+        code->add_instruction(divins);
+
+        ast->set_operand(muldest);
     }
 
     void visit_divide(struct Node *ast) override {
         ASTVisitor::visit_divide(ast);
-
 
         Node* lhs = node_get_kid(ast, 0);
         Node* rhs = node_get_kid(ast, 0);
