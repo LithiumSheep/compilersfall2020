@@ -2,8 +2,8 @@ PROGRAM arith10;
   VAR x, y, z : INTEGER;
 
 BEGIN
-  READ x;
-  READ y;
-  --z := x DIV y;
-  WRITE z;
+  --READ x;
+  --READ y;
+  z := x DIV y;
+  --WRITE z;
 END.

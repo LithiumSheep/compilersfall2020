@@ -20,6 +20,7 @@ void print_usage(void) {
     "   -p    print AST\n"
     "   -g    print AST as graph (DOT/graphviz)\n"
     "   -s    print symbol table information\n"
+    "   -h    print high-level instruction translation\n"
   );
 }
 
@@ -27,6 +28,7 @@ enum Mode {
   PRINT_AST,
   PRINT_AST_GRAPH,
   PRINT_SYMBOL_TABLE,
+  PRINT_HINS,
   COMPILE,
 };
 
@@ -37,7 +39,7 @@ int main(int argc, char **argv) {
   int mode = COMPILE;
   int opt;
 
-  while ((opt = getopt(argc, argv, "pgs")) != -1) {
+  while ((opt = getopt(argc, argv, "pgsh")) != -1) {
     switch (opt) {
     case 'p':
       mode = PRINT_AST;
@@ -49,6 +51,10 @@ int main(int argc, char **argv) {
 
     case 's':
       mode = PRINT_SYMBOL_TABLE;
+      break;
+
+    case 'h':
+      mode = PRINT_HINS;
       break;
 
     case '?':
@@ -77,6 +83,8 @@ int main(int argc, char **argv) {
     ast_print_graph(g_program);
   } else if (mode == PRINT_SYMBOL_TABLE) {
       context_set_flag(ctx, 's'); // tell Context to print symbol table info
+  } else if (mode == PRINT_HINS) {
+      context_set_flag(ctx, 'h');
   }
 
   context_build_symtab(ctx);

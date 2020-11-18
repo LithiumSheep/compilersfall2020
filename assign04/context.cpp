@@ -26,7 +26,8 @@ struct Context {
 private:
     Node *root;
     SymbolTable *global;
-    bool flag_print;
+    bool flag_print_symtab;
+    bool flag_print_hins;
 
 public:
   Context(struct Node *ast);
@@ -141,9 +142,6 @@ public:
     void visit_assign(struct Node *ast) override {
         ASTVisitor::visit_assign(ast);
 
-        // loadaddr lhs by offset
-        // localaddr vr0, $0
-
         // load rhs operand (could be in register, or could be iconst
         // ldci vr1, $val
 
@@ -171,7 +169,6 @@ public:
         Operand destreg(OPERAND_VREG, vreg);
 
         const std::string varname = ast->get_str();
-        printf("visit_indentifier[%s]\n", varname.c_str());
         // get offset from symbol
         // instruction is an offset ref
         int offset = 0;
@@ -188,8 +185,6 @@ public:
 
     void visit_int_literal(struct Node *ast) override {
         ASTVisitor::visit_int_literal(ast);
-
-        printf("visit_int_literal[%ld]", ast->get_ival());
 
         long vreg = next_vreg();
         Operand destreg(OPERAND_VREG, vreg);    // $vr0
@@ -421,7 +416,8 @@ public:
 Context::Context(struct Node *ast) {
     root = ast;
     global = new SymbolTable(nullptr);
-    flag_print = false;
+    flag_print_symtab = false;
+    flag_print_hins = false;
 }
 
 Context::~Context() {
@@ -429,7 +425,10 @@ Context::~Context() {
 
 void Context::set_flag(char flag) {
   if (flag == 's') {
-      flag_print = true;
+      flag_print_symtab = true;
+  }
+  if (flag == 'h') {
+      flag_print_hins = true;
   }
 }
 
@@ -439,7 +438,7 @@ void Context::build_symtab() {
     SymbolTableBuilder *visitor = new SymbolTableBuilder(global);
     visitor->visit(root);
 
-    if (flag_print) {
+    if (flag_print_symtab) {
       // print symbol table
       visitor->get_symtab()->print_sym_tab();
     }
@@ -450,8 +449,10 @@ void Context::build_hlevel() {
     hlcodegen->visit(root);
 
     // TODO: print highlevel to <filename>.txt
-    auto *hlprinter = new PrintHighLevelInstructionSequence(hlcodegen->get_iseq());
-    hlprinter->print();
+    if (flag_print_hins) {
+        auto *hlprinter = new PrintHighLevelInstructionSequence(hlcodegen->get_iseq());
+        hlprinter->print();
+    }
 }
 
 // TODO: implementation of additional Context member functions
