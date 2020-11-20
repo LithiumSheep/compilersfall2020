@@ -53,8 +53,7 @@ private:
     SymbolTable* scope;
     Type* integer_type;
     Type* char_type;
-    int integer_size = 8;
-    int curr_offset = 0;
+    long curr_offset = 0;
 public:
 
     void print_err(Node* node, const char* fmt, ...) {
@@ -78,7 +77,7 @@ public:
         return curr_offset;
     }
 
-    void incr_curr_offset(int offset) {
+    void incr_curr_offset(long offset) {
         curr_offset += offset;
     }
 
@@ -102,11 +101,7 @@ public:
         // set entry in symtab for name, type
         int offset = get_curr_offset();
         Symbol* sym = symbol_create(name, type, CONST, offset);
-        if (type == integer_type) {
-            incr_curr_offset(integer_size);
-        } else {
-            // TODO: figure out offset for CHAR, TYPE, or RECORD, which may vary
-        }
+        incr_curr_offset(type->get_size());
 
         if (scope->s_exists(name)) {
             SourceInfo info = node_get_source_info(left);
@@ -133,11 +128,7 @@ public:
             // set entry in symtab for name, type
             int offset = get_curr_offset();
             Symbol* sym = symbol_create(name, type, VARIABLE, offset);
-            if (type == integer_type) {
-                incr_curr_offset(integer_size);
-            } else {
-                // TODO: figure out offset for CHAR, TYPE, or RECORD, which may vary
-            }
+            incr_curr_offset(type->get_size());
             if (scope->s_exists(name)) {
                 SourceInfo info = node_get_source_info(left);
                 err_fatal("%s:%d:%d: Error: Name '%s' is already defined\n", info.filename, info.line, info.col, name);
@@ -161,11 +152,7 @@ public:
         // set entry in symtab for name, type
         int offset = get_curr_offset();
         Symbol* sym = symbol_create(name, type, TYPE, offset);
-        if (type == integer_type) {
-            incr_curr_offset(integer_size);
-        } else {
-            // TODO: figure out offset for CHAR, TYPE, or RECORD, which may vary
-        }
+        incr_curr_offset(type->get_size());
         if (scope->s_exists(name)) {
             SourceInfo info = node_get_source_info(left);
             err_fatal("%s:%d:%d: Error: Name '%s' is already defined\n", info.filename, info.line, info.col, name);
