@@ -560,6 +560,9 @@ private:
     InstructionSequence* assembly;
     InstructionSequence* hins;
     PrintHighLevelInstructionSequence* print_helper;
+    int total_local_storage;
+    int num_vreg;
+
     // storage size
     // num_vreg
     // localaddr with $N means N offset of rsp
@@ -572,10 +575,10 @@ public:
         assembly = new InstructionSequence();
         print_helper = new PrintHighLevelInstructionSequence(nullptr);
     }
+
     InstructionSequence* get_assembly_ins() {
         return assembly;
     }
-
 
 private:
     void emit_preamble() {
@@ -589,13 +592,22 @@ private:
     }
     // subq storage + (8 * num_vreg), rsp
 
+    void translate_instructions() {
+
+    }
+
+    void emit_asm() {
+        PrintX86_64InstructionSequence print_asm(assembly);
+        //print_asm.print();
+    }
+
     // addq storage + (8 * num_vreg), rsp
-    void emit_ret() {
+    void emit_epilogue() {
         std::string ret_stmt =
                 "movl $0, %eax\n"
                 "\tret";
     }
-private:
+
     std::string get_hins_comment(Instruction* hin) {
         return print_helper->format_instruction(hin);
     }
