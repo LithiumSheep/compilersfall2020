@@ -560,6 +560,12 @@ private:
     InstructionSequence* assembly;
     InstructionSequence* hins;
     PrintHighLevelInstructionSequence* print_helper;
+    // storage size
+    // num_vreg
+    // localaddr with $N means N offset of rsp
+    // N(%rsp)
+    // vrN means storage size + (N * 8);
+    //
 public:
     AssemblyCodeGen(InstructionSequence* highlevelins) {
         hins = highlevelins;
@@ -568,6 +574,26 @@ public:
     }
     InstructionSequence* get_assembly_ins() {
         return assembly;
+    }
+
+
+private:
+    void emit_preamble() {
+        std::string preamble =
+                "\t.section .rodata\n"
+                  "s_readint_fmt: .string \"%ld\"\n"
+                  "s_writeint_fmt: .string \"%ld\\n\"\n"
+                  "\t.section .text\n"
+                  "\t.globl main\n"
+                  "main:";
+    }
+    // subq storage + (8 * num_vreg), rsp
+
+    // addq storage + (8 * num_vreg), rsp
+    void emit_ret() {
+        std::string ret_stmt =
+                "movl $0, %eax\n"
+                "\tret";
     }
 private:
     std::string get_hins_comment(Instruction* hin) {
