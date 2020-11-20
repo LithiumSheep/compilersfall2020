@@ -24,6 +24,7 @@ public:
     const char* get_name();
     Type* get_type();
     int get_kind();
+    long get_size();
     int get_offset();
 };
 

@@ -16,6 +16,10 @@ int Symbol::get_kind() {
     return m_kind;
 }
 
+long Symbol::get_size() {
+    return get_type()->get_size();
+}
+
 int Symbol::get_offset() {
     return m_offset;
 }

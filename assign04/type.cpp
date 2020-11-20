@@ -5,24 +5,43 @@
 #include "cpputil.h"
 #include "type.h"
 
+static int INTEGER_SIZE = 8;
+static int CHAR_SIZE = 1;
+static Type* integer_primitive = type_create_integer();
+static Type* char_primitive = type_create_char();
+
 Type::Type(int realType) : realType(realType) {}
 
-Type* type_create_primitive(const char* name) {
-    Type* primitive = new Type(PRIMITIVE);
-    primitive->name = name;
-    return primitive;
+long Type::get_size() {
+    return size;
+}
+
+Type* type_create_integer() {
+    Type* integer = new Type(PRIMITIVE);
+    integer->name = "INTEGER";
+    integer->size = INTEGER_SIZE;
+    return integer;
+}
+
+Type* type_create_char() {
+    Type* integer = new Type(PRIMITIVE);
+    integer->name = "CHAR";
+    integer->size = INTEGER_SIZE;
+    return integer;
 }
 
 Type* type_create_array(long size, Type* elementType) {
     Type* arr = new Type(ARRAY);
     arr->arraySize = size;
     arr->arrayElementType = elementType;
+    arr->size = size * elementType->get_size();
     return arr;
 }
 
 Type* type_create_record(SymbolTable* symbolTable) {
     Type* record = new Type(RECORD);
     record->symtab = symbolTable;
+    // TODO: set size of record
     return record;
 }
 

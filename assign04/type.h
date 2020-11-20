@@ -26,6 +26,8 @@ public:
     long arraySize;
     Type* arrayElementType;
 
+    long size;
+
     const char* name;
 
     SymbolTable* symtab;
@@ -33,9 +35,12 @@ public:
     Type(int realType);
     ~Type();
     std::string to_string();
+    long get_size();
 };
 
-Type* type_create_primitive(const char* name);
+Type* type_create_integer();
+
+Type* type_create_char();
 
 Type* type_create_array(long size, Type* elementType);
 

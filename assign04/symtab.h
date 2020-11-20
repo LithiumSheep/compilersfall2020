@@ -22,6 +22,7 @@ public:
     Symbol lookup(const char* name);
     std::vector<Symbol> get_symbols();
     SymbolTable* get_parent();
+    long get_total_size();
     void print_sym_tab();
     bool s_exists(const char* name);
 };

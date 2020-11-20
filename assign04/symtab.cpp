@@ -47,6 +47,14 @@ SymbolTable* SymbolTable::get_parent() {
     return parent;
 }
 
+long SymbolTable::get_total_size() {
+    long total_size = 0;
+    for (auto sym : tab) {
+        total_size += sym.get_size();
+    }
+    return total_size;
+}
+
 bool SymbolTable::s_exists(const char* name) {
     for (auto sym : tab) {
         if (std::strcmp(name, sym.get_name()) == 0) {

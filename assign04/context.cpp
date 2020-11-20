@@ -84,8 +84,8 @@ public:
 
     SymbolTableBuilder(SymbolTable* symbolTable) {
         scope = symbolTable;
-        integer_type = type_create_primitive("INTEGER");
-        char_type = type_create_primitive("CHAR");
+        integer_type = type_create_integer();
+        char_type = type_create_char();
     }
 
     void visit_constant_def(struct Node *ast) override {
