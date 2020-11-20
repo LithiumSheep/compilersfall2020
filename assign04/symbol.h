@@ -28,7 +28,7 @@ public:
     long get_offset();
 };
 
-Symbol *symbol_create(const char* name, Type* type, int kind, int offset);
+Symbol *symbol_create(const char* name, Type* type, int kind, long offset);
 
 const char* get_name_for_kind(int kind);
 
