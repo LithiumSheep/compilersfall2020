@@ -38,7 +38,7 @@ public:
   void build_symtab();
   void print_err(Node* node, const char *fmt, ...);
 
-  void build_hlevel();
+  void gen_code();
 };
 
 // Known issues:
@@ -277,6 +277,14 @@ public:
 
     InstructionSequence* get_iseq() {
         return code;
+    }
+
+    long get_storage_size() {
+        return m_symtab.get_total_size();
+    }
+
+    long get_vreg_max() {
+        return m_vreg_max;
     }
 
 public:
@@ -547,15 +555,16 @@ private:
     InstructionSequence* assembly;
     InstructionSequence* hins;
     PrintHighLevelInstructionSequence* print_helper;
-    int total_local_storage;
-    int num_vreg;
+    long local_storage_size;
+    long num_vreg;
+    // total is just local_storage_size + (WORD_SIZE * num_vreg)
 
-    // storage size
-    // num_vreg
     // localaddr with $N means N offset of rsp
     // N(%rsp)
+
     // vrN means storage size + (N * 8);
-    //
+    // N = storage_size + (N * WORD_SIZE)
+    // N(%rsp)
 public:
     AssemblyCodeGen(InstructionSequence* highlevelins) {
         hins = highlevelins;
@@ -565,6 +574,10 @@ public:
 
     InstructionSequence* get_assembly_ins() {
         return assembly;
+    }
+
+    void emit() {
+        printf("reached assembly code gen");
     }
 
 private:
@@ -635,15 +648,17 @@ void Context::build_symtab() {
     }
 }
 
-void Context::build_hlevel() {
+void Context::gen_code() {
     auto *hlcodegen = new HighLevelCodeGen(global);
     hlcodegen->visit(root);
 
-    // TODO: print highlevel to <filename>.txt
     if (flag_print_hins) {
         auto *hlprinter = new PrintHighLevelInstructionSequence(hlcodegen->get_iseq());
         hlprinter->print();
     }
+
+    auto *asmcodegen = new AssemblyCodeGen(hlcodegen->get_iseq());
+    asmcodegen->emit();
 }
 
 // TODO: implementation of additional Context member functions
@@ -673,6 +688,6 @@ void context_build_symtab(struct Context *ctx) {
 void context_check_types(struct Context *ctx) {
 }
 
-void context_gen_hlevel(struct Context *ctx) {
-    ctx->build_hlevel();
+void context_gen_code(struct Context *ctx) {
+    ctx->gen_code();
 }

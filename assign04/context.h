@@ -22,7 +22,7 @@ void context_set_flag(struct Context *ctx, char flag);
 void context_build_symtab(struct Context *ctx);
 void context_check_types(struct Context *ctx);
 
-void context_gen_hlevel(struct Context *ctx);
+void context_gen_code(struct Context *ctx);
 
 #ifdef __cplusplus
 }

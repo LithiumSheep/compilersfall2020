@@ -88,7 +88,7 @@ int main(int argc, char **argv) {
   }
 
   context_build_symtab(ctx);
-  context_gen_hlevel(ctx);
+  context_gen_code(ctx);
 
   return 0;
 }
