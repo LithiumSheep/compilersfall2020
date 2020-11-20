@@ -20,7 +20,7 @@ long Symbol::get_size() {
     return get_type()->get_size();
 }
 
-int Symbol::get_offset() {
+long Symbol::get_offset() {
     return m_offset;
 }
 

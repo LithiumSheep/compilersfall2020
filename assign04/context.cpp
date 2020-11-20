@@ -73,7 +73,7 @@ public:
         return scope;
     }
 
-    int get_curr_offset() {
+    long get_curr_offset() {
         return curr_offset;
     }
 
@@ -99,7 +99,7 @@ public:
         const char* name = node_get_str(left);
 
         // set entry in symtab for name, type
-        int offset = get_curr_offset();
+        long offset = get_curr_offset();
         Symbol* sym = symbol_create(name, type, CONST, offset);
         incr_curr_offset(type->get_size());
 
@@ -126,7 +126,7 @@ public:
             Node* id = node_get_kid(left, i);
             const char* name = node_get_str(id);
             // set entry in symtab for name, type
-            int offset = get_curr_offset();
+            long offset = get_curr_offset();
             Symbol* sym = symbol_create(name, type, VARIABLE, offset);
             incr_curr_offset(type->get_size());
             if (scope->s_exists(name)) {
@@ -150,7 +150,7 @@ public:
         const char* name = node_get_str(left);
 
         // set entry in symtab for name, type
-        int offset = get_curr_offset();
+        long offset = get_curr_offset();
         Symbol* sym = symbol_create(name, type, TYPE, offset);
         incr_curr_offset(type->get_size());
         if (scope->s_exists(name)) {
@@ -251,7 +251,7 @@ class HighLevelCodeGen : public ASTVisitor {
 
 private:
     long m_vreg = -1;
-    long m_vreg_max = 0;
+    long m_vreg_max = -1;
     SymbolTable m_symtab;
     InstructionSequence* code;
     Operand rsp = Operand(OPERAND_MREG, MREG_RSP);
@@ -284,7 +284,8 @@ public:
     }
 
     long get_vreg_max() {
-        return m_vreg_max;
+        // if N is the index of vreg used, e.g. vrN, then the number of registers is N + 1
+        return m_vreg_max + 1;
     }
 
 public:
@@ -555,8 +556,10 @@ private:
     InstructionSequence* assembly;
     InstructionSequence* hins;
     PrintHighLevelInstructionSequence* print_helper;
+    const long WORD_SIZE = 8;
     long local_storage_size;
     long num_vreg;
+    long total_storage_size;
     // total is just local_storage_size + (WORD_SIZE * num_vreg)
 
     // localaddr with $N means N offset of rsp
@@ -566,8 +569,14 @@ private:
     // N = storage_size + (N * WORD_SIZE)
     // N(%rsp)
 public:
-    AssemblyCodeGen(InstructionSequence* highlevelins) {
+    AssemblyCodeGen(InstructionSequence* highlevelins, long storage_size, long vreg_max) {
         hins = highlevelins;
+        local_storage_size = storage_size;
+        num_vreg = vreg_max;
+        // calculate total storage
+        total_storage_size = local_storage_size + (num_vreg * WORD_SIZE);
+        printf("storage_size: %ld\n", storage_size);
+        printf("vreg_max: %ld\n", vreg_max);
         assembly = new InstructionSequence();
         print_helper = new PrintHighLevelInstructionSequence(nullptr);
     }
@@ -576,36 +585,37 @@ public:
         return assembly;
     }
 
-    void emit() {
-        printf("reached assembly code gen");
-    }
-
-private:
-    void emit_preamble() {
-        std::string preamble =
-                "\t.section .rodata\n"
-                  "s_readint_fmt: .string \"%ld\"\n"
-                  "s_writeint_fmt: .string \"%ld\\n\"\n"
-                  "\t.section .text\n"
-                  "\t.globl main\n"
-                  "main:";
-    }
-    // subq storage + (8 * num_vreg), rsp
-
     void translate_instructions() {
 
     }
 
+    void emit() {
+        emit_preamble();
+        emit_asm();
+        emit_epilogue();
+    }
+
+private:
+    void emit_preamble() {
+        printf("\t.section .rodata\n");
+        printf("s_readint_fmt: .string \"%%ld\"\n");
+        printf("s_writeint_fmt: .string \"%%ld\\n\"\n");
+        printf("\t.section .text\n");
+        printf("\t.globl main\n");
+        printf("main:\n");
+        printf("\tsubq $%ld, %%rsp\n", total_storage_size);
+    }
+
     void emit_asm() {
         PrintX86_64InstructionSequence print_asm(assembly);
-        //print_asm.print();
+        print_asm.print();
     }
 
     // addq storage + (8 * num_vreg), rsp
     void emit_epilogue() {
-        std::string ret_stmt =
-                "movl $0, %eax\n"
-                "\tret";
+        printf("\taddq $%ld, %%rsp\n", total_storage_size);
+        printf("\tmovl $0, %%eax\n");
+        printf("\tret\n");
     }
 
     std::string get_hins_comment(Instruction* hin) {
@@ -655,10 +665,15 @@ void Context::gen_code() {
     if (flag_print_hins) {
         auto *hlprinter = new PrintHighLevelInstructionSequence(hlcodegen->get_iseq());
         hlprinter->print();
+    } else {
+        auto *asmcodegen = new AssemblyCodeGen(
+                hlcodegen->get_iseq(),
+                hlcodegen->get_storage_size(),
+                hlcodegen->get_vreg_max()
+                );
+        asmcodegen->translate_instructions();
+        asmcodegen->emit();
     }
-
-    auto *asmcodegen = new AssemblyCodeGen(hlcodegen->get_iseq());
-    asmcodegen->emit();
 }
 
 // TODO: implementation of additional Context member functions
