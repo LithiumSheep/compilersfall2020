@@ -7,8 +7,6 @@
 
 static int INTEGER_SIZE = 8;
 static int CHAR_SIZE = 1;
-static Type* integer_primitive = type_create_integer();
-static Type* char_primitive = type_create_char();
 
 Type::Type(int realType) : realType(realType) {}
 
@@ -26,7 +24,7 @@ Type* type_create_integer() {
 Type* type_create_char() {
     Type* integer = new Type(PRIMITIVE);
     integer->name = "CHAR";
-    integer->size = INTEGER_SIZE;
+    integer->size = CHAR_SIZE;
     return integer;
 }
 
