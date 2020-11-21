@@ -590,6 +590,10 @@ public:
         Operand rsi(OPERAND_MREG, MREG_RSI);
         Operand r10(OPERAND_MREG, MREG_R10);
         Operand r11(OPERAND_MREG, MREG_R10);
+        Operand inputfmt("s_readint_fmt", true);
+        Operand outputmsg("s_writeint_fmt", true);
+        Operand printf_label("printf");
+        Operand scanf_label("scanf");
 
         const int num_ins = hins->get_length();
         for (int i = 0; i < num_ins; i++) {
@@ -605,8 +609,8 @@ public:
                     // vrN is offset 8N(rsp);
                     Operand lhs = hin->get_operand(0);
                     long offset = local_storage_size + (rhs.get_int_value() * WORD_SIZE);
-                    Operand vreg(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, offset);
-                    auto *movq = new Instruction(MINS_MOVQ, r10, vreg);
+                    Operand rspoffset(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, offset);
+                    auto *movq = new Instruction(MINS_MOVQ, r10, rspoffset);
                     assembly->add_instruction(movq);
                     break;
                 }
@@ -620,6 +624,13 @@ public:
                     break;
                 }
                 case HINS_READ_INT: {
+                    // move inputfmt to first argument register
+                    auto *movfmt = new Instruction(MINS_MOVQ, inputfmt, rdi);
+                    movfmt->set_comment(get_hins_comment(hin));
+                    assembly->add_instruction(movfmt);
+
+                    // load adrr of vreg into second argument register
+
                     break;
                 }
                 case HINS_INT_ADD: {
