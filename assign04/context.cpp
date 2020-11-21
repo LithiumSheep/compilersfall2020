@@ -690,10 +690,20 @@ public:
                     Operand memaddarg1(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, arg1_offset);
                     auto *movarg1 = new Instruction(MINS_MOVQ, memaddarg1, r10);
                     movarg1->set_comment(get_hins_comment(hin));
+                    assembly->add_instruction(movarg1);
 
                     long arg2_offset = local_storage_size + (addarg2.get_base_reg() * WORD_SIZE);
                     Operand memaddarg2(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, arg2_offset);
-                    // fixme
+                    auto *movarg2 = new Instruction(MINS_MOVQ, memaddarg2, r11);
+                    assembly->add_instruction(movarg2);
+
+                    auto *addins = new Instruction(MINS_ADDQ, r10, r11);
+                    assembly->add_instruction(addins);
+
+                    long dest_offset = local_storage_size + (dest.get_base_reg() * WORD_SIZE);
+                    Operand memdest(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, dest_offset);
+                    auto *movins = new Instruction(MINS_MOVQ, r11, memdest);
+                    assembly->add_instruction(movins);
                     break;
                 }
                 case HINS_INT_SUB: {
