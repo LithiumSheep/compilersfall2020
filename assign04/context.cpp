@@ -608,7 +608,7 @@ public:
 
                     // vrN is offset 8N(rsp);
                     Operand lhs = hin->get_operand(0);
-                    long offset = local_storage_size + (rhs.get_int_value() * WORD_SIZE);
+                    long offset = local_storage_size + (lhs.get_base_reg() * WORD_SIZE);
                     Operand rspoffset(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, offset);
                     auto *movq = new Instruction(MINS_MOVQ, r10, rspoffset);
                     assembly->add_instruction(movq);
@@ -618,6 +618,24 @@ public:
                     break;
                 }
                 case HINS_STORE_INT: {
+                    Operand rhs = hin->get_operand(1);
+                    long r_offset = local_storage_size + (rhs.get_base_reg() * WORD_SIZE);
+                    Operand storesrc(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, r_offset);
+
+                    Operand lhs = hin->get_operand(0);
+                    long l_offset = local_storage_size + (lhs.get_base_reg() * WORD_SIZE);
+                    Operand storedest(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, l_offset);
+
+                    auto *mov1 = new Instruction(MINS_MOVQ, storesrc, r11);
+                    mov1->set_comment(get_hins_comment(hin));
+                    assembly->add_instruction(mov1);
+
+                    auto *mov2 = new Instruction(MINS_MOVQ, storedest, r10);
+                    assembly->add_instruction(mov2);
+
+                    Operand memrefdest(OPERAND_MREG_MEMREF, MREG_R10);
+                    auto *mov3 = new Instruction(MINS_MOVQ, r11, memrefdest);
+                    assembly->add_instruction(mov3);
                     break;
                 }
                 case HINS_WRITE_INT: {
