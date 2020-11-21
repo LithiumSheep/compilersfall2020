@@ -4,5 +4,5 @@ PROGRAM arith01;
 BEGIN
   a := 2;
   b := 3;
-  WRITE a + b;
+  WRITE a * b;
 END.
