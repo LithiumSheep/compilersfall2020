@@ -589,7 +589,7 @@ public:
         Operand rdi(OPERAND_MREG, MREG_RDI);
         Operand rsi(OPERAND_MREG, MREG_RSI);
         Operand r10(OPERAND_MREG, MREG_R10);
-        Operand r11(OPERAND_MREG, MREG_R10);
+        Operand r11(OPERAND_MREG, MREG_R11);
         Operand inputfmt("s_readint_fmt", true);
         Operand outputfmt("s_writeint_fmt", true);
         Operand printf_label("printf");
@@ -615,6 +615,24 @@ public:
                     break;
                 }
                 case HINS_LOAD_INT:{
+                    Operand rhs = hin->get_operand(1);
+                    long r_offset = local_storage_size + (rhs.get_base_reg() * WORD_SIZE);
+                    Operand loadsrc(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, r_offset);
+
+                    Operand lhs = hin->get_operand(0);
+                    long l_offset = local_storage_size + (lhs.get_base_reg() * WORD_SIZE);
+                    Operand loaddest(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, l_offset);
+
+                    auto *mov1 = new Instruction(MINS_MOVQ, loadsrc, r11);
+                    mov1->set_comment(get_hins_comment(hin));
+                    assembly->add_instruction(mov1);
+
+                    Operand r11memref(OPERAND_MREG_MEMREF, MREG_R11);
+                    auto *mov2 = new Instruction(MINS_MOVQ, r11memref, r11);
+                    assembly->add_instruction(mov2);
+
+                    auto *mov3 = new Instruction(MINS_MOVQ, r11, loaddest);
+                    assembly->add_instruction(mov3);
                     break;
                 }
                 case HINS_STORE_INT: {
