@@ -591,7 +591,7 @@ public:
         Operand r10(OPERAND_MREG, MREG_R10);
         Operand r11(OPERAND_MREG, MREG_R10);
         Operand inputfmt("s_readint_fmt", true);
-        Operand outputmsg("s_writeint_fmt", true);
+        Operand outputfmt("s_writeint_fmt", true);
         Operand printf_label("printf");
         Operand scanf_label("scanf");
 
@@ -621,6 +621,21 @@ public:
                     break;
                 }
                 case HINS_WRITE_INT: {
+                    // move outputfmt to first argument register
+                    auto *movfmt = new Instruction(MINS_MOVQ, outputfmt, rdi);
+                    movfmt->set_comment(get_hins_comment(hin));
+                    assembly->add_instruction(movfmt);
+
+                    // load adrr of vreg into second argument register
+                    Operand op = hin->get_operand(0);
+                    long offset = local_storage_size + (op.get_base_reg() * WORD_SIZE);
+                    Operand rspoffset(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, offset);
+                    auto *leaq = new Instruction(MINS_LEAQ, rspoffset, rsi);
+                    assembly->add_instruction(leaq);
+
+                    // call the printf function
+                    auto *printf = new Instruction(MINS_CALL, printf_label);
+                    assembly->add_instruction(printf);
                     break;
                 }
                 case HINS_READ_INT: {
@@ -630,7 +645,15 @@ public:
                     assembly->add_instruction(movfmt);
 
                     // load adrr of vreg into second argument register
+                    Operand op = hin->get_operand(0);
+                    long offset = local_storage_size + (op.get_base_reg() * WORD_SIZE);
+                    Operand rspoffset(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, offset);
+                    auto *leaq = new Instruction(MINS_LEAQ, rspoffset, rsi);
+                    assembly->add_instruction(leaq);
 
+                    // call the scanf function
+                    auto *scanf = new Instruction(MINS_CALL, scanf_label);
+                    assembly->add_instruction(scanf);
                     break;
                 }
                 case HINS_INT_ADD: {
