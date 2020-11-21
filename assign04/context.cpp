@@ -252,14 +252,15 @@ class HighLevelCodeGen : public ASTVisitor {
 private:
     long m_vreg = -1;
     long m_vreg_max = -1;
-    SymbolTable m_symtab;
+    SymbolTable* m_symtab;
     InstructionSequence* code;
     Operand rsp = Operand(OPERAND_MREG, MREG_RSP);
     Operand printf_label = Operand("printf");
     Operand scanf_label = Operand("scanf");
 
 public:
-    HighLevelCodeGen(const SymbolTable &mSymtab) : m_symtab(mSymtab) {
+    HighLevelCodeGen(SymbolTable* symbolTable) {
+        m_symtab = symbolTable;
         code = new InstructionSequence();
     }
 
@@ -280,7 +281,7 @@ public:
     }
 
     long get_storage_size() {
-        return m_symtab.get_total_size();
+        return m_symtab->get_total_size();
     }
 
     long get_vreg_max() {
@@ -520,7 +521,7 @@ public:
         const char* varname = node_get_str(ast);
         // get offset from symbol
         // instruction is an offset ref
-        Symbol sym = m_symtab.lookup(varname);
+        Symbol sym = m_symtab->lookup(varname);
         int offset = sym.get_offset();
         Operand addroffset(OPERAND_INT_LITERAL, offset);
 
@@ -575,8 +576,6 @@ public:
         num_vreg = vreg_max;
         // calculate total storage
         total_storage_size = local_storage_size + (num_vreg * WORD_SIZE);
-        printf("storage_size: %ld\n", storage_size);
-        printf("vreg_max: %ld\n", vreg_max);
         assembly = new InstructionSequence();
         print_helper = new PrintHighLevelInstructionSequence(nullptr);
     }
