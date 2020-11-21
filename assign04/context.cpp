@@ -655,7 +655,7 @@ public:
                     Operand op = hin->get_operand(0);
                     long offset = local_storage_size + (op.get_base_reg() * WORD_SIZE);
                     Operand rspoffset(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, offset);
-                    auto *leaq = new Instruction(MINS_LEAQ, rspoffset, rsi);
+                    auto *leaq = new Instruction(MINS_MOVQ, rspoffset, rsi);
                     assembly->add_instruction(leaq);
 
                     // call the printf function
@@ -682,6 +682,18 @@ public:
                     break;
                 }
                 case HINS_INT_ADD: {
+                    Operand dest = hin->get_operand(0);
+                    Operand addarg1 = hin->get_operand(1);
+                    Operand addarg2 = hin->get_operand(2);
+
+                    long arg1_offset = local_storage_size + (addarg1.get_base_reg() * WORD_SIZE);
+                    Operand memaddarg1(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, arg1_offset);
+                    auto *movarg1 = new Instruction(MINS_MOVQ, memaddarg1, r10);
+                    movarg1->set_comment(get_hins_comment(hin));
+
+                    long arg2_offset = local_storage_size + (addarg2.get_base_reg() * WORD_SIZE);
+                    Operand memaddarg2(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, arg2_offset);
+                    // fixme
                     break;
                 }
                 case HINS_INT_SUB: {
@@ -712,7 +724,7 @@ public:
                     auto *divins = new Instruction(MINS_IDIVQ, r10);
                     assembly->add_instruction(divins);
 
-                    long dest_offset = local_storage_size + (divarg2.get_base_reg() * WORD_SIZE);
+                    long dest_offset = local_storage_size + (dest.get_base_reg() * WORD_SIZE);
                     Operand memdest(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, dest_offset);
                     auto *movdest = new Instruction(MINS_MOVQ, rax, memdest);
                     assembly->add_instruction(movdest);
