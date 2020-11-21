@@ -23,6 +23,8 @@ std::string PrintX86_64InstructionSequence::get_opcode_name(int opcode) {
         case MINS_CMPQ: return "cmpq";
         case MINS_CALL: return "call";
         case MINS_IMULQ: return "imulq";
+        case MINS_IDIVQ: return "idivq";
+        case MINS_CQTO: return "cqto";
         default:
             assert(false);
             s = "<invalid>";

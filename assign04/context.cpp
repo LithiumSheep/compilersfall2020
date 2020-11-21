@@ -590,6 +590,7 @@ public:
         Operand rsi(OPERAND_MREG, MREG_RSI);
         Operand r10(OPERAND_MREG, MREG_R10);
         Operand r11(OPERAND_MREG, MREG_R11);
+        Operand rax(OPERAND_MREG, MREG_RAX);
         Operand inputfmt("s_readint_fmt", true);
         Operand outputfmt("s_writeint_fmt", true);
         Operand printf_label("printf");
@@ -702,6 +703,14 @@ public:
                     break;
                 }
                 case HINS_INT_DIV: {
+                    Operand dest = hin->get_operand(0);
+                    Operand divarg1 = hin->get_operand(1);
+                    Operand divarg2 = hin->get_operand(2);
+
+                    long offset = local_storage_size + (divarg1.get_base_reg() * WORD_SIZE);
+                    Operand memdivarg1(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, offset);
+                    auto *movarg1 = new Instruction(MINS_MOVQ, memdivarg1, rax);
+
                     break;
                 }
                 default:
