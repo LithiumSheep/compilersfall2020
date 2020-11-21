@@ -522,7 +522,7 @@ public:
         // get offset from symbol
         // instruction is an offset ref
         Symbol sym = m_symtab->lookup(varname);
-        int offset = sym.get_offset();
+        long offset = sym.get_offset();
         Operand addroffset(OPERAND_INT_LITERAL, offset);
 
         auto *loadaddrins = new Instruction(HINS_LOCALADDR, destreg, addroffset);
@@ -597,10 +597,17 @@ public:
             switch(hin->get_opcode()) {
                 case HINS_LOCALADDR: {
                     Operand rhs = hin->get_operand(1); // offset is rhs
-                    Operand locaddr(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, rhs.get_offset());
+                    Operand locaddr(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, rhs.get_int_value());
                     auto *leaq = new Instruction(MINS_LEAQ, locaddr, r10);
                     leaq->set_comment(get_hins_comment(hin));
                     assembly->add_instruction(leaq);
+
+                    // vrN is offset 8N(rsp);
+                    Operand lhs = hin->get_operand(0);
+                    long offset = local_storage_size + (rhs.get_int_value() * WORD_SIZE);
+                    Operand vreg(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, offset);
+                    auto *movq = new Instruction(MINS_MOVQ, r10, vreg);
+                    assembly->add_instruction(movq);
                     break;
                 }
                 case HINS_LOAD_INT:{
