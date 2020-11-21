@@ -694,15 +694,15 @@ public:
 
                     long arg2_offset = local_storage_size + (arg2.get_base_reg() * WORD_SIZE);
                     Operand memarg2(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, arg2_offset);
-                    auto *movarg2 = new Instruction(MINS_MOVQ, memarg2, r11);
+                    auto *movarg2 = new Instruction(MINS_MOVQ, memarg2, rax);
                     assembly->add_instruction(movarg2);
 
-                    auto *addins = new Instruction(MINS_ADDQ, r10, r11);
+                    auto *addins = new Instruction(MINS_ADDQ, r10, rax);
                     assembly->add_instruction(addins);
 
                     long dest_offset = local_storage_size + (dest.get_base_reg() * WORD_SIZE);
                     Operand memdest(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, dest_offset);
-                    auto *movins = new Instruction(MINS_MOVQ, r11, memdest);
+                    auto *movins = new Instruction(MINS_MOVQ, rax, memdest);
                     assembly->add_instruction(movins);
                     break;
                 }
@@ -824,6 +824,18 @@ private:
 
     std::string get_hins_comment(Instruction* hin) {
         return print_helper->format_instruction(hin);
+    }
+
+    Operand get_mreg_operand(Operand vreg_or_lit) {
+        // Don't use this method to get the operand for LOCALADD, since it uses the literal to determine offset
+        if (vreg_or_lit.get_kind() == OPERAND_INT_LITERAL) {
+            return vreg_or_lit; // use the literal
+        }
+        if (vreg_or_lit.has_base_reg()) {
+            long offset = local_storage_size + (vreg_or_lit.get_base_reg() * WORD_SIZE);
+            Operand rspwithoffset(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, offset);
+            return rspwithoffset;
+        }
     }
 };
 
