@@ -598,7 +598,6 @@ public:
                 case HINS_LOCALADDR: {
                     Operand rhs = hin->get_operand(1); // offset is rhs
                     Operand locaddr(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, rhs.get_offset());
-                    Operand r10(OPERAND_MREG, MREG_R10);
                     auto *leaq = new Instruction(MINS_LEAQ, locaddr, r10);
                     leaq->set_comment(get_hins_comment(hin));
                     assembly->add_instruction(leaq);
@@ -616,7 +615,15 @@ public:
                 case HINS_READ_INT: {
                     break;
                 }
-                // TODO: add arithmetic
+                case HINS_INT_ADD: {
+                    break;
+                }
+                case HINS_INT_SUB: {
+                    break;
+                }
+                case HINS_INT_MUL: {
+                    break;
+                }
                 case HINS_INT_DIV: {
                     break;
                 }
