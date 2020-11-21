@@ -359,7 +359,7 @@ public:
         ASTVisitor::visit_add(ast);
 
         Node* lhs = node_get_kid(ast, 0);
-        Node* rhs = node_get_kid(ast, 0);
+        Node* rhs = node_get_kid(ast, 1);
 
         Operand l_op = lhs->get_operand();
         Operand r_op = rhs->get_operand();
@@ -391,7 +391,7 @@ public:
         ASTVisitor::visit_subtract(ast);
 
         Node* lhs = node_get_kid(ast, 0);
-        Node* rhs = node_get_kid(ast, 0);
+        Node* rhs = node_get_kid(ast, 1);
 
         Operand l_op = lhs->get_operand();
         Operand r_op = rhs->get_operand();
@@ -423,7 +423,7 @@ public:
         ASTVisitor::visit_multiply(ast);
 
         Node* lhs = node_get_kid(ast, 0);
-        Node* rhs = node_get_kid(ast, 0);
+        Node* rhs = node_get_kid(ast, 1);
 
         Operand l_op = lhs->get_operand();
         Operand r_op = rhs->get_operand();
@@ -455,7 +455,7 @@ public:
         ASTVisitor::visit_divide(ast);
 
         Node* lhs = node_get_kid(ast, 0);
-        Node* rhs = node_get_kid(ast, 0);
+        Node* rhs = node_get_kid(ast, 1);
 
         Operand l_op = lhs->get_operand();
         Operand r_op = rhs->get_operand();
