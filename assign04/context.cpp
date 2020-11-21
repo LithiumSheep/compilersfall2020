@@ -707,10 +707,27 @@ public:
                     Operand divarg1 = hin->get_operand(1);
                     Operand divarg2 = hin->get_operand(2);
 
-                    long offset = local_storage_size + (divarg1.get_base_reg() * WORD_SIZE);
-                    Operand memdivarg1(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, offset);
+                    long arg1_offset = local_storage_size + (divarg1.get_base_reg() * WORD_SIZE);
+                    Operand memdivarg1(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, arg1_offset);
                     auto *movarg1 = new Instruction(MINS_MOVQ, memdivarg1, rax);
+                    movarg1->set_comment(get_hins_comment(hin));
+                    assembly->add_instruction(movarg1);
 
+                    auto *convertins = new Instruction(MINS_CQTO);
+                    assembly->add_instruction(convertins);
+
+                    long arg2_offset = local_storage_size + (divarg2.get_base_reg() * WORD_SIZE);
+                    Operand memdivarg2(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, arg2_offset);
+                    auto *movarg2 = new Instruction(MINS_MOVQ, memdivarg2, r10);
+                    assembly->add_instruction(movarg2);
+
+                    auto *divins = new Instruction(MINS_IDIVQ, r10);
+                    assembly->add_instruction(divins);
+
+                    long dest_offset = local_storage_size + (divarg2.get_base_reg() * WORD_SIZE);
+                    Operand memdest(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, dest_offset);
+                    auto *movdest = new Instruction(MINS_MOVQ, rax, memdest);
+                    assembly->add_instruction(movdest);
                     break;
                 }
                 default:
