@@ -254,9 +254,6 @@ private:
     long m_vreg_max = -1;
     SymbolTable* m_symtab;
     InstructionSequence* code;
-    Operand rsp = Operand(OPERAND_MREG, MREG_RSP);
-    Operand printf_label = Operand("printf");
-    Operand scanf_label = Operand("scanf");
 
 public:
     HighLevelCodeGen(SymbolTable* symbolTable) {
@@ -292,18 +289,8 @@ public:
 public:
 
     void visit_declarations(struct Node *ast) override {
-        //ASTVisitor::visit_declarations(ast);
-        // fixme: Does codegen need to visit any declarations?
-    }
-
-    void visit_instructions(struct Node *ast) override {
-        // fixme: Call reset_vregs before instructions are visited
-        ASTVisitor::visit_instructions(ast);
-        // additinally, for any given instruction, if the parent is the a node AST_INSTRUCTIONS, we can call reset_vregs();
-    }
-
-    bool check_parent_node(struct Node *ast) {
-        return true;
+        // ASTVisitor::visit_declarations(ast);
+        // specifically disable visits to declarations so no vregs are incremented
     }
 
     void visit_read(struct Node *ast) override {
@@ -494,11 +481,6 @@ public:
         code->add_instruction(divins);
 
         ast->set_operand(divdest);
-    }
-
-    void visit_modulus(struct Node *ast) override {
-        ASTVisitor::visit_modulus(ast);
-        // TODO:
     }
 
     void visit_var_ref(struct Node *ast) override {
