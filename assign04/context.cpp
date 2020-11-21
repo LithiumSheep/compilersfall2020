@@ -483,6 +483,38 @@ public:
         ast->set_operand(divdest);
     }
 
+    void visit_modulus(struct Node *ast) override {
+        ASTVisitor::visit_modulus(ast);
+
+        Node* lhs = node_get_kid(ast, 0);
+        Node* rhs = node_get_kid(ast, 1);
+
+        Operand l_op = lhs->get_operand();
+        Operand r_op = rhs->get_operand();
+
+        // ldi vr3, (vr1)
+        long lreg = next_vreg();
+        Operand ldest(OPERAND_VREG, lreg);
+        Operand lfrom(OPERAND_VREG_MEMREF, l_op.get_base_reg());
+        auto* lload = new Instruction(HINS_LOAD_INT, ldest, lfrom);
+        code->add_instruction(lload);
+
+        // ldi vr4, (vr2)
+        long rreg = next_vreg();
+        Operand rdest(OPERAND_VREG, rreg);
+        Operand rfrom(OPERAND_VREG_MEMREF, r_op.get_base_reg());
+        auto* rload = new Instruction(HINS_LOAD_INT, rdest, rfrom);
+        code->add_instruction(rload);
+
+        // divi vr5, vr3, vr4
+        long result_reg = next_vreg();
+        Operand moddest(OPERAND_VREG, result_reg);
+        auto* modins = new Instruction(HINS_INT_MOD, moddest, ldest, rdest);
+        code->add_instruction(modins);
+
+        ast->set_operand(moddest);
+    }
+
     void visit_var_ref(struct Node *ast) override {
         ASTVisitor::visit_var_ref(ast);
 
@@ -570,12 +602,13 @@ public:
         Operand r10(OPERAND_MREG, MREG_R10);
         Operand r11(OPERAND_MREG, MREG_R11);
         Operand rax(OPERAND_MREG, MREG_RAX);
+        Operand rdx(OPERAND_MREG, MREG_RDX);
         Operand inputfmt("s_readint_fmt", true);
         Operand outputfmt("s_writeint_fmt", true);
         Operand printf_label("printf");
         Operand scanf_label("scanf");
 
-        const int num_ins = hins->get_length();
+        const long num_ins = hins->get_length();
         for (int i = 0; i < num_ins; i++) {
             auto *hin = hins->get_instruction(i);
             switch(hin->get_opcode()) {
@@ -783,6 +816,34 @@ public:
                     long dest_offset = local_storage_size + (dest.get_base_reg() * WORD_SIZE);
                     Operand memdest(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, dest_offset);
                     auto *movdest = new Instruction(MINS_MOVQ, rax, memdest);
+                    assembly->add_instruction(movdest);
+                    break;
+                }
+                case HINS_INT_MOD: {
+                    Operand dest = hin->get_operand(0);
+                    Operand divarg1 = hin->get_operand(1);
+                    Operand divarg2 = hin->get_operand(2);
+
+                    long arg1_offset = local_storage_size + (divarg1.get_base_reg() * WORD_SIZE);
+                    Operand memdivarg1(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, arg1_offset);
+                    auto *movarg1 = new Instruction(MINS_MOVQ, memdivarg1, rax);
+                    movarg1->set_comment(get_hins_comment(hin));
+                    assembly->add_instruction(movarg1);
+
+                    auto *convertins = new Instruction(MINS_CQTO);
+                    assembly->add_instruction(convertins);
+
+                    long arg2_offset = local_storage_size + (divarg2.get_base_reg() * WORD_SIZE);
+                    Operand memdivarg2(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, arg2_offset);
+                    auto *movarg2 = new Instruction(MINS_MOVQ, memdivarg2, r10);
+                    assembly->add_instruction(movarg2);
+
+                    auto *divins = new Instruction(MINS_IDIVQ, r10);
+                    assembly->add_instruction(divins);
+
+                    long dest_offset = local_storage_size + (dest.get_base_reg() * WORD_SIZE);
+                    Operand memdest(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, dest_offset);
+                    auto *movdest = new Instruction(MINS_MOVQ, rdx, memdest);   // different from DIV, check %rdx for remainder
                     assembly->add_instruction(movdest);
                     break;
                 }
