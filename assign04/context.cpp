@@ -599,8 +599,14 @@ public:
                 }
                 case HINS_LOAD_INT:{
                     Operand rhs = hin->get_operand(1);
-                    long r_offset = local_storage_size + (rhs.get_base_reg() * WORD_SIZE);
-                    Operand loadsrc(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, r_offset);
+                    Operand loadsrc;
+                    if (rhs.get_kind() == OPERAND_INT_LITERAL) {
+                        loadsrc = rhs;
+                    } else {
+                        long r_offset = local_storage_size + (rhs.get_base_reg() * WORD_SIZE);
+                        Operand memref(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, r_offset);
+                        loadsrc = memref;
+                    }
 
                     Operand lhs = hin->get_operand(0);
                     long l_offset = local_storage_size + (lhs.get_base_reg() * WORD_SIZE);

@@ -1,9 +1,8 @@
-PROGRAM arith10;
-  VAR x, y, z : INTEGER;
+PROGRAM arith01;
+  VAR a, b: INTEGER;
 
 BEGIN
-  READ x;
-  READ y;
-  z := x DIV y;
-  WRITE z;
+  a := 2;
+  b := 3;
+  WRITE a + b;
 END.
