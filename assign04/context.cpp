@@ -556,14 +556,11 @@ public:
         hins = highlevelins;
         local_storage_size = storage_size;
         num_vreg = vreg_max;
+
         // calculate total storage
         total_storage_size = local_storage_size + (num_vreg * WORD_SIZE);
         assembly = new InstructionSequence();
         print_helper = new PrintHighLevelInstructionSequence(nullptr);
-    }
-
-    InstructionSequence* get_assembly_ins() {
-        return assembly;
     }
 
     void translate_instructions() {
