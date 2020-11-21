@@ -585,7 +585,45 @@ public:
     }
 
     void translate_instructions() {
+        Operand rsp(OPERAND_MREG, MREG_RSP);
+        Operand rdi(OPERAND_MREG, MREG_RDI);
+        Operand rsi(OPERAND_MREG, MREG_RSI);
+        Operand r10(OPERAND_MREG, MREG_R10);
+        Operand r11(OPERAND_MREG, MREG_R10);
 
+        const int num_ins = hins->get_length();
+        for (int i = 0; i < num_ins; i++) {
+            auto *hin = hins->get_instruction(i);
+            switch(hin->get_opcode()) {
+                case HINS_LOCALADDR: {
+                    Operand rhs = hin->get_operand(1); // offset is rhs
+                    Operand locaddr(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, rhs.get_offset());
+                    Operand r10(OPERAND_MREG, MREG_R10);
+                    auto *leaq = new Instruction(MINS_LEAQ, locaddr, r10);
+                    leaq->set_comment(get_hins_comment(hin));
+                    assembly->add_instruction(leaq);
+                    break;
+                }
+                case HINS_LOAD_INT:{
+                    break;
+                }
+                case HINS_STORE_INT: {
+                    break;
+                }
+                case HINS_WRITE_INT: {
+                    break;
+                }
+                case HINS_READ_INT: {
+                    break;
+                }
+                // TODO: add arithmetic
+                case HINS_INT_DIV: {
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
     }
 
     void emit() {
