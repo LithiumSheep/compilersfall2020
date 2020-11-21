@@ -616,9 +616,11 @@ public:
                     mov1->set_comment(get_hins_comment(hin));
                     assembly->add_instruction(mov1);
 
-                    Operand r11memref(OPERAND_MREG_MEMREF, MREG_R11);
-                    auto *mov2 = new Instruction(MINS_MOVQ, r11memref, r11);
-                    assembly->add_instruction(mov2);
+                    if (rhs.get_kind() != OPERAND_INT_LITERAL) {
+                        Operand r11memref(OPERAND_MREG_MEMREF, MREG_R11);
+                        auto *mov2 = new Instruction(MINS_MOVQ, r11memref, r11);
+                        assembly->add_instruction(mov2);
+                    }
 
                     auto *mov3 = new Instruction(MINS_MOVQ, r11, loaddest);
                     assembly->add_instruction(mov3);
