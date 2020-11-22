@@ -745,15 +745,15 @@ public:
 
                     long arg2_offset = local_storage_size + (arg2.get_base_reg() * WORD_SIZE);
                     Operand memarg2(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, arg2_offset);
-                    auto *movarg2 = new Instruction(MINS_MOVQ, memarg2, rax);
+                    auto *movarg2 = new Instruction(MINS_MOVQ, memarg2, r11);
                     assembly->add_instruction(movarg2);
 
-                    auto *addins = new Instruction(MINS_ADDQ, r10, rax);
+                    auto *addins = new Instruction(MINS_ADDQ, r10, r11);
                     assembly->add_instruction(addins);
 
                     long dest_offset = local_storage_size + (dest.get_base_reg() * WORD_SIZE);
                     Operand memdest(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, dest_offset);
-                    auto *movins = new Instruction(MINS_MOVQ, rax, memdest);
+                    auto *movins = new Instruction(MINS_MOVQ, r11, memdest);
                     assembly->add_instruction(movins);
                     break;
                 }
