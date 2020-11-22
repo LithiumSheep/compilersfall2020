@@ -545,6 +545,42 @@ public:
         ast->set_operand(moddest);
     }
 
+    void visit_array_element_ref(struct Node *ast) override {
+        ASTVisitor::visit_array_element_ref(ast);
+
+        // load array start addr into vr0
+        // load array accessor into into vr1
+        // multiply
+
+        // vr0 = (arr)
+        // vr0 is address of arr start
+        // vr1 = $index
+        // vr2 = vr1 * element_size
+        // vr3 = vr0 + vr2
+
+        Node *identifier = node_get_kid(ast, 0);
+        Operand arr_start = identifier->get_operand();
+
+        Node *index = node_get_kid(ast, 1);
+        Operand index_lit = index->get_operand();
+
+        const char* varname = node_get_str(identifier);
+        Type *element_type = m_symtab->lookup(varname).get_type();
+        Operand element_size(OPERAND_INT_LITERAL, element_type->get_size());
+
+        long vreg = next_vreg();
+        Operand offset_reg(OPERAND_VREG, vreg);
+        auto *mulins = new Instruction(HINS_INT_MUL, offset_reg, index_lit, element_size);
+        code->add_instruction(mulins);
+
+        // result reg now contains offset from array start
+        // add the address and offset to get address of (arr[index])
+        vreg = next_vreg();
+        Operand arr_addr_reg(OPERAND_VREG, vreg);
+        auto *addins = new Instruction(HINS_INT_ADD, arr_addr_reg, arr_start, offset_reg);
+        code->add_instruction(addins);
+    }
+
     void visit_var_ref(struct Node *ast) override {
         ASTVisitor::visit_var_ref(ast);
 
