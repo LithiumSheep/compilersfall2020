@@ -5,6 +5,7 @@
 #include <cstring>
 #include <string>
 #include <set>
+#include "grammar_symbols.h"
 #include "util.h"
 #include "cpputil.h"
 #include "node.h"
@@ -317,19 +318,24 @@ public:
     void visit_write(struct Node *ast) override {
         ASTVisitor::visit_write(ast);
 
-        // loadint from addr to vreg
-        // ldi vr1, (vr0)
-        long loadreg = next_vreg();
-        Operand writedest(OPERAND_VREG, loadreg);
-        Node *varref = node_get_kid(ast, 0);
-        Operand fromreg = varref->get_operand();    // don't use this one
-        Operand fromaddr(OPERAND_VREG_MEMREF, fromreg.get_base_reg()); // use this one
-        auto *loadins = new Instruction(HINS_LOAD_INT, writedest, fromaddr);
-        code->add_instruction(loadins);
+        Node* kid = node_get_kid(ast, 0);
+        Operand op = kid->get_operand();
+
+        if (kid->get_tag() == AST_VAR_REF) {
+            // loadint from addr to vreg
+            // ldi vr1, (vr0)
+            long loadreg = next_vreg();
+            Operand writedest(OPERAND_VREG, loadreg);
+            op = writedest;
+            Operand fromreg = kid->get_operand();    // don't use this one
+            Operand fromaddr(OPERAND_VREG_MEMREF, fromreg.get_base_reg()); // use this one
+            auto *loadins = new Instruction(HINS_LOAD_INT, writedest, fromaddr);
+            code->add_instruction(loadins);
+        }
 
         // writeint
         // writei vr1
-        auto *writeins = new Instruction(HINS_WRITE_INT, writedest);
+        auto *writeins = new Instruction(HINS_WRITE_INT, op);
         code->add_instruction(writeins);
 
         reset_vreg();
