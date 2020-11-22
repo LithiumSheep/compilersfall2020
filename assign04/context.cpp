@@ -396,8 +396,8 @@ public:
     void visit_subtract(struct Node *ast) override {
         ASTVisitor::visit_subtract(ast);
 
-        Node* lhs = node_get_kid(ast, 0);
-        Node* rhs = node_get_kid(ast, 1);
+        Node* lhs = node_get_kid(ast, 0);   // 27
+        Node* rhs = node_get_kid(ast, 1);   // 5
 
         Operand l_op = lhs->get_operand();
         Operand r_op = rhs->get_operand();
@@ -425,7 +425,11 @@ public:
         // subi vr5, vr3, vr4
         long result_reg = next_vreg();
         Operand subdest(OPERAND_VREG, result_reg);
-        auto* divins = new Instruction(HINS_INT_SUB, subdest, l_op, r_op);
+        // https://en.wikibooks.org/wiki/X86_Assembly/Arithmetic#Addition_and_Subtraction
+        // sub subtrahend, dest
+        // dest -= subtrahend
+        // dest = dest - subtrahend
+        auto* divins = new Instruction(HINS_INT_SUB, subdest, r_op, l_op);
         code->add_instruction(divins);
 
         ast->set_operand(subdest);
