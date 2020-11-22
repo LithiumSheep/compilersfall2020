@@ -801,9 +801,10 @@ public:
                     auto *subins = new Instruction(MINS_SUBQ, r11, r10);
                     assembly->add_instruction(subins);
 
+                    // r10 contains the result now
                     long dest_offset = local_storage_size + (dest.get_base_reg() * WORD_SIZE);
                     Operand memdest(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, dest_offset);
-                    auto *movins = new Instruction(MINS_MOVQ, r11, memdest);
+                    auto *movins = new Instruction(MINS_MOVQ, r10, memdest);
                     assembly->add_instruction(movins);
                     break;
                 }
