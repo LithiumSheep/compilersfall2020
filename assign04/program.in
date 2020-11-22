@@ -1,7 +1,22 @@
-PROGRAM arith03;
-  VAR a : INTEGER;
+PROGRAM arith02;
+  VAR a, b, c : INTEGER;
 
 BEGIN
-  a := 27 - 5 - 3;
-  WRITE a;
+  a := 7;
+  b := 29;
+
+  c := (b - 5 - 3);
+  WRITE c;
+
+  c := (b DIV 2);
+  WRITE c;
+
+  c := a * 1;
+  WRITE c;
+
+  c := (b - 5 - 3) * (b DIV 2);
+  WRITE c;
+
+  c := (b - 5 - 3) * (b DIV 2) + a * 1;
+  WRITE c;
 END.

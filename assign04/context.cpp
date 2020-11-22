@@ -412,7 +412,7 @@ public:
             code->add_instruction(lload);
         }
 
-        if (node_get_tag(lhs) == AST_VAR_REF) {
+        if (node_get_tag(rhs) == AST_VAR_REF) {
             // ldi vr4, (vr2)
             long rreg = next_vreg();
             Operand rdest(OPERAND_VREG, rreg);
