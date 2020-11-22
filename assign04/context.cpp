@@ -568,17 +568,18 @@ public:
         Type *element_type = m_symtab->lookup(varname).get_type();
         Operand element_size(OPERAND_INT_LITERAL, element_type->get_size());
 
-        long vreg = next_vreg();
-        Operand offset_reg(OPERAND_VREG, vreg);
+        long next = next_vreg();
+        Operand offset_reg(OPERAND_VREG, next);
         auto *mulins = new Instruction(HINS_INT_MUL, offset_reg, index_lit, element_size);
         code->add_instruction(mulins);
 
         // result reg now contains offset from array start
         // add the address and offset to get address of (arr[index])
-        vreg = next_vreg();
-        Operand arr_addr_reg(OPERAND_VREG, vreg);
+        next = next_vreg();
+        Operand arr_addr_reg(OPERAND_VREG, next);
         auto *addins = new Instruction(HINS_INT_ADD, arr_addr_reg, arr_start, offset_reg);
         code->add_instruction(addins);
+        ast->set_operand(arr_addr_reg);
     }
 
     void visit_var_ref(struct Node *ast) override {
