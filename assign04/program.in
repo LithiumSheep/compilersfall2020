@@ -1,22 +1,10 @@
-PROGRAM arith02;
-  VAR a, b, c : INTEGER;
+PROGRAM array01;
+  VAR arr : ARRAY 10 OF INTEGER;
 
 BEGIN
-  a := 7;
-  b := 29;
+  arr[0] := 42;
+  arr[1] := 17;
 
-  c := (b - 5 - 3);
-  WRITE c;
-
-  c := (b DIV 2);
-  WRITE c;
-
-  c := a * 1;
-  WRITE c;
-
-  c := (b - 5 - 3) * (b DIV 2);
-  WRITE c;
-
-  c := (b - 5 - 3) * (b DIV 2) + a * 1;
-  WRITE c;
+  WRITE arr[0];
+  WRITE arr[1];
 END.

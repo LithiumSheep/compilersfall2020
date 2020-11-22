@@ -318,8 +318,8 @@ public:
         if (node_get_tag(kid) == AST_VAR_REF) {
             // loadint from addr to vreg
             // ldi vr1, (vr0)
-            long loadreg = next_vreg();
-            Operand writedest(OPERAND_VREG, loadreg);
+            long toreg = next_vreg();
+            Operand writedest(OPERAND_VREG, toreg);
             op = writedest;
             Operand fromreg = kid->get_operand();    // don't use this one
             Operand fromaddr(OPERAND_VREG_MEMREF, fromreg.get_base_reg()); // use this one
