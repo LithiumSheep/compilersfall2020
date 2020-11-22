@@ -321,7 +321,7 @@ public:
         Node* kid = node_get_kid(ast, 0);
         Operand op = kid->get_operand();
 
-        if (kid->get_tag() == AST_VAR_REF) {
+        if (node_get_tag(kid) == AST_VAR_REF) {
             // loadint from addr to vreg
             // ldi vr1, (vr0)
             long loadreg = next_vreg();
@@ -370,7 +370,7 @@ public:
         Operand l_op = lhs->get_operand();
         Operand r_op = rhs->get_operand();
 
-        if (l_op.get_kind() != OPERAND_INT_LITERAL) {
+        if (node_get_tag(lhs) == AST_VAR_REF) {
             // ldi vr3, (vr1)
             long lreg = next_vreg();
             Operand ldest(OPERAND_VREG, lreg);
@@ -379,7 +379,7 @@ public:
             code->add_instruction(lload);
         }
 
-        if (r_op.get_kind() != OPERAND_INT_LITERAL) {
+        if (node_get_tag(rhs) == AST_VAR_REF) {
             // ldi vr4, (vr2)
             long rreg = next_vreg();
             Operand rdest(OPERAND_VREG, rreg);
