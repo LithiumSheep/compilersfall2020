@@ -1,8 +1,7 @@
-PROGRAM arith01;
-  VAR a, b: INTEGER;
+PROGRAM arith03;
+  VAR a : INTEGER;
 
 BEGIN
-  a := 2;
-  b := 3;
-  WRITE a + b;
+  a := 27 - 5 - 3;
+  WRITE a;
 END.
