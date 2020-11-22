@@ -376,6 +376,7 @@ public:
             Operand ldest(OPERAND_VREG, lreg);
             Operand lfrom(OPERAND_VREG_MEMREF, l_op.get_base_reg());
             auto* lload = new Instruction(HINS_LOAD_INT, ldest, lfrom);
+            l_op = ldest;
             code->add_instruction(lload);
         }
 
