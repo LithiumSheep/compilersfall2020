@@ -903,8 +903,7 @@ private:
         // Don't use this method to get the operand for LOCALADD, since it uses the literal to determine offset
         if (vreg_or_lit.get_kind() == OPERAND_INT_LITERAL) {
             return vreg_or_lit; // use the literal
-        }
-        if (vreg_or_lit.has_base_reg()) {
+        } else {
             long offset = local_storage_size + (vreg_or_lit.get_base_reg() * WORD_SIZE);
             Operand rspwithoffset(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, offset);
             return rspwithoffset;
