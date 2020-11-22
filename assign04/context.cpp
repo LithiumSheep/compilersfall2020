@@ -559,11 +559,9 @@ public:
         long vreg = next_vreg();
         Operand destreg(OPERAND_VREG, vreg);    // $vr0
         Operand immval(OPERAND_INT_LITERAL, ast->get_ival());   // $1
-        auto *ins = new Instruction(HINS_LOAD_INT, destreg, immval);    // movq vr0, lit1
+        auto *ins = new Instruction(HINS_LOAD_ICONST, destreg, immval);
         code->add_instruction(ins);
         ast->set_operand(destreg);
-
-        // do we need to reset virtual registers?
     }
 };
 
