@@ -85,6 +85,9 @@ int main(int argc, char **argv) {
       context_set_flag(ctx, 's'); // tell Context to print symbol table info
   } else if (mode == PRINT_HINS) {
       context_set_flag(ctx, 'h');
+  } else {
+      // mode is compile
+      context_set_flag(ctx, 'c');
   }
 
   context_build_symtab(ctx);

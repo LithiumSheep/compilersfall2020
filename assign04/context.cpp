@@ -29,6 +29,7 @@ private:
     SymbolTable *global;
     bool flag_print_symtab;
     bool flag_print_hins;
+    bool flag_compile;
 
 public:
   Context(struct Node *ast);
@@ -231,13 +232,6 @@ public:
         ast->set_str(varname);
         ast->set_type(sym.get_type());
         ast->set_source_info(node_get_source_info(ident));
-    }
-
-    void visit_identifier(struct Node *ast) override {
-        ASTVisitor::visit_identifier(ast);
-
-        // TODO: Consts can be deferenced and have a long value set to the node
-        const char* identifier = node_get_str(ast);
     }
 
     void visit_int_literal(struct Node *ast) override {
@@ -945,6 +939,9 @@ void Context::set_flag(char flag) {
   if (flag == 'h') {
       flag_print_hins = true;
   }
+  if (flag == 'c') {
+      flag_compile = true;
+  }
 }
 
 void Context::build_symtab() {
@@ -966,7 +963,7 @@ void Context::gen_code() {
     if (flag_print_hins) {
         auto *hlprinter = new PrintHighLevelInstructionSequence(hlcodegen->get_iseq());
         hlprinter->print();
-    } else {
+    } else if (flag_compile) {
         auto *asmcodegen = new AssemblyCodeGen(
                 hlcodegen->get_iseq(),
                 hlcodegen->get_storage_size(),
@@ -976,10 +973,6 @@ void Context::gen_code() {
         asmcodegen->emit();
     }
 }
-
-// TODO: implementation of additional Context member functions
-
-// TODO: implementation of member functions for helper classes
 
 ////////////////////////////////////////////////////////////////////////
 // Context API functions
