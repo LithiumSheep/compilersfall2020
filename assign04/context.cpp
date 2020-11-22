@@ -661,6 +661,16 @@ public:
                     assembly->add_instruction(mov3);
                     break;
                 }
+                case HINS_LOAD_ICONST: {
+                    Operand vreg = hin->get_operand(0);
+                    Operand lit = hin->get_operand(1);
+
+                    Operand dest = get_mreg_operand(vreg);
+                    auto *movins = new Instruction(MINS_MOVQ, lit, dest);
+                    movins->set_comment(get_hins_comment(hin));
+                    assembly->add_instruction(movins);
+                    break;
+                }
                 case HINS_STORE_INT: {
                     Operand rhs = hin->get_operand(1);
                     long r_offset = local_storage_size + (rhs.get_base_reg() * WORD_SIZE);
