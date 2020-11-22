@@ -396,8 +396,8 @@ public:
     void visit_subtract(struct Node *ast) override {
         ASTVisitor::visit_subtract(ast);
 
-        Node* lhs = node_get_kid(ast, 0);   // 27
-        Node* rhs = node_get_kid(ast, 1);   // 5
+        Node* lhs = node_get_kid(ast, 0);
+        Node* rhs = node_get_kid(ast, 1);
 
         Operand l_op = lhs->get_operand();
         Operand r_op = rhs->get_operand();
@@ -425,11 +425,7 @@ public:
         // subi vr5, vr3, vr4
         long result_reg = next_vreg();
         Operand subdest(OPERAND_VREG, result_reg);
-        // https://en.wikibooks.org/wiki/X86_Assembly/Arithmetic#Addition_and_Subtraction
-        // sub subtrahend, dest
-        // dest -= subtrahend
-        // dest = dest - subtrahend
-        auto* divins = new Instruction(HINS_INT_SUB, subdest, r_op, l_op);
+        auto* divins = new Instruction(HINS_INT_SUB, subdest, l_op, r_op);
         code->add_instruction(divins);
 
         ast->set_operand(subdest);
@@ -796,7 +792,13 @@ public:
                     auto *movarg2 = new Instruction(MINS_MOVQ, memarg2, r11);
                     assembly->add_instruction(movarg2);
 
-                    auto *subins = new Instruction(MINS_SUBQ, r10, r11);
+                    // https://en.wikibooks.org/wiki/X86_Assembly/Arithmetic#Addition_and_Subtraction
+                    // sub subtrahend, dest
+                    // dest -= subtrahend
+                    // dest = dest - subtrahend
+                    // HINS_INT_SUB d, a1, a2
+                    // SUBQ a2, a1 // places result in a1
+                    auto *subins = new Instruction(MINS_SUBQ, r11, r10);
                     assembly->add_instruction(subins);
 
                     long dest_offset = local_storage_size + (dest.get_base_reg() * WORD_SIZE);
