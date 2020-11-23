@@ -807,13 +807,13 @@ public:
 
                     long arg1_offset = local_storage_size + (arg1.get_base_reg() * WORD_SIZE);
                     Operand memarg1(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, arg1_offset);
-                    auto *movarg1 = new Instruction(MINS_MOVQ, memarg1, r10);
+                    auto *movarg1 = new Instruction(MINS_MOVQ, memarg1, r11);
                     movarg1->set_comment(get_hins_comment(hin));
                     assembly->add_instruction(movarg1);
 
                     long arg2_offset = local_storage_size + (arg2.get_base_reg() * WORD_SIZE);
                     Operand memarg2(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, arg2_offset);
-                    auto *movarg2 = new Instruction(MINS_MOVQ, memarg2, r11);
+                    auto *movarg2 = new Instruction(MINS_MOVQ, memarg2, r10);
                     assembly->add_instruction(movarg2);
 
                     auto *addins = new Instruction(MINS_ADDQ, r11, r10);
