@@ -976,7 +976,7 @@ public:
 
 private:
     void emit_preamble() {
-        printf("/* %ld vregs used */", num_vreg);
+        printf("/* %ld vregs used */\n", num_vreg);
         printf("\t.section .rodata\n");
         printf("s_readint_fmt: .string \"%%ld\"\n");
         printf("s_writeint_fmt: .string \"%%ld\\n\"\n");
