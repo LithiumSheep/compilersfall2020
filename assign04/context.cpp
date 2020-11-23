@@ -877,14 +877,24 @@ public:
                         assembly->add_instruction(movarg1);
                     }
 
+                    if (arg1.is_memref()) {
+                        auto *deref = new Instruction(MINS_MOVQ, r11.to_memref(), r11);
+                        assembly->add_instruction(deref);
+                    }
+
                     if (arg2.has_base_reg()) {
                         long arg2_offset = local_storage_size + (arg2.get_base_reg() * WORD_SIZE);
                         Operand memdivarg2(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, arg2_offset);
                         auto *movarg2 = new Instruction(MINS_MOVQ, memdivarg2, r10);
                         assembly->add_instruction(movarg2);
-                    } else {
+                    }  else {
                         auto *movarg2 = new Instruction(MINS_MOVQ, arg2, r10);
                         assembly->add_instruction(movarg2);
+                    }
+
+                    if (arg2.is_memref()) {
+                        auto *deref = new Instruction(MINS_MOVQ, r10.to_memref(), r10);
+                        assembly->add_instruction(deref);
                     }
 
                     auto *mulins = new Instruction(MINS_IMULQ, r11, r10);
