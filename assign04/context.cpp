@@ -667,6 +667,10 @@ public:
     AssemblyCodeGen(InstructionSequence* highlevelins, long storage_size, long vreg_max) {
         hins = highlevelins;
         local_storage_size = storage_size;
+        // stack alignment check
+        if (local_storage_size % 16 == 0) {
+            local_storage_size += 8;
+        }
         num_vreg = vreg_max;
 
         // calculate total storage
