@@ -667,14 +667,14 @@ public:
     AssemblyCodeGen(InstructionSequence* highlevelins, long storage_size, long vreg_max) {
         hins = highlevelins;
         local_storage_size = storage_size;
-        // stack alignment check
-        if (local_storage_size % 16 == 0) {
-            local_storage_size += 8;
-        }
         num_vreg = vreg_max;
 
         // calculate total storage
         total_storage_size = local_storage_size + (num_vreg * WORD_SIZE);
+        // stack alignment check
+        if (total_storage_size % 16 == 0) {
+            total_storage_size += 8;
+        }
         assembly = new InstructionSequence();
         print_helper = new PrintHighLevelInstructionSequence(nullptr);
     }
