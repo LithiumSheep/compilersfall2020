@@ -671,6 +671,7 @@ public:
 
         // calculate total storage
         total_storage_size = local_storage_size + (num_vreg * WORD_SIZE);
+        total_storage_size += 8;
         assembly = new InstructionSequence();
         print_helper = new PrintHighLevelInstructionSequence(nullptr);
     }
