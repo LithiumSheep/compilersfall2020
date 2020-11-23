@@ -288,6 +288,14 @@ public:
         // specifically disable visits to declarations so no vregs are incremented
     }
 
+    void visit_repeat(struct Node *ast) override {
+        ASTVisitor::visit_repeat(ast);
+    }
+
+    void visit_while(struct Node *ast) override {
+        ASTVisitor::visit_while(ast);
+    }
+
     void visit_read(struct Node *ast) override {
         ASTVisitor::visit_read(ast);
 

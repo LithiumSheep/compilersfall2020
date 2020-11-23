@@ -1,14 +1,16 @@
-PROGRAM array01;
-  VAR arr : ARRAY 10 OF INTEGER;
-  VAR i : INTEGER;
+PROGRAM SumToN;
+  VAR i, sum, n: INTEGER;
 
 BEGIN
-  arr[0] := 42;
-  arr[1] := 17;
-  i := 7;
-  arr[i] := 99;
-
-  WRITE arr[0];
-  WRITE arr[1];
-  WRITE arr[i];
+  -- read integer from user
+  READ n;
+  -- compute sum from 1 to the integer
+  i := 1;
+  sum := 0;
+  WHILE i <= n DO
+    sum := sum + i;
+    i := i + 1;
+  END;
+  -- output the sum
+  WRITE sum;
 END.
