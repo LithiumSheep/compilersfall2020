@@ -573,7 +573,10 @@ public:
         Operand arr_start = identifier->get_operand();
 
         Node *index = node_get_kid(ast, 1);
-        Operand index_lit = index->get_operand();
+        Operand index_op = index->get_operand();
+        if (node_get_tag(index) == AST_VAR_REF) {   // dereference any identifiers passed into index
+            index_op = index_op.to_memref();
+        }   // otherwise, the index immediate is safe to use
 
         const char* varname = node_get_str(identifier);
         Type *array_type = m_symtab->lookup(varname).get_type();
@@ -582,7 +585,7 @@ public:
 
         long next = next_vreg();
         Operand offset_reg(OPERAND_VREG, next);
-        auto *mulins = new Instruction(HINS_INT_MUL, offset_reg, index_lit, element_size);
+        auto *mulins = new Instruction(HINS_INT_MUL, offset_reg, index_op, element_size);
         code->add_instruction(mulins);
 
         // result reg now contains offset from array start
