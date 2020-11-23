@@ -315,7 +315,8 @@ public:
         Node* kid = node_get_kid(ast, 0);
         Operand op = kid->get_operand();
 
-        if (node_get_tag(kid) == AST_VAR_REF) {
+        int tag = node_get_tag(kid);
+        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
             // loadint from addr to vreg
             // ldi vr1, (vr0)
             long toreg = next_vreg();
@@ -364,7 +365,8 @@ public:
         Operand l_op = lhs->get_operand();
         Operand r_op = rhs->get_operand();
 
-        if (node_get_tag(lhs) == AST_VAR_REF) {
+        int tag = node_get_tag(lhs);
+        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
             // ldi vr3, (vr1)
             long lreg = next_vreg();
             Operand ldest(OPERAND_VREG, lreg);
@@ -374,7 +376,8 @@ public:
             code->add_instruction(lload);
         }
 
-        if (node_get_tag(rhs) == AST_VAR_REF) {
+        tag = node_get_tag(rhs);
+        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
             // ldi vr4, (vr2)
             long rreg = next_vreg();
             Operand rdest(OPERAND_VREG, rreg);
@@ -403,7 +406,8 @@ public:
         Operand r_op = rhs->get_operand();
 
         // ldi vr3, (vr1)
-        if (node_get_tag(lhs) == AST_VAR_REF) {
+        int tag = node_get_tag(lhs);
+        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
             long lreg = next_vreg();
             Operand ldest(OPERAND_VREG, lreg);
             Operand lfrom(OPERAND_VREG_MEMREF, l_op.get_base_reg());
@@ -412,7 +416,8 @@ public:
             code->add_instruction(lload);
         }
 
-        if (node_get_tag(rhs) == AST_VAR_REF) {
+        tag = node_get_tag(rhs);
+        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
             // ldi vr4, (vr2)
             long rreg = next_vreg();
             Operand rdest(OPERAND_VREG, rreg);
@@ -440,7 +445,8 @@ public:
         Operand l_op = lhs->get_operand();
         Operand r_op = rhs->get_operand();
 
-        if (node_get_tag(lhs) == AST_VAR_REF) {
+        int tag = node_get_tag(lhs);
+        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
             // ldi vr3, (vr1)
             long lreg = next_vreg();
             Operand ldest(OPERAND_VREG, lreg);
@@ -450,7 +456,8 @@ public:
             code->add_instruction(lload);
         }
 
-        if (node_get_tag(rhs) == AST_VAR_REF) {
+        tag = node_get_tag(rhs);
+        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
             // ldi vr4, (vr2)
             long rreg = next_vreg();
             Operand rdest(OPERAND_VREG, rreg);
@@ -478,7 +485,8 @@ public:
         Operand l_op = lhs->get_operand();
         Operand r_op = rhs->get_operand();
 
-        if (node_get_tag(lhs) == AST_VAR_REF) {
+        int tag = node_get_tag(lhs);
+        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
             // ldi vr3, (vr1)
             long lreg = next_vreg();
             Operand ldest(OPERAND_VREG, lreg);
@@ -488,7 +496,8 @@ public:
             code->add_instruction(lload);
         }
 
-        if (node_get_tag(rhs) == AST_VAR_REF) {
+        tag = node_get_tag(rhs);
+        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
             // ldi vr4, (vr2)
             long rreg = next_vreg();
             Operand rdest(OPERAND_VREG, rreg);
@@ -516,7 +525,8 @@ public:
         Operand l_op = lhs->get_operand();
         Operand r_op = rhs->get_operand();
 
-        if (node_get_tag(lhs) == AST_VAR_REF) {
+        int tag = node_get_tag(lhs);
+        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
             // ldi vr3, (vr1)
             long lreg = next_vreg();
             Operand ldest(OPERAND_VREG, lreg);
@@ -526,7 +536,8 @@ public:
             code->add_instruction(lload);
         }
 
-        if (node_get_tag(rhs) == AST_VAR_REF) {
+        tag = node_get_tag(rhs);
+        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
             // ldi vr4, (vr2)
             long rreg = next_vreg();
             Operand rdest(OPERAND_VREG, rreg);
