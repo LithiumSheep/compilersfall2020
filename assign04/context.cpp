@@ -865,27 +865,31 @@ public:
                     if (arg1.has_base_reg()) {
                         long arg1_offset = local_storage_size + (arg1.get_base_reg() * WORD_SIZE);
                         Operand memarg1(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, arg1_offset);
-                        auto *movarg1 = new Instruction(MINS_MOVQ, memarg1, rax);
+                        auto *movarg1 = new Instruction(MINS_MOVQ, memarg1, r11);
+                        movarg1->set_comment(get_hins_comment(hin));
+                        assembly->add_instruction(movarg1);
+                    } else {
+                        auto *movarg1 = new Instruction(MINS_MOVQ, arg1, r11);
                         movarg1->set_comment(get_hins_comment(hin));
                         assembly->add_instruction(movarg1);
                     }
-
-                    auto *convertins = new Instruction(MINS_CQTO);
-                    assembly->add_instruction(convertins);
 
                     if (arg2.has_base_reg()) {
                         long arg2_offset = local_storage_size + (arg2.get_base_reg() * WORD_SIZE);
                         Operand memdivarg2(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, arg2_offset);
                         auto *movarg2 = new Instruction(MINS_MOVQ, memdivarg2, r10);
                         assembly->add_instruction(movarg2);
+                    } else {
+                        auto *movarg2 = new Instruction(MINS_MOVQ, arg2, r10);
+                        assembly->add_instruction(movarg2);
                     }
 
-                    auto *mulins = new Instruction(MINS_IMULQ, r10);
+                    auto *mulins = new Instruction(MINS_IMULQ, r11, r10);
                     assembly->add_instruction(mulins);
 
                     long dest_offset = local_storage_size + (dest.get_base_reg() * WORD_SIZE);
                     Operand memdest(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, dest_offset);
-                    auto *movdest = new Instruction(MINS_MOVQ, rax, memdest);
+                    auto *movdest = new Instruction(MINS_MOVQ, r10, memdest);
                     assembly->add_instruction(movdest);
                     break;
                 }
