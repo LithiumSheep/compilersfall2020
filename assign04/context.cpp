@@ -565,7 +565,8 @@ public:
         Operand index_lit = index->get_operand();
 
         const char* varname = node_get_str(identifier);
-        Type *element_type = m_symtab->lookup(varname).get_type();
+        Type *array_type = m_symtab->lookup(varname).get_type();
+        Type *element_type = array_type->arrayElementType;
         Operand element_size(OPERAND_INT_LITERAL, element_type->get_size());
 
         long next = next_vreg();
