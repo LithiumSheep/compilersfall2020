@@ -296,13 +296,14 @@ public:
     }
 
     void visit_if(struct Node *ast) override {
-        std::string out_label = next_label();
-
         Node *cond = ast->get_kid(0);
         Node *iftrue = ast->get_kid(1);
 
-        // cond->set_inverted(true);
-        //cond->set_operand(Operand(out_label));
+        std::string out_label = next_label();
+
+        cond->set_inverted(true);
+        Operand op_out(out_label);
+        cond->set_operand(op_out);
 
         visit(cond);
         visit(iftrue);
@@ -310,7 +311,20 @@ public:
     }
 
     void visit_if_else(struct Node *ast) override {
+        Node *condition = node_get_kid(ast, 0);
+        Node *iftrue = node_get_kid(ast, 1);
+        Node *otherwise = node_get_kid(ast, 2);
 
+        std::string else_label = next_label();
+
+        condition->set_inverted(true);
+        Operand op_else(else_label);
+        condition->set_operand(op_else);
+
+        visit(condition);
+        visit(iftrue);
+        code->define_label(else_label);
+        visit(otherwise);
     }
 
     void visit_repeat(struct Node *ast) override {
