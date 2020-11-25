@@ -1388,6 +1388,10 @@ public:
                     break;
             }
         }
+
+        if (hins->has_label_at_end()) {
+            assembly->define_label(hins->get_label_at_end());
+        }
     }
 
     void emit() {
