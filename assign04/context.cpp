@@ -1251,13 +1251,56 @@ public:
                     assembly->add_instruction(movdest);
                     break;
                 }
+                case HINS_INT_COMPARE: {
+                    break;
+                }
                 case HINS_JUMP: {
                     Operand label = hin->get_operand(0);
-
                     auto *jumpins = new Instruction(MINS_JMP, label);
                     jumpins->set_comment(get_hins_comment(hin));
                     assembly->add_instruction(jumpins);
-
+                    break;
+                }
+                case HINS_JE: {
+                    Operand label = hin->get_operand(0);
+                    auto *jumpins = new Instruction(MINS_JE, label);
+                    jumpins->set_comment(get_hins_comment(hin));
+                    assembly->add_instruction(jumpins);
+                    break;
+                }
+                case HINS_JNE: {
+                    Operand label = hin->get_operand(0);
+                    auto *jumpins = new Instruction(MINS_JNE, label);
+                    jumpins->set_comment(get_hins_comment(hin));
+                    assembly->add_instruction(jumpins);
+                    break;
+                }
+                case HINS_JLT: {
+                    Operand label = hin->get_operand(0);
+                    auto *jumpins = new Instruction(MINS_JL, label);
+                    jumpins->set_comment(get_hins_comment(hin));
+                    assembly->add_instruction(jumpins);
+                    break;
+                }
+                case HINS_JLTE: {
+                    Operand label = hin->get_operand(0);
+                    auto *jumpins = new Instruction(MINS_JLE, label);
+                    jumpins->set_comment(get_hins_comment(hin));
+                    assembly->add_instruction(jumpins);
+                    break;
+                }
+                case HINS_JGT: {
+                    Operand label = hin->get_operand(0);
+                    auto *jumpins = new Instruction(MINS_JG, label);
+                    jumpins->set_comment(get_hins_comment(hin));
+                    assembly->add_instruction(jumpins);
+                    break;
+                }
+                case HINS_JGTE: {
+                    Operand label = hin->get_operand(0);
+                    auto *jumpins = new Instruction(MINS_JGE, label);
+                    jumpins->set_comment(get_hins_comment(hin));
+                    assembly->add_instruction(jumpins);
                     break;
                 }
                 default:
