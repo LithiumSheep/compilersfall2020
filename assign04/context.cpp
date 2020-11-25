@@ -309,6 +309,10 @@ public:
         code->define_label(out_label);
     }
 
+    void visit_if_else(struct Node *ast) override {
+
+    }
+
     void visit_repeat(struct Node *ast) override {
 
     }
