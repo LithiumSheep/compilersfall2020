@@ -314,7 +314,23 @@ public:
     }
 
     void visit_repeat(struct Node *ast) override {
+        Node *instructions = node_get_kid(ast, 0);
+        Node *condition = node_get_kid(ast, 1);
 
+        std::string loop_body_label = next_label();         // .L0
+        std::string loop_condition_label = next_label();    // .L1std::string loop_body
+
+        Operand op_loop_body(loop_body_label);
+        Operand op_loop_condition(loop_condition_label);
+
+        // no need to jump, will flow right into loop body for first loop iteration
+
+        code->define_label(loop_body_label);
+        visit(instructions);
+
+        code->define_label(loop_condition_label);
+        condition->set_operand(op_loop_body);
+        visit(condition);
     }
 
     void visit_while(struct Node *ast) override {
