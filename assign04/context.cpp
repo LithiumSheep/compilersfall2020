@@ -389,7 +389,8 @@ public:
         auto *cmpins = new Instruction(HINS_INT_COMPARE, l_op, r_op);
         code->add_instruction(cmpins);
 
-        auto *jumpeq = new Instruction(HINS_JE, ast->get_operand());
+        // invert the operator, we want to repeat if the statement is *not* true
+        auto *jumpeq = new Instruction(HINS_JNE, ast->get_operand());
         code->add_instruction(jumpeq);
     }
 
