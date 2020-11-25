@@ -247,6 +247,7 @@ class HighLevelCodeGen : public ASTVisitor {
 private:
     long m_vreg = -1;
     long m_vreg_max = -1;
+    long loop_index = 0;
     SymbolTable* m_symtab;
     InstructionSequence* code;
 
@@ -266,6 +267,12 @@ public:
 
     void reset_vreg() {
         m_vreg = -1;
+    }
+
+    std::string next_label() {
+        std::string label = cpputil::format(".L%ld", loop_index);
+        loop_index ++;
+        return label;
     }
 
     InstructionSequence* get_iseq() {
@@ -288,12 +295,77 @@ public:
         // specifically disable visits to declarations so no vregs are incremented
     }
 
+    void visit_if(struct Node *ast) override {
+        std::string out_label = next_label();
+
+        Node *cond = ast->get_kid(0);
+        Node *iftrue = ast->get_kid(1);
+
+        // cond->set_inverted(true);
+        //cond->set_operand(Operand(out_label));
+
+        visit(cond);
+        visit(iftrue);
+        code->define_label(out_label);
+    }
+
     void visit_repeat(struct Node *ast) override {
-        ASTVisitor::visit_repeat(ast);
+
     }
 
     void visit_while(struct Node *ast) override {
-        ASTVisitor::visit_while(ast);
+        Node *condition = node_get_kid(ast, 0);
+        Node *instructions = node_get_kid(ast, 1);
+
+        std::string label = next_label();
+
+        // jump to loop condition
+        Operand op_loop_condition(label);
+        auto *jumpins = new Instruction(HINS_JUMP, op_loop_condition);
+        code->add_instruction(jumpins);
+
+        code->define_label(label);
+        Operand op_loop_body_label(label);
+        //instructions->set_operand(op_loop_body_label);
+        visit(instructions);
+
+        label = next_label();
+        code->define_label(label);
+        condition->set_operand(op_loop_body_label);
+        visit(condition);
+    }
+
+    void visit_compare_eq(struct Node *ast) override {
+        ASTVisitor::visit_compare_eq(ast);
+    }
+
+    void visit_compare_neq(struct Node *ast) override {
+        ASTVisitor::visit_compare_neq(ast);
+    }
+
+    void visit_compare_lt(struct Node *ast) override {
+        ASTVisitor::visit_compare_lt(ast);
+    }
+
+    void visit_compare_lte(struct Node *ast) override {
+        ASTVisitor::visit_compare_lte(ast);
+
+        Node *lhs = node_get_kid(ast, 0);
+        Node *rhs = node_get_kid(ast, 1);
+
+        auto *cmpins = new Instruction(HINS_INT_COMPARE, lhs->get_operand(), rhs->get_operand());
+        code->add_instruction(cmpins);
+
+        auto *jumplte = new Instruction(HINS_JLTE, ast->get_operand());
+        code->add_instruction(jumplte);
+    }
+
+    void visit_compare_gt(struct Node *ast) override {
+        ASTVisitor::visit_compare_gt(ast);
+    }
+
+    void visit_compare_gte(struct Node *ast) override {
+        ASTVisitor::visit_compare_gte(ast);
     }
 
     void visit_read(struct Node *ast) override {
