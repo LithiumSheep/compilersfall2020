@@ -337,14 +337,116 @@ public:
 
     void visit_compare_eq(struct Node *ast) override {
         ASTVisitor::visit_compare_eq(ast);
+
+        Node *lhs = node_get_kid(ast, 0);
+        Node *rhs = node_get_kid(ast, 1);
+
+        Operand l_op = lhs->get_operand();
+        Operand r_op = rhs->get_operand();
+
+        int tag = node_get_tag(lhs);
+        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            // ldi vr3, (vr1)
+            long lreg = next_vreg();
+            Operand ldest(OPERAND_VREG, lreg);
+            Operand lfrom(OPERAND_VREG_MEMREF, l_op.get_base_reg());
+            auto* lload = new Instruction(HINS_LOAD_INT, ldest, lfrom);
+            l_op = ldest;
+            code->add_instruction(lload);
+        }
+
+        tag = node_get_tag(rhs);
+        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            // ldi vr4, (vr2)
+            long rreg = next_vreg();
+            Operand rdest(OPERAND_VREG, rreg);
+            Operand rfrom(OPERAND_VREG_MEMREF, r_op.get_base_reg());
+            auto *rload = new Instruction(HINS_LOAD_INT, rdest, rfrom);
+            r_op = rdest;
+            code->add_instruction(rload);
+        }
+
+        auto *cmpins = new Instruction(HINS_INT_COMPARE, l_op, r_op);
+        code->add_instruction(cmpins);
+
+        auto *jumpeq = new Instruction(HINS_JE, ast->get_operand());
+        code->add_instruction(jumpeq);
     }
 
     void visit_compare_neq(struct Node *ast) override {
         ASTVisitor::visit_compare_neq(ast);
+
+        Node *lhs = node_get_kid(ast, 0);
+        Node *rhs = node_get_kid(ast, 1);
+
+        Operand l_op = lhs->get_operand();
+        Operand r_op = rhs->get_operand();
+
+        int tag = node_get_tag(lhs);
+        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            // ldi vr3, (vr1)
+            long lreg = next_vreg();
+            Operand ldest(OPERAND_VREG, lreg);
+            Operand lfrom(OPERAND_VREG_MEMREF, l_op.get_base_reg());
+            auto* lload = new Instruction(HINS_LOAD_INT, ldest, lfrom);
+            l_op = ldest;
+            code->add_instruction(lload);
+        }
+
+        tag = node_get_tag(rhs);
+        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            // ldi vr4, (vr2)
+            long rreg = next_vreg();
+            Operand rdest(OPERAND_VREG, rreg);
+            Operand rfrom(OPERAND_VREG_MEMREF, r_op.get_base_reg());
+            auto *rload = new Instruction(HINS_LOAD_INT, rdest, rfrom);
+            r_op = rdest;
+            code->add_instruction(rload);
+        }
+
+        auto *cmpins = new Instruction(HINS_INT_COMPARE, l_op, r_op);
+        code->add_instruction(cmpins);
+
+        auto *jumpne = new Instruction(HINS_JNE, ast->get_operand());
+        code->add_instruction(jumpne);
     }
 
     void visit_compare_lt(struct Node *ast) override {
         ASTVisitor::visit_compare_lt(ast);
+
+        Node *lhs = node_get_kid(ast, 0);
+        Node *rhs = node_get_kid(ast, 1);
+
+        Operand l_op = lhs->get_operand();
+        Operand r_op = rhs->get_operand();
+
+        int tag = node_get_tag(lhs);
+        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            // ldi vr3, (vr1)
+            long lreg = next_vreg();
+            Operand ldest(OPERAND_VREG, lreg);
+            Operand lfrom(OPERAND_VREG_MEMREF, l_op.get_base_reg());
+            auto* lload = new Instruction(HINS_LOAD_INT, ldest, lfrom);
+            l_op = ldest;
+            code->add_instruction(lload);
+        }
+
+        tag = node_get_tag(rhs);
+        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            // ldi vr4, (vr2)
+            long rreg = next_vreg();
+            Operand rdest(OPERAND_VREG, rreg);
+            Operand rfrom(OPERAND_VREG_MEMREF, r_op.get_base_reg());
+            auto *rload = new Instruction(HINS_LOAD_INT, rdest, rfrom);
+            r_op = rdest;
+            code->add_instruction(rload);
+        }
+
+        auto *cmpins = new Instruction(HINS_INT_COMPARE, l_op, r_op);
+        code->add_instruction(cmpins);
+
+        auto *jumplt = new Instruction(HINS_JLT, ast->get_operand());
+        code->add_instruction(jumplt);
     }
 
     void visit_compare_lte(struct Node *ast) override {
@@ -387,10 +489,78 @@ public:
 
     void visit_compare_gt(struct Node *ast) override {
         ASTVisitor::visit_compare_gt(ast);
+
+        Node *lhs = node_get_kid(ast, 0);
+        Node *rhs = node_get_kid(ast, 1);
+
+        Operand l_op = lhs->get_operand();
+        Operand r_op = rhs->get_operand();
+
+        int tag = node_get_tag(lhs);
+        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            // ldi vr3, (vr1)
+            long lreg = next_vreg();
+            Operand ldest(OPERAND_VREG, lreg);
+            Operand lfrom(OPERAND_VREG_MEMREF, l_op.get_base_reg());
+            auto* lload = new Instruction(HINS_LOAD_INT, ldest, lfrom);
+            l_op = ldest;
+            code->add_instruction(lload);
+        }
+
+        tag = node_get_tag(rhs);
+        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            // ldi vr4, (vr2)
+            long rreg = next_vreg();
+            Operand rdest(OPERAND_VREG, rreg);
+            Operand rfrom(OPERAND_VREG_MEMREF, r_op.get_base_reg());
+            auto *rload = new Instruction(HINS_LOAD_INT, rdest, rfrom);
+            r_op = rdest;
+            code->add_instruction(rload);
+        }
+
+        auto *cmpins = new Instruction(HINS_INT_COMPARE, l_op, r_op);
+        code->add_instruction(cmpins);
+
+        auto *jumpgt = new Instruction(HINS_JGT, ast->get_operand());
+        code->add_instruction(jumpgt);
     }
 
     void visit_compare_gte(struct Node *ast) override {
         ASTVisitor::visit_compare_gte(ast);
+
+        Node *lhs = node_get_kid(ast, 0);
+        Node *rhs = node_get_kid(ast, 1);
+
+        Operand l_op = lhs->get_operand();
+        Operand r_op = rhs->get_operand();
+
+        int tag = node_get_tag(lhs);
+        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            // ldi vr3, (vr1)
+            long lreg = next_vreg();
+            Operand ldest(OPERAND_VREG, lreg);
+            Operand lfrom(OPERAND_VREG_MEMREF, l_op.get_base_reg());
+            auto* lload = new Instruction(HINS_LOAD_INT, ldest, lfrom);
+            l_op = ldest;
+            code->add_instruction(lload);
+        }
+
+        tag = node_get_tag(rhs);
+        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            // ldi vr4, (vr2)
+            long rreg = next_vreg();
+            Operand rdest(OPERAND_VREG, rreg);
+            Operand rfrom(OPERAND_VREG_MEMREF, r_op.get_base_reg());
+            auto *rload = new Instruction(HINS_LOAD_INT, rdest, rfrom);
+            r_op = rdest;
+            code->add_instruction(rload);
+        }
+
+        auto *cmpins = new Instruction(HINS_INT_COMPARE, l_op, r_op);
+        code->add_instruction(cmpins);
+
+        auto *jumpgte = new Instruction(HINS_JGTE, ast->get_operand());
+        code->add_instruction(jumpgte);
     }
 
     void visit_read(struct Node *ast) override {
