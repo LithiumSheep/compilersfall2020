@@ -151,7 +151,7 @@ assignstmt
 
 ifstmt
     : TOK_IF condition TOK_THEN opt_instructions TOK_END { $$ = node_build2(AST_IF, $2, $4); }
-    | TOK_IF condition TOK_THEN opt_instructions TOK_ELSE opt_instructions TOK_END { $$ = node_build3(AST_IF, $2, $4, $6); }
+    | TOK_IF condition TOK_THEN opt_instructions TOK_ELSE opt_instructions TOK_END { $$ = node_build3(AST_IF_ELSE, $2, $4, $6); }
     ;
 
 repeatstmt
