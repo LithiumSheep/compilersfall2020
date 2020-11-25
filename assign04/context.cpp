@@ -316,15 +316,21 @@ public:
         Node *otherwise = node_get_kid(ast, 2);
 
         std::string else_label = next_label();
+        std::string out_label = next_label();
 
         condition->set_inverted(true);
         Operand op_else(else_label);
         condition->set_operand(op_else);
 
+        Operand op_out(out_label);
+
         visit(condition);
         visit(iftrue);
+        auto *jumpins = new Instruction(HINS_JUMP, out_label);  // jump after iftrue to skip else
+        code->add_instruction(jumpins);
         code->define_label(else_label);
         visit(otherwise);
+        code->define_label(out_label);
     }
 
     void visit_repeat(struct Node *ast) override {
