@@ -329,6 +329,7 @@ public:
         visit(instructions);
 
         code->define_label(loop_condition_label);
+        condition->set_inverted(true);
         condition->set_operand(op_loop_body);
         visit(condition);
     }
@@ -370,7 +371,7 @@ public:
             long lreg = next_vreg();
             Operand ldest(OPERAND_VREG, lreg);
             Operand lfrom(OPERAND_VREG_MEMREF, l_op.get_base_reg());
-            auto* lload = new Instruction(HINS_LOAD_INT, ldest, lfrom);
+            auto *lload = new Instruction(HINS_LOAD_INT, ldest, lfrom);
             l_op = ldest;
             code->add_instruction(lload);
         }
@@ -389,9 +390,13 @@ public:
         auto *cmpins = new Instruction(HINS_INT_COMPARE, l_op, r_op);
         code->add_instruction(cmpins);
 
-        // invert the operator, we want to repeat if the statement is *not* true
-        auto *jumpeq = new Instruction(HINS_JNE, ast->get_operand());
-        code->add_instruction(jumpeq);
+        Instruction *jumpins;
+        if (ast->is_inverted()) {
+            jumpins = new Instruction(HINS_JNE, ast->get_operand());
+        } else {
+            jumpins = new Instruction(HINS_JE, ast->get_operand());
+        }
+        code->add_instruction(jumpins);
     }
 
     void visit_compare_neq(struct Node *ast) override {
@@ -428,8 +433,13 @@ public:
         auto *cmpins = new Instruction(HINS_INT_COMPARE, l_op, r_op);
         code->add_instruction(cmpins);
 
-        auto *jumpne = new Instruction(HINS_JNE, ast->get_operand());
-        code->add_instruction(jumpne);
+        Instruction *jumpins;
+        if (ast->is_inverted()) {
+            jumpins = new Instruction(HINS_JE, ast->get_operand());
+        } else {
+            jumpins = new Instruction(HINS_JNE, ast->get_operand());
+        }
+        code->add_instruction(jumpins);
     }
 
     void visit_compare_lt(struct Node *ast) override {

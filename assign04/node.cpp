@@ -133,6 +133,14 @@ Operand Node::get_operand() {
     return m_operand;
 }
 
+void Node::set_inverted(bool inverted) {
+    m_invert = inverted;
+}
+
+bool Node::is_inverted() {
+    return m_invert;
+}
+
 ////////////////////////////////////////////////////////////////////////
 // C API for working with Nodes
 ////////////////////////////////////////////////////////////////////////

@@ -42,6 +42,7 @@ private:
   unsigned m_index; // index of symbol table entry
   Type *m_type;
   Operand m_operand;
+  bool m_invert;
 
   // copy ctor and assignment operator disallowed
   Node(const Node &);
@@ -76,6 +77,8 @@ public:
   Type *get_type();
   void set_operand(Operand &op);
   Operand get_operand();
+  void set_inverted(bool inverted);
+  bool is_inverted();
 };
 
 extern "C" {
