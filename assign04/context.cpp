@@ -1256,12 +1256,12 @@ public:
                     Operand r_op = hin->get_operand(1);
 
                     Operand l_arg = get_mreg_operand(l_op);
-                    auto *movarg1 = new Instruction(MINS_MOVQ, l_arg, r11);
+                    auto *movarg1 = new Instruction(MINS_MOVQ, l_arg, r10);
                     movarg1->set_comment(get_hins_comment(hin));
                     assembly->add_instruction(movarg1);
 
                     Operand r_arg = get_mreg_operand(r_op);
-                    auto *movarg2 = new Instruction(MINS_MOVQ, r_arg, r10);
+                    auto *movarg2 = new Instruction(MINS_MOVQ, r_arg, r11);
                     assembly->add_instruction(movarg2);
 
                     auto *compareins = new Instruction(MINS_CMPQ, r11, r10);
