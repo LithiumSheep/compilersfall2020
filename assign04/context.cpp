@@ -974,6 +974,12 @@ public:
         const long num_ins = hins->get_length();
         for (int i = 0; i < num_ins; i++) {
             auto *hin = hins->get_instruction(i);
+
+            if (hins->has_label(i)) {
+                std::string label = hins->get_label(i);
+                assembly->define_label(label);
+            }
+
             switch(hin->get_opcode()) {
                 case HINS_LOCALADDR: {
                     Operand rhs = hin->get_operand(1); // offset is rhs
@@ -1243,6 +1249,15 @@ public:
                     Operand memdest(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, dest_offset);
                     auto *movdest = new Instruction(MINS_MOVQ, rdx, memdest);   // different from DIV, check %rdx for remainder
                     assembly->add_instruction(movdest);
+                    break;
+                }
+                case HINS_JUMP: {
+                    Operand label = hin->get_operand(0);
+
+                    auto *jumpins = new Instruction(MINS_JMP, label);
+                    jumpins->set_comment(get_hins_comment(hin));
+                    assembly->add_instruction(jumpins);
+
                     break;
                 }
                 default:
