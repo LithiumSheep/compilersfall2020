@@ -317,21 +317,21 @@ public:
         Node *condition = node_get_kid(ast, 0);
         Node *instructions = node_get_kid(ast, 1);
 
-        std::string label = next_label();
+        std::string loop_body_label = next_label();         // .L0
+        std::string loop_condition_label = next_label();    // .L1
 
-        // jump to loop condition
-        Operand op_loop_condition(label);
+        Operand op_loop_condition(loop_condition_label);
         auto *jumpins = new Instruction(HINS_JUMP, op_loop_condition);
         code->add_instruction(jumpins);
 
-        code->define_label(label);
-        Operand op_loop_body_label(label);
-        //instructions->set_operand(op_loop_body_label);
+        // loop body
+        Operand op_loop_body(loop_body_label);
+        code->define_label(loop_body_label);
         visit(instructions);
 
-        label = next_label();
-        code->define_label(label);
-        condition->set_operand(op_loop_body_label);
+        // loop condition
+        code->define_label(loop_condition_label);
+        condition->set_operand(op_loop_body);
         visit(condition);
     }
 
@@ -353,7 +353,32 @@ public:
         Node *lhs = node_get_kid(ast, 0);
         Node *rhs = node_get_kid(ast, 1);
 
-        auto *cmpins = new Instruction(HINS_INT_COMPARE, lhs->get_operand(), rhs->get_operand());
+        Operand l_op = lhs->get_operand();
+        Operand r_op = rhs->get_operand();
+
+        int tag = node_get_tag(lhs);
+        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            // ldi vr3, (vr1)
+            long lreg = next_vreg();
+            Operand ldest(OPERAND_VREG, lreg);
+            Operand lfrom(OPERAND_VREG_MEMREF, l_op.get_base_reg());
+            auto* lload = new Instruction(HINS_LOAD_INT, ldest, lfrom);
+            l_op = ldest;
+            code->add_instruction(lload);
+        }
+
+        tag = node_get_tag(rhs);
+        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            // ldi vr4, (vr2)
+            long rreg = next_vreg();
+            Operand rdest(OPERAND_VREG, rreg);
+            Operand rfrom(OPERAND_VREG_MEMREF, r_op.get_base_reg());
+            auto *rload = new Instruction(HINS_LOAD_INT, rdest, rfrom);
+            r_op = rdest;
+            code->add_instruction(rload);
+        }
+
+        auto *cmpins = new Instruction(HINS_INT_COMPARE, l_op, r_op);
         code->add_instruction(cmpins);
 
         auto *jumplte = new Instruction(HINS_JLTE, ast->get_operand());
