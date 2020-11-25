@@ -496,8 +496,13 @@ public:
         auto *cmpins = new Instruction(HINS_INT_COMPARE, l_op, r_op);
         code->add_instruction(cmpins);
 
-        auto *jumplt = new Instruction(HINS_JLT, ast->get_operand());
-        code->add_instruction(jumplt);
+        Instruction *jumpins;
+        if (ast->is_inverted()) {
+            jumpins = new Instruction(HINS_JGTE, ast->get_operand());
+        } else {
+            jumpins = new Instruction(HINS_JLT, ast->get_operand());
+        }
+        code->add_instruction(jumpins);
     }
 
     void visit_compare_lte(struct Node *ast) override {
@@ -534,8 +539,13 @@ public:
         auto *cmpins = new Instruction(HINS_INT_COMPARE, l_op, r_op);
         code->add_instruction(cmpins);
 
-        auto *jumplte = new Instruction(HINS_JLTE, ast->get_operand());
-        code->add_instruction(jumplte);
+        Instruction *jumpins;
+        if (ast->is_inverted()) {
+            jumpins = new Instruction(HINS_JGT, ast->get_operand());
+        } else {
+            jumpins = new Instruction(HINS_JLTE, ast->get_operand());
+        }
+        code->add_instruction(jumpins);
     }
 
     void visit_compare_gt(struct Node *ast) override {
@@ -572,8 +582,13 @@ public:
         auto *cmpins = new Instruction(HINS_INT_COMPARE, l_op, r_op);
         code->add_instruction(cmpins);
 
-        auto *jumpgt = new Instruction(HINS_JGT, ast->get_operand());
-        code->add_instruction(jumpgt);
+        Instruction *jumpins;
+        if (ast->is_inverted()) {
+            jumpins = new Instruction(HINS_JLTE, ast->get_operand());
+        } else {
+            jumpins = new Instruction(HINS_JGT, ast->get_operand());
+        }
+        code->add_instruction(jumpins);
     }
 
     void visit_compare_gte(struct Node *ast) override {
@@ -610,8 +625,13 @@ public:
         auto *cmpins = new Instruction(HINS_INT_COMPARE, l_op, r_op);
         code->add_instruction(cmpins);
 
-        auto *jumpgte = new Instruction(HINS_JGTE, ast->get_operand());
-        code->add_instruction(jumpgte);
+        Instruction *jumpins;
+        if (ast->is_inverted()) {
+            jumpins = new Instruction(HINS_JLT, ast->get_operand());
+        } else {
+            jumpins = new Instruction(HINS_JGTE, ast->get_operand());
+        }
+        code->add_instruction(jumpins);
     }
 
     void visit_read(struct Node *ast) override {
