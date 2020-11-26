@@ -1,64 +1,27 @@
-PROGRAM decision03;
-  VAR n : INTEGER;
+PROGRAM array03;
+  VAR x, n, keep_going, sum : INTEGER;
+  VAR arr : ARRAY 100 OF INTEGER;
 
 BEGIN
-  READ n;
-  IF n >= 50 THEN
-    IF n MOD 2 = 0 THEN
-      WRITE 1;
+  keep_going := 1;
+  n := 0;
+
+  WHILE keep_going # 0 DO
+    READ x;
+    IF x < 0 THEN
+      keep_going := 0;
     ELSE
-      WRITE 2;
-    END;
-  ELSE
-    IF n MOD 2 = 0 THEN
-      WRITE 3;
-    ELSE
-      WRITE 4;
+      arr[n] := x;
+      n := n + 1;
     END;
   END;
 
-  READ n;
-  IF n <= 50 THEN
-    IF n MOD 2 = 0 THEN
-      WRITE 1;
-    ELSE
-      WRITE 2;
-    END;
-  ELSE
-    IF n MOD 2 = 0 THEN
-      WRITE 3;
-    ELSE
-      WRITE 4;
-    END;
+  x := 0;
+  sum := 0;
+  WHILE x < n DO
+    sum := sum + arr[x];
+    x := x + 1;
   END;
 
-  READ n;
-  IF n > 50 THEN
-    IF n MOD 2 = 0 THEN
-      WRITE 1;
-    ELSE
-      WRITE 2;
-    END;
-  ELSE
-    IF n MOD 2 = 0 THEN
-      WRITE 3;
-    ELSE
-      WRITE 4;
-    END;
-  END;
-
-  READ n;
-  IF n < 50 THEN
-    IF n MOD 2 = 0 THEN
-      WRITE 1;
-    ELSE
-      WRITE 2;
-    END;
-  ELSE
-    IF n MOD 2 = 0 THEN
-      WRITE 3;
-    ELSE
-      WRITE 4;
-    END;
-  END;
+  WRITE sum;
 END.
