@@ -322,15 +322,18 @@ public:
         Operand op_else(else_label);
         condition->set_operand(op_else);
 
-        Operand op_out(out_label);
-
         visit(condition);
         visit(iftrue);
-        auto *jumpins = new Instruction(HINS_JUMP, out_label);  // jump after iftrue to skip else
+        Operand op_out(out_label);
+        auto *jumpins = new Instruction(HINS_JUMP, op_out);  // jump after iftrue to skip else
         code->add_instruction(jumpins);
         code->define_label(else_label);
         visit(otherwise);
         code->define_label(out_label);
+
+        // add no-op to resolve define_label assertion error
+        auto *noopins = new Instruction(HINS_NOP);
+        code->add_instruction(noopins);
     }
 
     void visit_repeat(struct Node *ast) override {
@@ -1383,6 +1386,11 @@ public:
                     jumpins->set_comment(get_hins_comment(hin));
                     assembly->add_instruction(jumpins);
                     break;
+                }
+                case HINS_NOP: {
+                    auto *nopins = new Instruction(MINS_NOP);
+                    nopins->set_comment(get_hins_comment(hin));
+                    assembly->add_instruction(nopins);
                 }
                 default:
                     break;
