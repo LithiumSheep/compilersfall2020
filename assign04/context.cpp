@@ -271,7 +271,7 @@ public:
 
     std::string next_label() {
         std::string label = cpputil::format(".L%ld", loop_index);
-        loop_index ++;
+        loop_index++;
         return label;
     }
 
@@ -338,7 +338,7 @@ public:
         Node *condition = node_get_kid(ast, 1);
 
         std::string loop_body_label = next_label();         // .L0
-        std::string loop_condition_label = next_label();    // .L1std::string loop_body
+        std::string loop_condition_label = next_label();    // .L1
 
         Operand op_loop_body(loop_body_label);
         Operand op_loop_condition(loop_condition_label);
