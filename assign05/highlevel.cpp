@@ -28,6 +28,7 @@ std::string PrintHighLevelInstructionSequence::get_opcode_name(int opcode) {
         case HINS_JGT:         return "jgt";
         case HINS_JGTE:        return "jgte";
         case HINS_INT_COMPARE: return "cmpi";
+        case HINS_LEA:         return "lea";
 
         default:
             assert(false);
@@ -39,4 +40,28 @@ std::string PrintHighLevelInstructionSequence::get_mreg_name(int regnum) {
     // high level instructions should not use machine registers
     assert(false);
     return "<invalid>";
+}
+
+HighLevelControlFlowGraphBuilder::HighLevelControlFlowGraphBuilder(InstructionSequence *iseq)
+        : ControlFlowGraphBuilder(iseq) {
+}
+
+HighLevelControlFlowGraphBuilder::~HighLevelControlFlowGraphBuilder() {
+}
+
+bool HighLevelControlFlowGraphBuilder::falls_through(Instruction *ins) {
+    // only unconditional jump instructions don't fall through
+    return ins->get_opcode() != HINS_JUMP;
+}
+
+HighLevelControlFlowGraphPrinter::HighLevelControlFlowGraphPrinter(ControlFlowGraph *cfg)
+        : ControlFlowGraphPrinter(cfg) {
+}
+
+HighLevelControlFlowGraphPrinter::~HighLevelControlFlowGraphPrinter() {
+}
+
+void HighLevelControlFlowGraphPrinter::print_basic_block(BasicBlock *bb) {
+    PrintHighLevelInstructionSequence print_hliseq(bb);
+    print_hliseq.print();
 }

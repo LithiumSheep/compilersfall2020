@@ -39,7 +39,7 @@ enum X86_64Instruction {
     MINS_CALL,
     MINS_IMULQ,
     MINS_IDIVQ,
-    MINS_CQTO
+    MINS_CQTO,
 };
 
 class PrintX86_64InstructionSequence : public PrintInstructionSequence {
@@ -48,6 +48,23 @@ public:
 
     virtual std::string get_opcode_name(int opcode);
     virtual std::string get_mreg_name(int regnum);
+};
+
+class X86_64ControlFlowGraphBuilder : public ControlFlowGraphBuilder {
+public:
+    X86_64ControlFlowGraphBuilder(InstructionSequence *iseq);
+    ~X86_64ControlFlowGraphBuilder();
+
+    virtual bool is_branch(Instruction *ins);
+    virtual bool falls_through(Instruction *ins);
+};
+
+class X86_64ControlFlowGraphPrinter : public ControlFlowGraphPrinter {
+public:
+    X86_64ControlFlowGraphPrinter(ControlFlowGraph *cfg);
+    ~X86_64ControlFlowGraphPrinter();
+
+    virtual void print_basic_block(BasicBlock *bb);
 };
 
 #endif // X86_64_H
