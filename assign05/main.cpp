@@ -21,6 +21,7 @@ void print_usage(void) {
     "   -g    print AST as graph (DOT/graphviz)\n"
     "   -s    print symbol table information\n"
     "   -h    print high-level instruction translation\n"
+    "   -o    perform optimization on emitted assembly\n"
   );
 }
 
@@ -29,6 +30,7 @@ enum Mode {
   PRINT_AST_GRAPH,
   PRINT_SYMBOL_TABLE,
   PRINT_HINS,
+  OPTIMIZE,
   COMPILE,
 };
 
@@ -39,7 +41,7 @@ int main(int argc, char **argv) {
   int mode = COMPILE;
   int opt;
 
-  while ((opt = getopt(argc, argv, "pgsh")) != -1) {
+  while ((opt = getopt(argc, argv, "pgsho")) != -1) {
     switch (opt) {
     case 'p':
       mode = PRINT_AST;
@@ -55,6 +57,10 @@ int main(int argc, char **argv) {
 
     case 'h':
       mode = PRINT_HINS;
+      break;
+
+    case 'o':
+      mode = OPTIMIZE;
       break;
 
     case '?':
@@ -85,8 +91,11 @@ int main(int argc, char **argv) {
       context_set_flag(ctx, 's'); // tell Context to print symbol table info
   } else if (mode == PRINT_HINS) {
       context_set_flag(ctx, 'h');
+  } else if (mode == OPTIMIZE) {
+      context_set_flag(ctx, 'o');
+      context_set_flag(ctx, 'c');
   } else {
-      // mode is compile
+      // mode is only compile
       context_set_flag(ctx, 'c');
   }
 

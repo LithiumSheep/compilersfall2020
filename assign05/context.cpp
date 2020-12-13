@@ -28,6 +28,7 @@ private:
     SymbolTable *global;
     bool flag_print_symtab;
     bool flag_print_hins;
+    bool flag_optimize;
     bool flag_compile;
 
 public:
@@ -1481,6 +1482,9 @@ void Context::set_flag(char flag) {
   if (flag == 'h') {
       flag_print_hins = true;
   }
+  if (flag == 'o') {
+      flag_optimize = true;
+  }
   if (flag == 'c') {
       flag_compile = true;
   }
@@ -1505,7 +1509,13 @@ void Context::gen_code() {
     if (flag_print_hins) {
         auto *hlprinter = new PrintHighLevelInstructionSequence(hlcodegen->get_iseq());
         hlprinter->print();
-    } else if (flag_compile) {
+    }
+
+    if (flag_optimize) {
+        // TODO: Optimizations here
+    }
+
+    if (flag_compile) {
         auto *asmcodegen = new AssemblyCodeGen(
                 hlcodegen->get_iseq(),
                 hlcodegen->get_storage_size(),
