@@ -1512,7 +1512,13 @@ void Context::gen_code() {
     }
 
     if (flag_optimize) {
-        // TODO: Optimizations here
+        HighLevelControlFlowGraphBuilder cfg_builder(hlcodegen->get_iseq());
+        ControlFlowGraph *cfg = cfg_builder.build();
+
+        HighLevelControlFlowGraphPrinter cfg_printer(cfg);
+        cfg_printer.print();
+
+        cfg->create_instruction_sequence();
     }
 
     if (flag_compile) {
