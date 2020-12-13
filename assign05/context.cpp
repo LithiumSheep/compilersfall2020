@@ -1017,17 +1017,6 @@ public:
         ast->set_operand(moddest);
     }
 
-    void visit_constant_def(struct Node *ast) override {
-        ASTVisitor::visit_constant_def(ast);
-
-        // lhs is ident
-        // rhs is expression or literal
-
-        Node *lhs = node_get_kid(ast, 0);
-        Node *rhs = node_get_kid(ast, 1);
-
-    }
-
     void visit_array_element_ref(struct Node *ast) override {
         ASTVisitor::visit_array_element_ref(ast);
 
@@ -1091,11 +1080,20 @@ public:
         // get offset from symbol
         // instruction is an offset ref
         Symbol sym = m_symtab->lookup(varname);
-        long offset = sym.get_offset();
-        Operand addroffset(OPERAND_INT_LITERAL, offset);
 
-        auto *loadaddrins = new Instruction(HINS_LOCALADDR, destreg, addroffset);
-        code->add_instruction(loadaddrins);
+        if (sym.get_kind() == CONST) {
+            long value = sym.get_ival();
+            Operand constval(OPERAND_INT_LITERAL, value);
+
+            auto *loadins = new Instruction(HINS_LOAD_ICONST, destreg, constval);
+            code->add_instruction(loadins);
+        } else {
+            long offset = sym.get_offset();
+            Operand addroffset(OPERAND_INT_LITERAL, offset);
+
+            auto *loadaddrins = new Instruction(HINS_LOCALADDR, destreg, addroffset);
+            code->add_instruction(loadaddrins);
+        }
 
         // set Operand to Node
         ast->set_operand(destreg);
