@@ -141,6 +141,14 @@ bool Node::is_inverted() {
     return m_invert;
 }
 
+void Node::set_is_const(bool is_const) {
+    m_is_const = is_const;
+}
+
+bool Node::is_const() {
+    return m_is_const;
+}
+
 ////////////////////////////////////////////////////////////////////////
 // C API for working with Nodes
 ////////////////////////////////////////////////////////////////////////

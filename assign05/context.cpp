@@ -92,10 +92,12 @@ public:
     void visit_constant_def(struct Node *ast) override {
         recur_on_children(ast);
 
-        // TODO: Type should be integer?
         // find out type on right
-        Node* right = node_get_kid(ast, 1);
-        Type* type = right->get_type();
+        //Node* right = node_get_kid(ast, 1);
+        //Type* type = right->get_type();
+
+        // Consts are always going to be INTEGER
+        Type* type = integer_type;
 
         // get left identifier
         Node* left = node_get_kid(ast, 0);
