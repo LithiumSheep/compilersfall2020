@@ -10,7 +10,8 @@ C_OBJS = $(C_SRCS:%.c=%.o)
 # to CXX_SRCS when you implement types and symbol tables.
 CXX_SRCS = main.cpp cpputil.cpp node.cpp ast.cpp context.cpp \
 	astvisitor.cpp symbol.cpp symtab.cpp type.cpp \
-	cfg.cpp highlevel.cpp x86_64.cpp
+	cfg.cpp highlevel.cpp x86_64.cpp \
+	cfg_transform.cpp
 CXX_OBJS = $(CXX_SRCS:%.cpp=%.o)
 
 CC = gcc

@@ -17,6 +17,7 @@
 #include "cfg.h"
 #include "highlevel.h"
 #include "x86_64.h"
+#include "cfg_transform.h"
 
 ////////////////////////////////////////////////////////////////////////
 // Classes
@@ -1570,6 +1571,23 @@ private:
     }
 };
 
+class CFGHighLevelTransform : public ControlFlowGraphTransform {
+
+public:
+    CFGHighLevelTransform(ControlFlowGraph *cfg) : ControlFlowGraphTransform(cfg) {}
+
+public:
+    InstructionSequence *transform_basic_block(InstructionSequence *iseq) override {
+        const long num_ins = iseq->get_length();
+        for (int i = 0; i < num_ins; i++) {
+            auto *hin = iseq->get_instruction(i);
+
+            // TODO
+        }
+        return iseq;
+    }
+};
+
 ////////////////////////////////////////////////////////////////////////
 // Context class implementation
 ////////////////////////////////////////////////////////////////////////
@@ -1621,10 +1639,13 @@ void Context::gen_code() {
         HighLevelControlFlowGraphBuilder cfg_builder(iseq);
         ControlFlowGraph *cfg = cfg_builder.build();
 
-        HighLevelControlFlowGraphPrinter cfg_printer(cfg);
+        CFGHighLevelTransform hltransformer(cfg);
+        ControlFlowGraph *cfg_local_opt = hltransformer.transform_cfg();
+
+        HighLevelControlFlowGraphPrinter cfg_printer(cfg_local_opt);
         cfg_printer.print();
 
-        iseq = cfg->create_instruction_sequence();
+        iseq = cfg_local_opt->create_instruction_sequence();
     }
 
     if (flag_print_hins) {
