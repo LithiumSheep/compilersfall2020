@@ -208,8 +208,11 @@ public:
 
         // get left size
         Node* left = node_get_kid(ast, 0);
+        if (!left->is_const()) {
+            SourceInfo info = node_get_source_info(left);
+            err_fatal("%s:%d:%d: Error: Non-constant in constant expression\n", info.filename, info.line, info.col);
+        }
         long size = node_get_ival(left);
-        // could check left size node for non-constant value error
 
         Type* arrayType = type_create_array(size, type);
         ast->set_type(arrayType);
@@ -262,13 +265,12 @@ public:
     void visit_add(struct Node *ast) override {
         ASTVisitor::visit_add(ast);
 
-
         Node *left = node_get_kid(ast, 0);
         Node *right = node_get_kid(ast, 1);
 
         if (!left->is_const() || !right->is_const()) {
-            SourceInfo info = node_get_source_info(left);
-            err_fatal("%s:%d:%d: Error: Non-constant in constant expression\n", info.filename, info.line, info.col);
+            // skip evaluation if calculation is not constant
+            return;
         }
 
         long lval = left->get_ival();
@@ -281,13 +283,12 @@ public:
     void visit_subtract(struct Node *ast) override {
         ASTVisitor::visit_subtract(ast);
 
-
         Node *left = node_get_kid(ast, 0);
         Node *right = node_get_kid(ast, 1);
 
         if (!left->is_const() || !right->is_const()) {
-            SourceInfo info = node_get_source_info(left);
-            err_fatal("%s:%d:%d: Error: Non-constant in constant expression\n", info.filename, info.line, info.col);
+            // skip evaluation if calculation is not constant
+            return;
         }
 
         long lval = left->get_ival();
@@ -304,8 +305,8 @@ public:
         Node *right = node_get_kid(ast, 1);
 
         if (!left->is_const() || !right->is_const()) {
-            SourceInfo info = node_get_source_info(left);
-            err_fatal("%s:%d:%d: Error: Non-constant in constant expression\n", info.filename, info.line, info.col);
+            // skip evaluation if calculation is not constant
+            return;
         }
 
         long lval = left->get_ival();
@@ -318,13 +319,12 @@ public:
     void visit_divide(struct Node *ast) override {
         ASTVisitor::visit_divide(ast);
 
-
         Node *left = node_get_kid(ast, 0);
         Node *right = node_get_kid(ast, 1);
 
         if (!left->is_const() || !right->is_const()) {
-            SourceInfo info = node_get_source_info(left);
-            err_fatal("%s:%d:%d: Error: Non-constant in constant expression\n", info.filename, info.line, info.col);
+            // skip evaluation if calculation is not constant
+            return;
         }
 
         long lval = left->get_ival();
@@ -337,13 +337,12 @@ public:
     void visit_modulus(struct Node *ast) override {
         ASTVisitor::visit_modulus(ast);
 
-
         Node *left = node_get_kid(ast, 0);
         Node *right = node_get_kid(ast, 1);
 
         if (!left->is_const() || !right->is_const()) {
-            SourceInfo info = node_get_source_info(left);
-            err_fatal("%s:%d:%d: Error: Non-constant in constant expression\n", info.filename, info.line, info.col);
+            // skip evaluation if calculation is not constant
+            return;
         }
 
         long lval = left->get_ival();
@@ -351,11 +350,6 @@ public:
 
         ast->set_ival(lval % rval);
         ast->set_is_const(true);
-    }
-
-    void visit_instructions(struct Node *ast) override {
-        // disable visiting instructions
-        //ASTVisitor::visit_instructions(ast);
     }
 };
 
