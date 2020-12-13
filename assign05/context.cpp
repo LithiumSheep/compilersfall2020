@@ -5,7 +5,6 @@
 #include <cstring>
 #include <string>
 #include <set>
-#include "grammar_symbols.h"
 #include "util.h"
 #include "cpputil.h"
 #include "node.h"
@@ -92,6 +91,7 @@ public:
     void visit_constant_def(struct Node *ast) override {
         recur_on_children(ast);
 
+        // TODO: Type should be integer?
         // find out type on right
         Node* right = node_get_kid(ast, 1);
         Type* type = right->get_type();
@@ -291,8 +291,9 @@ public:
 public:
 
     void visit_declarations(struct Node *ast) override {
-        // ASTVisitor::visit_declarations(ast);
         // specifically disable visits to declarations so no vregs are incremented
+        //ASTVisitor::visit_declarations(ast);
+        reset_vreg();
     }
 
     void visit_if(struct Node *ast) override {
@@ -903,6 +904,17 @@ public:
         code->add_instruction(modins);
 
         ast->set_operand(moddest);
+    }
+
+    void visit_constant_def(struct Node *ast) override {
+        ASTVisitor::visit_constant_def(ast);
+
+        // lhs is ident
+        // rhs is expression or literal
+
+        Node *lhs = node_get_kid(ast, 0);
+        Node *rhs = node_get_kid(ast, 1);
+
     }
 
     void visit_array_element_ref(struct Node *ast) override {

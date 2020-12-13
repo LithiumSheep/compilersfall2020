@@ -39,7 +39,7 @@ Type* type_create_array(long size, Type* elementType) {
 Type* type_create_record(SymbolTable* symbolTable) {
     Type* record = new Type(RECORD);
     record->symtab = symbolTable;
-    // TODO: set size of record
+    record->size = symbolTable->get_total_size();
     return record;
 }
 
