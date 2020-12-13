@@ -1506,24 +1506,26 @@ void Context::gen_code() {
     auto *hlcodegen = new HighLevelCodeGen(global);
     hlcodegen->visit(root);
 
-    if (flag_print_hins) {
-        auto *hlprinter = new PrintHighLevelInstructionSequence(hlcodegen->get_iseq());
-        hlprinter->print();
-    }
+    InstructionSequence *iseq = hlcodegen->get_iseq();
 
     if (flag_optimize) {
-        HighLevelControlFlowGraphBuilder cfg_builder(hlcodegen->get_iseq());
+        HighLevelControlFlowGraphBuilder cfg_builder(iseq);
         ControlFlowGraph *cfg = cfg_builder.build();
 
         HighLevelControlFlowGraphPrinter cfg_printer(cfg);
         cfg_printer.print();
 
-        cfg->create_instruction_sequence();
+        iseq = cfg->create_instruction_sequence();
+    }
+
+    if (flag_print_hins) {
+        auto *hlprinter = new PrintHighLevelInstructionSequence(iseq);
+        hlprinter->print();
     }
 
     if (flag_compile) {
         auto *asmcodegen = new AssemblyCodeGen(
-                hlcodegen->get_iseq(),
+                iseq,
                 hlcodegen->get_storage_size(),
                 hlcodegen->get_vreg_max()
                 );
