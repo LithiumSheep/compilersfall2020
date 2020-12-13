@@ -10,7 +10,7 @@
 struct Type;
 
 enum Kind {
-    VARIABLE = 0,
+    VARIABLE = 5000,
     CONST,
     TYPE
 };
@@ -21,11 +21,14 @@ public:
     Type* m_type;
     int m_kind;
     long m_offset;
+    long ival;
     const char* get_name();
     Type* get_type();
     int get_kind();
     long get_size();
     long get_offset();
+    long get_ival();
+    void set_ival(long val);
 };
 
 Symbol *symbol_create(const char* name, Type* type, int kind, long offset);

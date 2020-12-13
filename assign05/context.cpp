@@ -103,9 +103,18 @@ public:
         Node* left = node_get_kid(ast, 0);
         const char* name = node_get_str(left);
 
+        // get right value
+        Node *right = node_get_kid(ast, 1);
+        if (!right->is_const()) {
+            SourceInfo info = node_get_source_info(left);
+            err_fatal("%s:%d:%d: Error: Non-constant in constant expression\n", info.filename, info.line, info.col);
+        }
+        long val = right->get_ival();
+
         // set entry in symtab for name, type
         long offset = get_curr_offset();
         Symbol* sym = symbol_create(name, type, CONST, offset);
+        sym->set_ival(val);
         incr_curr_offset(type->get_size());
 
         if (scope->s_exists(name)) {
@@ -200,6 +209,7 @@ public:
         // get left size
         Node* left = node_get_kid(ast, 0);
         long size = node_get_ival(left);
+        // could check left size node for non-constant value error
 
         Type* arrayType = type_create_array(size, type);
         ast->set_type(arrayType);
@@ -235,6 +245,10 @@ public:
         ast->set_str(varname);
         ast->set_type(sym.get_type());
         ast->set_source_info(node_get_source_info(ident));
+        if (sym.get_kind() == CONST) {
+            ast->set_is_const(true);
+            ast->set_ival(sym.get_ival());
+        }
     }
 
     void visit_int_literal(struct Node *ast) override {
@@ -242,6 +256,106 @@ public:
         ast->set_ival(strtol(node_get_str(ast), nullptr, 10));
         // set type to integer
         ast->set_type(integer_type);
+        ast->set_is_const(true);
+    }
+
+    void visit_add(struct Node *ast) override {
+        ASTVisitor::visit_add(ast);
+
+
+        Node *left = node_get_kid(ast, 0);
+        Node *right = node_get_kid(ast, 1);
+
+        if (!left->is_const() || !right->is_const()) {
+            SourceInfo info = node_get_source_info(left);
+            err_fatal("%s:%d:%d: Error: Non-constant in constant expression\n", info.filename, info.line, info.col);
+        }
+
+        long lval = left->get_ival();
+        long rval = right->get_ival();
+
+        ast->set_ival(lval + rval);
+        ast->set_is_const(true);
+    }
+
+    void visit_subtract(struct Node *ast) override {
+        ASTVisitor::visit_subtract(ast);
+
+
+        Node *left = node_get_kid(ast, 0);
+        Node *right = node_get_kid(ast, 1);
+
+        if (!left->is_const() || !right->is_const()) {
+            SourceInfo info = node_get_source_info(left);
+            err_fatal("%s:%d:%d: Error: Non-constant in constant expression\n", info.filename, info.line, info.col);
+        }
+
+        long lval = left->get_ival();
+        long rval = right->get_ival();
+
+        ast->set_ival(lval - rval);
+        ast->set_is_const(true);
+    }
+
+    void visit_multiply(struct Node *ast) override {
+        ASTVisitor::visit_multiply(ast);
+
+        Node *left = node_get_kid(ast, 0);
+        Node *right = node_get_kid(ast, 1);
+
+        if (!left->is_const() || !right->is_const()) {
+            SourceInfo info = node_get_source_info(left);
+            err_fatal("%s:%d:%d: Error: Non-constant in constant expression\n", info.filename, info.line, info.col);
+        }
+
+        long lval = left->get_ival();
+        long rval = right->get_ival();
+
+        ast->set_ival(lval * rval);
+        ast->set_is_const(true);
+    }
+
+    void visit_divide(struct Node *ast) override {
+        ASTVisitor::visit_divide(ast);
+
+
+        Node *left = node_get_kid(ast, 0);
+        Node *right = node_get_kid(ast, 1);
+
+        if (!left->is_const() || !right->is_const()) {
+            SourceInfo info = node_get_source_info(left);
+            err_fatal("%s:%d:%d: Error: Non-constant in constant expression\n", info.filename, info.line, info.col);
+        }
+
+        long lval = left->get_ival();
+        long rval = right->get_ival();
+
+        ast->set_ival(lval / rval);
+        ast->set_is_const(true);
+    }
+
+    void visit_modulus(struct Node *ast) override {
+        ASTVisitor::visit_modulus(ast);
+
+
+        Node *left = node_get_kid(ast, 0);
+        Node *right = node_get_kid(ast, 1);
+
+        if (!left->is_const() || !right->is_const()) {
+            SourceInfo info = node_get_source_info(left);
+            err_fatal("%s:%d:%d: Error: Non-constant in constant expression\n", info.filename, info.line, info.col);
+        }
+
+        long lval = left->get_ival();
+        long rval = right->get_ival();
+
+        ast->set_ival(lval % rval);
+        ast->set_is_const(true);
+    }
+
+    void visit_instructions(struct Node *ast) override {
+        // disable visiting instructions
+        //ASTVisitor::visit_instructions(ast);
     }
 };
 
@@ -966,6 +1080,7 @@ public:
 
         // set Operand on Node
         Node *identifier = node_get_kid(ast, 0);
+        ast->set_str(node_get_str(identifier));
         Operand op = identifier->get_operand();
         ast->set_operand(op);
     }

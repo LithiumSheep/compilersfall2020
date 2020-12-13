@@ -12,7 +12,7 @@ struct SymbolTable;
 
 // fixme: Changing the enum starting value to *not* 0 fixes segfault on array03, input02, etc, but RECORD will stop printing their fields
 enum RealType {
-    PRIMITIVE = 0,
+    PRIMITIVE = 6000,
     ARRAY,
     RECORD
 };

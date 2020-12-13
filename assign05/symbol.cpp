@@ -24,6 +24,14 @@ long Symbol::get_offset() {
     return m_offset;
 }
 
+long Symbol::get_ival() {
+    return ival;
+}
+
+void Symbol::set_ival(long val) {
+    ival = val;
+}
+
 struct Symbol *symbol_create(const char* name, Type* type, int kind, long offset) {
     Symbol *symbol = new Symbol();
     symbol->m_name = name;
