@@ -65,6 +65,11 @@ int main(int argc, char **argv) {
 
     case '?':
       print_usage();
+      break;
+
+    default:
+      mode = COMPILE;
+      break;
     }
   }
 
