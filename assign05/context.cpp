@@ -1241,7 +1241,11 @@ public:
                     long l_offset = local_storage_size + (lhs.get_base_reg() * WORD_SIZE);
                     Operand storedest(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, l_offset);
 
-                    auto *mov1 = new Instruction(MINS_MOVQ, storesrc, r11);
+                    Operand vardest = r11;
+                    if (rhs_is_memref) {
+                        vardest = vardest.to_memref();
+                    }
+                    auto *mov1 = new Instruction(MINS_MOVQ, storesrc, vardest); // r11 or (r11)
                     mov1->set_comment(get_hins_comment(hin));
                     assembly->add_instruction(mov1);
 
@@ -1249,11 +1253,7 @@ public:
                     assembly->add_instruction(mov2);
 
                     Operand memrefdest(OPERAND_MREG_MEMREF, MREG_R10);
-                    Operand src = r11;
-                    if (rhs_is_memref) {
-                        src = src.to_memref();
-                    }
-                    auto *mov3 = new Instruction(MINS_MOVQ, src, memrefdest);
+                    auto *mov3 = new Instruction(MINS_MOVQ, r11, memrefdest);
                     assembly->add_instruction(mov3);
                     break;
                 }
