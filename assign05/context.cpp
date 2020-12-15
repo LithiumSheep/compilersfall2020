@@ -1233,6 +1233,7 @@ public:
                 }
                 case HINS_STORE_INT: {
                     Operand rhs = hin->get_operand(1);
+                    bool rhs_is_memref = rhs.is_memref();
                     long r_offset = local_storage_size + (rhs.get_base_reg() * WORD_SIZE);
                     Operand storesrc(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, r_offset);
 
@@ -1248,7 +1249,11 @@ public:
                     assembly->add_instruction(mov2);
 
                     Operand memrefdest(OPERAND_MREG_MEMREF, MREG_R10);
-                    auto *mov3 = new Instruction(MINS_MOVQ, r11, memrefdest);
+                    Operand src = r11;
+                    if (rhs_is_memref) {
+                        src = src.to_memref();
+                    }
+                    auto *mov3 = new Instruction(MINS_MOVQ, src, memrefdest);
                     assembly->add_instruction(mov3);
                     break;
                 }
