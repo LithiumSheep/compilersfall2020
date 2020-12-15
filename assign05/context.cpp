@@ -809,7 +809,10 @@ public:
         Operand valop = rhs->get_operand();
         int tag = node_get_tag(rhs);
         if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
-            valop = valop.to_memref();
+            long vreg = next_vreg();
+            Operand loaddest(OPERAND_VREG, vreg);
+            auto *loadins = new Instruction(HINS_LOAD_INT, loaddest, valop.to_memref());
+            code->add_instruction(loadins);
         }
 
         Operand l_vreg = lhs->get_operand();
@@ -1233,7 +1236,6 @@ public:
                 }
                 case HINS_STORE_INT: {
                     Operand rhs = hin->get_operand(1);
-                    bool rhs_is_memref = rhs.is_memref();
                     long r_offset = local_storage_size + (rhs.get_base_reg() * WORD_SIZE);
                     Operand storesrc(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, r_offset);
 
@@ -1241,11 +1243,7 @@ public:
                     long l_offset = local_storage_size + (lhs.get_base_reg() * WORD_SIZE);
                     Operand storedest(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, l_offset);
 
-                    Operand vardest = r11;
-                    if (rhs_is_memref) {
-                        vardest = vardest.to_memref();
-                    }
-                    auto *mov1 = new Instruction(MINS_MOVQ, storesrc, vardest); // r11 or (r11)
+                    auto *mov1 = new Instruction(MINS_MOVQ, storesrc, r11);
                     mov1->set_comment(get_hins_comment(hin));
                     assembly->add_instruction(mov1);
 
