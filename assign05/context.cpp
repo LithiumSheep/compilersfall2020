@@ -813,6 +813,7 @@ public:
             Operand loaddest(OPERAND_VREG, vreg);
             auto *loadins = new Instruction(HINS_LOAD_INT, loaddest, valop.to_memref());
             code->add_instruction(loadins);
+            valop = loaddest;
         }
 
         Operand l_vreg = lhs->get_operand();
