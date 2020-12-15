@@ -806,8 +806,11 @@ public:
         Node* lhs = node_get_kid(ast, 0);
         Node* rhs = node_get_kid(ast, 1);
 
-        Operand r_vreg = rhs->get_operand();
-        Operand valop(OPERAND_VREG, r_vreg.get_base_reg());
+        Operand valop = rhs->get_operand();
+        int tag = node_get_tag(rhs);
+        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            valop = valop.to_memref();
+        }
 
         Operand l_vreg = lhs->get_operand();
         Operand refop(OPERAND_VREG_MEMREF, l_vreg.get_base_reg());
