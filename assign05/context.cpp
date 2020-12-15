@@ -512,15 +512,17 @@ public:
             code->add_instruction(lload);
         }
 
-        tag = node_get_tag(rhs);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
-            // ldi vr4, (vr2)
-            long rreg = next_vreg();
-            Operand rdest(OPERAND_VREG, rreg);
-            Operand rfrom(OPERAND_VREG_MEMREF, r_op.get_base_reg());
-            auto *rload = new Instruction(HINS_LOAD_INT, rdest, rfrom);
-            r_op = rdest;
-            code->add_instruction(rload);
+        if (!rhs->is_const()) {
+            tag = node_get_tag(rhs);
+            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+                // ldi vr4, (vr2)
+                long rreg = next_vreg();
+                Operand rdest(OPERAND_VREG, rreg);
+                Operand rfrom(OPERAND_VREG_MEMREF, r_op.get_base_reg());
+                auto *rload = new Instruction(HINS_LOAD_INT, rdest, rfrom);
+                r_op = rdest;
+                code->add_instruction(rload);
+            }
         }
 
         auto *cmpins = new Instruction(HINS_INT_COMPARE, l_op, r_op);
@@ -555,15 +557,17 @@ public:
             code->add_instruction(lload);
         }
 
-        tag = node_get_tag(rhs);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
-            // ldi vr4, (vr2)
-            long rreg = next_vreg();
-            Operand rdest(OPERAND_VREG, rreg);
-            Operand rfrom(OPERAND_VREG_MEMREF, r_op.get_base_reg());
-            auto *rload = new Instruction(HINS_LOAD_INT, rdest, rfrom);
-            r_op = rdest;
-            code->add_instruction(rload);
+        if (!rhs->is_const()) {
+            tag = node_get_tag(rhs);
+            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+                // ldi vr4, (vr2)
+                long rreg = next_vreg();
+                Operand rdest(OPERAND_VREG, rreg);
+                Operand rfrom(OPERAND_VREG_MEMREF, r_op.get_base_reg());
+                auto *rload = new Instruction(HINS_LOAD_INT, rdest, rfrom);
+                r_op = rdest;
+                code->add_instruction(rload);
+            }
         }
 
         auto *cmpins = new Instruction(HINS_INT_COMPARE, l_op, r_op);
@@ -598,15 +602,17 @@ public:
             code->add_instruction(lload);
         }
 
-        tag = node_get_tag(rhs);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
-            // ldi vr4, (vr2)
-            long rreg = next_vreg();
-            Operand rdest(OPERAND_VREG, rreg);
-            Operand rfrom(OPERAND_VREG_MEMREF, r_op.get_base_reg());
-            auto *rload = new Instruction(HINS_LOAD_INT, rdest, rfrom);
-            r_op = rdest;
-            code->add_instruction(rload);
+        if (!rhs->is_const()) {
+            tag = node_get_tag(rhs);
+            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+                // ldi vr4, (vr2)
+                long rreg = next_vreg();
+                Operand rdest(OPERAND_VREG, rreg);
+                Operand rfrom(OPERAND_VREG_MEMREF, r_op.get_base_reg());
+                auto *rload = new Instruction(HINS_LOAD_INT, rdest, rfrom);
+                r_op = rdest;
+                code->add_instruction(rload);
+            }
         }
 
         auto *cmpins = new Instruction(HINS_INT_COMPARE, l_op, r_op);
@@ -641,15 +647,17 @@ public:
             code->add_instruction(lload);
         }
 
-        tag = node_get_tag(rhs);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
-            // ldi vr4, (vr2)
-            long rreg = next_vreg();
-            Operand rdest(OPERAND_VREG, rreg);
-            Operand rfrom(OPERAND_VREG_MEMREF, r_op.get_base_reg());
-            auto *rload = new Instruction(HINS_LOAD_INT, rdest, rfrom);
-            r_op = rdest;
-            code->add_instruction(rload);
+        if (!rhs->is_const()) {
+            tag = node_get_tag(rhs);
+            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+                // ldi vr4, (vr2)
+                long rreg = next_vreg();
+                Operand rdest(OPERAND_VREG, rreg);
+                Operand rfrom(OPERAND_VREG_MEMREF, r_op.get_base_reg());
+                auto *rload = new Instruction(HINS_LOAD_INT, rdest, rfrom);
+                r_op = rdest;
+                code->add_instruction(rload);
+            }
         }
 
         auto *cmpins = new Instruction(HINS_INT_COMPARE, l_op, r_op);
@@ -684,15 +692,17 @@ public:
             code->add_instruction(lload);
         }
 
-        tag = node_get_tag(rhs);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
-            // ldi vr4, (vr2)
-            long rreg = next_vreg();
-            Operand rdest(OPERAND_VREG, rreg);
-            Operand rfrom(OPERAND_VREG_MEMREF, r_op.get_base_reg());
-            auto *rload = new Instruction(HINS_LOAD_INT, rdest, rfrom);
-            r_op = rdest;
-            code->add_instruction(rload);
+        if (!rhs->is_const()) {
+            tag = node_get_tag(rhs);
+            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+                // ldi vr4, (vr2)
+                long rreg = next_vreg();
+                Operand rdest(OPERAND_VREG, rreg);
+                Operand rfrom(OPERAND_VREG_MEMREF, r_op.get_base_reg());
+                auto *rload = new Instruction(HINS_LOAD_INT, rdest, rfrom);
+                r_op = rdest;
+                code->add_instruction(rload);
+            }
         }
 
         auto *cmpins = new Instruction(HINS_INT_COMPARE, l_op, r_op);
@@ -727,15 +737,17 @@ public:
             code->add_instruction(lload);
         }
 
-        tag = node_get_tag(rhs);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
-            // ldi vr4, (vr2)
-            long rreg = next_vreg();
-            Operand rdest(OPERAND_VREG, rreg);
-            Operand rfrom(OPERAND_VREG_MEMREF, r_op.get_base_reg());
-            auto *rload = new Instruction(HINS_LOAD_INT, rdest, rfrom);
-            r_op = rdest;
-            code->add_instruction(rload);
+        if (!rhs->is_const()) {
+            tag = node_get_tag(rhs);
+            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+                // ldi vr4, (vr2)
+                long rreg = next_vreg();
+                Operand rdest(OPERAND_VREG, rreg);
+                Operand rfrom(OPERAND_VREG_MEMREF, r_op.get_base_reg());
+                auto *rload = new Instruction(HINS_LOAD_INT, rdest, rfrom);
+                r_op = rdest;
+                code->add_instruction(rload);
+            }
         }
 
         auto *cmpins = new Instruction(HINS_INT_COMPARE, l_op, r_op);
@@ -807,13 +819,16 @@ public:
         Node* rhs = node_get_kid(ast, 1);
 
         Operand valop = rhs->get_operand();
-        int tag = node_get_tag(rhs);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
-            long vreg = next_vreg();
-            Operand loaddest(OPERAND_VREG, vreg);
-            auto *loadins = new Instruction(HINS_LOAD_INT, loaddest, valop.to_memref());
-            code->add_instruction(loadins);
-            valop = loaddest;
+
+        if (!rhs->is_const()) {
+            int tag = node_get_tag(rhs);
+            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+                long vreg = next_vreg();
+                Operand loaddest(OPERAND_VREG, vreg);
+                auto *loadins = new Instruction(HINS_LOAD_INT, loaddest, valop.to_memref());
+                code->add_instruction(loadins);
+                valop = loaddest;
+            }
         }
 
         Operand l_vreg = lhs->get_operand();
@@ -845,15 +860,17 @@ public:
             code->add_instruction(lload);
         }
 
-        tag = node_get_tag(rhs);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
-            // ldi vr4, (vr2)
-            long rreg = next_vreg();
-            Operand rdest(OPERAND_VREG, rreg);
-            Operand rfrom(OPERAND_VREG_MEMREF, r_op.get_base_reg());
-            auto *rload = new Instruction(HINS_LOAD_INT, rdest, rfrom);
-            r_op = rdest;
-            code->add_instruction(rload);
+        if (!rhs->is_const()) {
+            tag = node_get_tag(rhs);
+            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+                // ldi vr4, (vr2)
+                long rreg = next_vreg();
+                Operand rdest(OPERAND_VREG, rreg);
+                Operand rfrom(OPERAND_VREG_MEMREF, r_op.get_base_reg());
+                auto *rload = new Instruction(HINS_LOAD_INT, rdest, rfrom);
+                r_op = rdest;
+                code->add_instruction(rload);
+            }
         }
 
         // addi vr5, vr3, vr4
@@ -885,15 +902,17 @@ public:
             code->add_instruction(lload);
         }
 
-        tag = node_get_tag(rhs);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
-            // ldi vr4, (vr2)
-            long rreg = next_vreg();
-            Operand rdest(OPERAND_VREG, rreg);
-            Operand rfrom(OPERAND_VREG_MEMREF, r_op.get_base_reg());
-            auto *rload = new Instruction(HINS_LOAD_INT, rdest, rfrom);
-            r_op = rdest;
-            code->add_instruction(rload);
+        if (!rhs->is_const()) {
+            tag = node_get_tag(rhs);
+            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+                // ldi vr4, (vr2)
+                long rreg = next_vreg();
+                Operand rdest(OPERAND_VREG, rreg);
+                Operand rfrom(OPERAND_VREG_MEMREF, r_op.get_base_reg());
+                auto *rload = new Instruction(HINS_LOAD_INT, rdest, rfrom);
+                r_op = rdest;
+                code->add_instruction(rload);
+            }
         }
 
         // subi vr5, vr3, vr4
@@ -925,15 +944,17 @@ public:
             code->add_instruction(lload);
         }
 
-        tag = node_get_tag(rhs);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
-            // ldi vr4, (vr2)
-            long rreg = next_vreg();
-            Operand rdest(OPERAND_VREG, rreg);
-            Operand rfrom(OPERAND_VREG_MEMREF, r_op.get_base_reg());
-            auto *rload = new Instruction(HINS_LOAD_INT, rdest, rfrom);
-            r_op = rdest;
-            code->add_instruction(rload);
+        if (!rhs->is_const()) {
+            tag = node_get_tag(rhs);
+            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+                // ldi vr4, (vr2)
+                long rreg = next_vreg();
+                Operand rdest(OPERAND_VREG, rreg);
+                Operand rfrom(OPERAND_VREG_MEMREF, r_op.get_base_reg());
+                auto *rload = new Instruction(HINS_LOAD_INT, rdest, rfrom);
+                r_op = rdest;
+                code->add_instruction(rload);
+            }
         }
 
         // muli vr5, vr3, vr4
@@ -965,15 +986,17 @@ public:
             code->add_instruction(lload);
         }
 
-        tag = node_get_tag(rhs);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
-            // ldi vr4, (vr2)
-            long rreg = next_vreg();
-            Operand rdest(OPERAND_VREG, rreg);
-            Operand rfrom(OPERAND_VREG_MEMREF, r_op.get_base_reg());
-            auto *rload = new Instruction(HINS_LOAD_INT, rdest, rfrom);
-            r_op = rdest;
-            code->add_instruction(rload);
+        if (!rhs->is_const()) {
+            tag = node_get_tag(rhs);
+            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+                // ldi vr4, (vr2)
+                long rreg = next_vreg();
+                Operand rdest(OPERAND_VREG, rreg);
+                Operand rfrom(OPERAND_VREG_MEMREF, r_op.get_base_reg());
+                auto *rload = new Instruction(HINS_LOAD_INT, rdest, rfrom);
+                r_op = rdest;
+                code->add_instruction(rload);
+            }
         }
 
         // divi vr5, vr3, vr4
@@ -1005,15 +1028,17 @@ public:
             code->add_instruction(lload);
         }
 
-        tag = node_get_tag(rhs);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
-            // ldi vr4, (vr2)
-            long rreg = next_vreg();
-            Operand rdest(OPERAND_VREG, rreg);
-            Operand rfrom(OPERAND_VREG_MEMREF, r_op.get_base_reg());
-            auto *rload = new Instruction(HINS_LOAD_INT, rdest, rfrom);
-            r_op = rdest;
-            code->add_instruction(rload);
+        if (!rhs->is_const()) {
+            tag = node_get_tag(rhs);
+            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+                // ldi vr4, (vr2)
+                long rreg = next_vreg();
+                Operand rdest(OPERAND_VREG, rreg);
+                Operand rfrom(OPERAND_VREG_MEMREF, r_op.get_base_reg());
+                auto *rload = new Instruction(HINS_LOAD_INT, rdest, rfrom);
+                r_op = rdest;
+                code->add_instruction(rload);
+            }
         }
 
         // divi vr5, vr3, vr4
