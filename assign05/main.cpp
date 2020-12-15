@@ -93,7 +93,7 @@ int main(int argc, char **argv) {
   } else if (mode == PRINT_AST_GRAPH) {
     ast_print_graph(g_program);
   } else if (mode == PRINT_SYMBOL_TABLE) {
-      context_set_flag(ctx, 's'); // tell Context to print symbol table info
+      context_set_flag(ctx, 's');
   } else if (mode == PRINT_HINS) {
       context_set_flag(ctx, 'h');
   } else if (mode == OPTIMIZE) {
