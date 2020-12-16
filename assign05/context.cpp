@@ -1624,12 +1624,9 @@ public:
                         if (it == const_values.end()) {
                             // Operator representing const was not found
                         } else {
-                            if (opcode == HINS_LOCALADDR) {
-                                // if used in LOCALADDR, vreg is now in use for a scalar variable
+                            if (opcode == HINS_LOCALADDR || opcode == HINS_LOAD_INT) {
+                                // if used in LOCALADDR or LOAD_INT, vreg is now in use for a scalar variable
                                 const_values.erase(it);
-                            } else if (opcode == HINS_LOAD_INT ||
-                                        opcode == HINS_WRITE_INT) {
-                                // if used in LOAD_INT, ignore instruction
                             } else {
                                 // vreg representing constant found
                                 // replace vreg with literal
