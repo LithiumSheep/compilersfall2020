@@ -1217,9 +1217,8 @@ public:
 
                     // vrN is offset 8N(rsp);
                     Operand lhs = hin->get_operand(0);
-                    long offset = local_storage_size + (lhs.get_base_reg() * WORD_SIZE);
-                    Operand rspoffset(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, offset);
-                    auto *movq = new Instruction(MINS_MOVQ, r10, rspoffset);
+                    Operand dest = get_mreg(lhs);
+                    auto *movq = new Instruction(MINS_MOVQ, r10, dest);
                     assembly->add_instruction(movq);
                     break;
                 }
@@ -1228,8 +1227,7 @@ public:
                     Operand loadsrc = get_mreg_or_lit(rhs);
 
                     Operand lhs = hin->get_operand(0);
-                    long l_offset = local_storage_size + (lhs.get_base_reg() * WORD_SIZE);
-                    Operand loaddest(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, l_offset);
+                    Operand loaddest = get_mreg(lhs);
 
                     auto *mov1 = new Instruction(MINS_MOVQ, loadsrc, r11);
                     mov1->set_comment(get_hins_comment(hin));
@@ -1257,21 +1255,16 @@ public:
                 }
                 case HINS_STORE_INT: {
                     Operand rhs = hin->get_operand(1);
-                    Operand src = rhs;
-                    if (rhs.has_base_reg()) {
-                        long r_offset = local_storage_size + (rhs.get_base_reg() * WORD_SIZE);
-                        src = Operand(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, r_offset);
-                    }
+                    Operand src = get_mreg_or_lit(rhs);
 
                     Operand lhs = hin->get_operand(0);
-                    long l_offset = local_storage_size + (lhs.get_base_reg() * WORD_SIZE);
-                    Operand storedest(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, l_offset);
+                    Operand dest = get_mreg(lhs);
 
                     auto *mov1 = new Instruction(MINS_MOVQ, src, r11);
                     mov1->set_comment(get_hins_comment(hin));
                     assembly->add_instruction(mov1);
 
-                    auto *mov2 = new Instruction(MINS_MOVQ, storedest, r10);
+                    auto *mov2 = new Instruction(MINS_MOVQ, dest, r10);
                     assembly->add_instruction(mov2);
 
                     Operand memrefdest(OPERAND_MREG_MEMREF, MREG_R10);
@@ -1285,11 +1278,10 @@ public:
                     movfmt->set_comment(get_hins_comment(hin));
                     assembly->add_instruction(movfmt);
 
-                    // load adrr of vreg into second argument register
+                    // load addr of vreg into second argument register
                     Operand op = hin->get_operand(0);
-                    long offset = local_storage_size + (op.get_base_reg() * WORD_SIZE);
-                    Operand rspoffset(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, offset);
-                    auto *leaq = new Instruction(MINS_MOVQ, rspoffset, rsi);
+                    Operand src = get_mreg_or_lit(op);
+                    auto *leaq = new Instruction(MINS_MOVQ, src, rsi);
                     assembly->add_instruction(leaq);
 
                     // call the printf function
@@ -1303,11 +1295,10 @@ public:
                     movfmt->set_comment(get_hins_comment(hin));
                     assembly->add_instruction(movfmt);
 
-                    // load adrr of vreg into second argument register
+                    // load addr of vreg into second argument register
                     Operand op = hin->get_operand(0);
-                    long offset = local_storage_size + (op.get_base_reg() * WORD_SIZE);
-                    Operand rspoffset(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, offset);
-                    auto *leaq = new Instruction(MINS_LEAQ, rspoffset, rsi);
+                    Operand dest = get_mreg(op);
+                    auto *leaq = new Instruction(MINS_LEAQ, dest, rsi);
                     assembly->add_instruction(leaq);
 
                     // call the scanf function
@@ -1320,23 +1311,20 @@ public:
                     Operand arg1 = hin->get_operand(1);
                     Operand arg2 = hin->get_operand(2);
 
-                    long arg1_offset = local_storage_size + (arg1.get_base_reg() * WORD_SIZE);
-                    Operand memarg1(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, arg1_offset);
-                    auto *movarg1 = new Instruction(MINS_MOVQ, memarg1, r11);
+                    Operand addend = get_mreg_or_lit(arg1);
+                    auto *movarg1 = new Instruction(MINS_MOVQ,addend, r11);
                     movarg1->set_comment(get_hins_comment(hin));
                     assembly->add_instruction(movarg1);
 
-                    long arg2_offset = local_storage_size + (arg2.get_base_reg() * WORD_SIZE);
-                    Operand memarg2(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, arg2_offset);
-                    auto *movarg2 = new Instruction(MINS_MOVQ, memarg2, r10);
+                    Operand destination = get_mreg_or_lit(arg2);
+                    auto *movarg2 = new Instruction(MINS_MOVQ, destination, r10);
                     assembly->add_instruction(movarg2);
 
                     auto *addins = new Instruction(MINS_ADDQ, r11, r10);
                     assembly->add_instruction(addins);
 
-                    long dest_offset = local_storage_size + (dest.get_base_reg() * WORD_SIZE);
-                    Operand memdest(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, dest_offset);
-                    auto *movins = new Instruction(MINS_MOVQ, r10, memdest);
+                    Operand resultdestination = get_mreg(dest);
+                    auto *movins = new Instruction(MINS_MOVQ, r10, resultdestination);
                     assembly->add_instruction(movins);
                     break;
                 }
@@ -1345,15 +1333,13 @@ public:
                     Operand arg1 = hin->get_operand(1);
                     Operand arg2 = hin->get_operand(2);
 
-                    long arg1_offset = local_storage_size + (arg1.get_base_reg() * WORD_SIZE);
-                    Operand memarg1(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, arg1_offset);
-                    auto *movarg1 = new Instruction(MINS_MOVQ, memarg1, r10);
+                    Operand destination = get_mreg_or_lit(arg1);
+                    auto *movarg1 = new Instruction(MINS_MOVQ, destination, r10);
                     movarg1->set_comment(get_hins_comment(hin));
                     assembly->add_instruction(movarg1);
 
-                    long arg2_offset = local_storage_size + (arg2.get_base_reg() * WORD_SIZE);
-                    Operand memarg2(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, arg2_offset);
-                    auto *movarg2 = new Instruction(MINS_MOVQ, memarg2, r11);
+                    Operand subtrahend = get_mreg_or_lit(arg2);
+                    auto *movarg2 = new Instruction(MINS_MOVQ, subtrahend, r11);
                     assembly->add_instruction(movarg2);
 
                     // https://en.wikibooks.org/wiki/X86_Assembly/Arithmetic#Addition_and_Subtraction
@@ -1366,9 +1352,8 @@ public:
                     assembly->add_instruction(subins);
 
                     // r10 contains the result now
-                    long dest_offset = local_storage_size + (dest.get_base_reg() * WORD_SIZE);
-                    Operand memdest(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, dest_offset);
-                    auto *movins = new Instruction(MINS_MOVQ, r10, memdest);
+                    Operand resultdestination = get_mreg(dest);
+                    auto *movins = new Instruction(MINS_MOVQ, r10, resultdestination);
                     assembly->add_instruction(movins);
                     break;
                 }
@@ -1377,32 +1362,19 @@ public:
                     Operand arg1 = hin->get_operand(1);
                     Operand arg2 = hin->get_operand(2);
 
-                    if (arg1.has_base_reg()) {
-                        long arg1_offset = local_storage_size + (arg1.get_base_reg() * WORD_SIZE);
-                        Operand memarg1(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, arg1_offset);
-                        auto *movarg1 = new Instruction(MINS_MOVQ, memarg1, r11);
-                        movarg1->set_comment(get_hins_comment(hin));
-                        assembly->add_instruction(movarg1);
-                    } else {
-                        auto *movarg1 = new Instruction(MINS_MOVQ, arg1, r11);
-                        movarg1->set_comment(get_hins_comment(hin));
-                        assembly->add_instruction(movarg1);
-                    }
+                    Operand multiplicand = get_mreg_or_lit(arg1);
+                    auto *movarg1 = new Instruction(MINS_MOVQ, multiplicand, r11);
+                    movarg1->set_comment(get_hins_comment(hin));
+                    assembly->add_instruction(movarg1);
 
                     if (arg1.is_memref()) {
                         auto *deref = new Instruction(MINS_MOVQ, r11.to_memref(), r11);
                         assembly->add_instruction(deref);
                     }
 
-                    if (arg2.has_base_reg()) {
-                        long arg2_offset = local_storage_size + (arg2.get_base_reg() * WORD_SIZE);
-                        Operand memdivarg2(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, arg2_offset);
-                        auto *movarg2 = new Instruction(MINS_MOVQ, memdivarg2, r10);
-                        assembly->add_instruction(movarg2);
-                    }  else {
-                        auto *movarg2 = new Instruction(MINS_MOVQ, arg2, r10);
-                        assembly->add_instruction(movarg2);
-                    }
+                    Operand destination = get_mreg_or_lit(arg2);
+                    auto *movarg2 = new Instruction(MINS_MOVQ, destination, r10);
+                    assembly->add_instruction(movarg2);
 
                     if (arg2.is_memref()) {
                         auto *deref = new Instruction(MINS_MOVQ, r10.to_memref(), r10);
@@ -1412,9 +1384,8 @@ public:
                     auto *mulins = new Instruction(MINS_IMULQ, r11, r10);
                     assembly->add_instruction(mulins);
 
-                    long dest_offset = local_storage_size + (dest.get_base_reg() * WORD_SIZE);
-                    Operand memdest(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, dest_offset);
-                    auto *movdest = new Instruction(MINS_MOVQ, r10, memdest);
+                    Operand resultdestination = get_mreg(dest);
+                    auto *movdest = new Instruction(MINS_MOVQ, r10, resultdestination);
                     assembly->add_instruction(movdest);
                     break;
                 }
@@ -1423,54 +1394,48 @@ public:
                     Operand divarg1 = hin->get_operand(1);
                     Operand divarg2 = hin->get_operand(2);
 
-                    long arg1_offset = local_storage_size + (divarg1.get_base_reg() * WORD_SIZE);
-                    Operand memdivarg1(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, arg1_offset);
-                    auto *movarg1 = new Instruction(MINS_MOVQ, memdivarg1, rax);
+                    Operand op1 = get_mreg_or_lit(divarg1);
+                    auto *movarg1 = new Instruction(MINS_MOVQ, op1, rax);
                     movarg1->set_comment(get_hins_comment(hin));
                     assembly->add_instruction(movarg1);
 
                     auto *convertins = new Instruction(MINS_CQTO);
                     assembly->add_instruction(convertins);
 
-                    long arg2_offset = local_storage_size + (divarg2.get_base_reg() * WORD_SIZE);
-                    Operand memdivarg2(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, arg2_offset);
-                    auto *movarg2 = new Instruction(MINS_MOVQ, memdivarg2, r10);
+                    Operand op2 = get_mreg_or_lit(divarg2);
+                    auto *movarg2 = new Instruction(MINS_MOVQ, op2, r10);
                     assembly->add_instruction(movarg2);
 
                     auto *divins = new Instruction(MINS_IDIVQ, r10);
                     assembly->add_instruction(divins);
 
-                    long dest_offset = local_storage_size + (dest.get_base_reg() * WORD_SIZE);
-                    Operand memdest(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, dest_offset);
-                    auto *movdest = new Instruction(MINS_MOVQ, rax, memdest);
+                    Operand resultdestination = get_mreg(dest);
+                    auto *movdest = new Instruction(MINS_MOVQ, rax, resultdestination);
                     assembly->add_instruction(movdest);
                     break;
                 }
                 case HINS_INT_MOD: {
                     Operand dest = hin->get_operand(0);
-                    Operand divarg1 = hin->get_operand(1);
-                    Operand divarg2 = hin->get_operand(2);
+                    Operand modarg1 = hin->get_operand(1);
+                    Operand modarg2 = hin->get_operand(2);
 
-                    long arg1_offset = local_storage_size + (divarg1.get_base_reg() * WORD_SIZE);
-                    Operand memdivarg1(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, arg1_offset);
-                    auto *movarg1 = new Instruction(MINS_MOVQ, memdivarg1, rax);
+                    Operand op1 = get_mreg_or_lit(modarg1);
+                    auto *movarg1 = new Instruction(MINS_MOVQ, op1, rax);
                     movarg1->set_comment(get_hins_comment(hin));
                     assembly->add_instruction(movarg1);
 
                     auto *convertins = new Instruction(MINS_CQTO);
                     assembly->add_instruction(convertins);
 
-                    long arg2_offset = local_storage_size + (divarg2.get_base_reg() * WORD_SIZE);
-                    Operand memdivarg2(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, arg2_offset);
-                    auto *movarg2 = new Instruction(MINS_MOVQ, memdivarg2, r10);
+                    Operand op2 = get_mreg_or_lit(modarg2);
+                    auto *movarg2 = new Instruction(MINS_MOVQ, op2, r10);
                     assembly->add_instruction(movarg2);
 
                     auto *divins = new Instruction(MINS_IDIVQ, r10);
                     assembly->add_instruction(divins);
 
-                    long dest_offset = local_storage_size + (dest.get_base_reg() * WORD_SIZE);
-                    Operand memdest(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, dest_offset);
-                    auto *movdest = new Instruction(MINS_MOVQ, rdx, memdest);   // different from DIV, check %rdx for remainder
+                    Operand resultdestination = get_mreg(dest);
+                    auto *movdest = new Instruction(MINS_MOVQ, rdx, resultdestination);   // different from DIV, check %rdx for remainder
                     assembly->add_instruction(movdest);
                     break;
                 }
@@ -1634,6 +1599,9 @@ public:
             auto *hin = iseq->get_instruction(i);
             int opcode = hin->get_opcode();
 
+            // the instruction that may be modified
+            Instruction *instruction = hin->duplicate();
+
             if (opcode == HINS_LOAD_ICONST) {
                 // lhs is virtual register, rhs is const literal
                 Operand dest = hin->get_operand(0);
@@ -1647,7 +1615,6 @@ public:
                 // do not include HINS_LOAD_ICONST instructions
             } else {
                 const long num_ops = hin->get_num_operands();
-                Instruction *instruction = hin->duplicate();
 
                 for (int j = 0; j < num_ops; j++) {
                     Operand operand = hin->get_operand(j);
@@ -1657,9 +1624,14 @@ public:
                         if (it == const_values.end()) {
                             // Operator representing const was not found
                         } else {
-                            // vreg representing constant found
-                            // replace vreg with literal
-                            instruction->operator[](j) = it->second;
+                            if (opcode == HINS_LOCALADDR) {
+                                // if used in LOCALADDR, vreg is now in use for a scalar variable
+                                const_values.erase(it);
+                            } else {
+                                // vreg representing constant found
+                                // replace vreg with literal
+                                instruction->operator[](j) = it->second;
+                            }
                         }
                     }
                 }
@@ -1735,6 +1707,9 @@ void Context::gen_code() {
         ControlFlowGraph *cfg_local_opt = hltransformer.transform_cfg();
 
         iseq = cfg_local_opt->create_instruction_sequence();
+
+        auto *hlprinter = new PrintHighLevelInstructionSequence(iseq);
+        hlprinter->print();
     }
 
     if (flag_print_hins) {
