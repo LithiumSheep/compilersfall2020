@@ -1628,8 +1628,7 @@ public:
                                 // if used in LOCALADDR, vreg is now in use for a scalar variable
                                 const_values.erase(it);
                             } else if (opcode == HINS_LOAD_INT ||
-                                        opcode == HINS_WRITE_INT ||
-                                        opcode == HINS_READ_INT) {
+                                        opcode == HINS_WRITE_INT) {
                                 // if used in LOAD_INT, ignore instruction
                             } else {
                                 // vreg representing constant found
