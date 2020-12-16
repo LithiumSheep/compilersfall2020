@@ -1627,6 +1627,8 @@ public:
                             if (opcode == HINS_LOCALADDR) {
                                 // if used in LOCALADDR, vreg is now in use for a scalar variable
                                 const_values.erase(it);
+                            } else if (opcode == HINS_LOAD_INT) {
+                                // if used in LOAD_INT, ignore instruction
                             } else {
                                 // vreg representing constant found
                                 // replace vreg with literal
@@ -1707,6 +1709,9 @@ void Context::gen_code() {
         ControlFlowGraph *cfg_local_opt = hltransformer.transform_cfg();
 
         iseq = cfg_local_opt->create_instruction_sequence();
+
+        auto *hlprinter = new PrintHighLevelInstructionSequence(iseq);
+        hlprinter->print();
     }
 
     if (flag_print_hins) {
