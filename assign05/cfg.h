@@ -381,6 +381,8 @@ public:
     // Get pointer to the dedicated empty exit block
     BasicBlock *get_exit_block() const;
 
+    BasicBlock *get_block(unsigned i) const;
+
     // iterator over pointers to BasicBlocks
     BlockList::const_iterator bb_begin() const { return m_basic_blocks.cbegin(); }
     BlockList::const_iterator bb_end() const   { return m_basic_blocks.cend(); }

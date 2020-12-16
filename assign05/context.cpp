@@ -18,6 +18,7 @@
 #include "highlevel.h"
 #include "x86_64.h"
 #include "cfg_transform.h"
+#include "live_vregs.h"
 
 ////////////////////////////////////////////////////////////////////////
 // Classes
@@ -1671,11 +1672,17 @@ void Context::gen_code() {
         HighLevelControlFlowGraphBuilder cfg_builder(iseq);
         ControlFlowGraph *cfg = cfg_builder.build();
 
+        // CFG Printer
+        //HighLevelControlFlowGraphPrinter cfg_printer(cfg);
+        //cfg_printer.print();
+
+        // Live Vregs Printer
+        auto live_vregs = new LiveVregs(cfg);
+        LiveVregsControlFlowGraphPrinter live_vregs_printer(cfg, live_vregs);
+        //live_vregs_printer.print();
+
         CFGHighLevelTransform hltransformer(cfg);
         ControlFlowGraph *cfg_local_opt = hltransformer.transform_cfg();
-
-        //HighLevelControlFlowGraphPrinter cfg_printer(cfg_local_opt);
-        //cfg_printer.print();
 
         iseq = cfg_local_opt->create_instruction_sequence();
     }

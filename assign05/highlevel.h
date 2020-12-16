@@ -29,6 +29,12 @@ enum HighLevelOpcode {
     HINS_LEA,
 };
 
+class HighLevel {
+public:
+    static bool is_def(Instruction *ins);
+    static bool is_use(Instruction *ins, unsigned i);
+};
+
 class PrintHighLevelInstructionSequence : public PrintInstructionSequence {
 public:
     PrintHighLevelInstructionSequence(InstructionSequence *ins);
@@ -51,6 +57,7 @@ public:
     ~HighLevelControlFlowGraphPrinter();
 
     virtual void print_basic_block(BasicBlock *bb);
+    virtual std::string format_instruction(BasicBlock *bb, Instruction *ins);
 };
 
 #endif // HIGHLEVEL_H

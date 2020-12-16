@@ -397,6 +397,11 @@ BasicBlock *ControlFlowGraph::get_exit_block() const {
     return m_exit;
 }
 
+BasicBlock *ControlFlowGraph::get_block(unsigned i) const {
+    assert(i < m_basic_blocks.size());
+    return m_basic_blocks[i];
+}
+
 BasicBlock *ControlFlowGraph::create_basic_block(BasicBlockKind kind, const std::string &label) {
     BasicBlock *bb = new BasicBlock(kind, unsigned(m_basic_blocks.size()), label);
     m_basic_blocks.push_back(bb);

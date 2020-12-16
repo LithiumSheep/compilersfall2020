@@ -36,6 +36,41 @@ std::string PrintHighLevelInstructionSequence::get_opcode_name(int opcode) {
     }
 }
 
+bool HighLevel::is_def(Instruction *ins) {
+    int opcode = ins->get_opcode();
+    switch(opcode) {
+        case HINS_LOAD_ICONST:  return true;
+        case HINS_INT_ADD:      return true;
+        case HINS_INT_SUB:      return true;
+        case HINS_INT_MUL:      return true;
+        case HINS_INT_DIV:      return true;
+        case HINS_INT_MOD:      return true;
+        case HINS_INT_NEGATE:   return true;
+        case HINS_LOCALADDR:    return true;
+        case HINS_LOAD_INT:     return true;
+        case HINS_STORE_INT:    return true;
+        case HINS_READ_INT:     return true;
+        default:                return false;
+    }
+}
+
+bool HighLevel::is_use(Instruction *ins, unsigned i) {
+    int opcode = ins->get_opcode();
+
+    Operand op = ins->get_operand(i);
+    bool op_is_vreg = op.has_base_reg();
+
+    switch(opcode) {
+        // TODO:
+    }
+
+    if (op_is_vreg) {
+        return true;
+    }
+
+    return false;
+}
+
 std::string PrintHighLevelInstructionSequence::get_mreg_name(int regnum) {
     // high level instructions should not use machine registers
     assert(false);
@@ -62,6 +97,15 @@ HighLevelControlFlowGraphPrinter::~HighLevelControlFlowGraphPrinter() {
 }
 
 void HighLevelControlFlowGraphPrinter::print_basic_block(BasicBlock *bb) {
-    PrintHighLevelInstructionSequence print_hliseq(bb);
-    print_hliseq.print();
+    for (auto i = bb->cbegin(); i != bb->cend(); i++) {
+        Instruction *ins = *i;
+        std::string s = format_instruction(bb, ins);
+        printf("\t%s\n", s.c_str());
+    }
+}
+
+std::string HighLevelControlFlowGraphPrinter::format_instruction(BasicBlock *bb,
+                                                                 Instruction *ins) {
+    PrintHighLevelInstructionSequence p(bb);
+    return p.format_instruction(ins);
 }
