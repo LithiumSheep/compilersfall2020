@@ -1709,9 +1709,6 @@ void Context::gen_code() {
         ControlFlowGraph *cfg_local_opt = hltransformer.transform_cfg();
 
         iseq = cfg_local_opt->create_instruction_sequence();
-
-        auto *hlprinter = new PrintHighLevelInstructionSequence(iseq);
-        hlprinter->print();
     }
 
     if (flag_print_hins) {
