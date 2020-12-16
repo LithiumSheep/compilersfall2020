@@ -182,6 +182,7 @@ private:
 public:
     typedef std::vector<Instruction *>::iterator iterator;
     typedef std::vector<Instruction *>::const_iterator const_iterator;
+    typedef std::vector<Instruction *>::const_reverse_iterator const_reverse_iterator;
 
     InstructionSequence();
 
@@ -230,6 +231,8 @@ public:
     iterator end() { return m_instr_seq.end(); }
     const_iterator cbegin() const { return m_instr_seq.cbegin(); }
     const_iterator cend() const { return m_instr_seq.cend(); }
+    const_reverse_iterator crbegin() const { return m_instr_seq.crbegin(); }
+    const_reverse_iterator crend() const { return m_instr_seq.crend(); }
 };
 
 // For debugging: print a textual representation of an InstructionSequence
