@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <string>
+#include <map>
 #include <set>
 #include "util.h"
 #include "cpputil.h"
@@ -1224,14 +1225,7 @@ public:
                 }
                 case HINS_LOAD_INT:{
                     Operand rhs = hin->get_operand(1);
-                    Operand loadsrc;
-                    if (rhs.get_kind() == OPERAND_INT_LITERAL) {
-                        loadsrc = rhs;
-                    } else {
-                        long r_offset = local_storage_size + (rhs.get_base_reg() * WORD_SIZE);
-                        Operand memref(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, r_offset);
-                        loadsrc = memref;
-                    }
+                    Operand loadsrc = get_mreg_or_lit(rhs);
 
                     Operand lhs = hin->get_operand(0);
                     long l_offset = local_storage_size + (lhs.get_base_reg() * WORD_SIZE);
@@ -1263,14 +1257,17 @@ public:
                 }
                 case HINS_STORE_INT: {
                     Operand rhs = hin->get_operand(1);
-                    long r_offset = local_storage_size + (rhs.get_base_reg() * WORD_SIZE);
-                    Operand storesrc(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, r_offset);
+                    Operand src = rhs;
+                    if (rhs.has_base_reg()) {
+                        long r_offset = local_storage_size + (rhs.get_base_reg() * WORD_SIZE);
+                        src = Operand(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, r_offset);
+                    }
 
                     Operand lhs = hin->get_operand(0);
                     long l_offset = local_storage_size + (lhs.get_base_reg() * WORD_SIZE);
                     Operand storedest(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, l_offset);
 
-                    auto *mov1 = new Instruction(MINS_MOVQ, storesrc, r11);
+                    auto *mov1 = new Instruction(MINS_MOVQ, src, r11);
                     mov1->set_comment(get_hins_comment(hin));
                     assembly->add_instruction(mov1);
 
@@ -1593,13 +1590,28 @@ private:
     }
 
     Operand get_mreg_operand(Operand vreg_or_lit) {
-        // Don't use this method to get the operand for LOCALADD, since it uses the literal to determine offset
+        // Don't use this method to get the operand for LOCALADDR, since it uses the literal to determine offset
         if (vreg_or_lit.get_kind() == OPERAND_INT_LITERAL) {
             return vreg_or_lit; // use the literal
         } else {
             long offset = local_storage_size + (vreg_or_lit.get_base_reg() * WORD_SIZE);
             Operand rspwithoffset(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, offset);
             return rspwithoffset;
+        }
+    }
+
+    Operand get_mreg(const Operand vreg) {
+        assert(vreg.has_base_reg());
+        long offset = local_storage_size + (vreg.get_base_reg() * WORD_SIZE);
+        Operand rspwithoffset(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, offset);
+        return rspwithoffset;
+    }
+
+    Operand get_mreg_or_lit(Operand vreg_or_lit) {
+        if (vreg_or_lit.get_kind() == OPERAND_INT_LITERAL) {
+            return vreg_or_lit;
+        } else {
+            return get_mreg(vreg_or_lit);
         }
     }
 };
@@ -1611,13 +1623,50 @@ public:
 
 public:
     InstructionSequence *transform_basic_block(InstructionSequence *iseq) override {
+        auto ins = new InstructionSequence();
+
         const long num_ins = iseq->get_length();
+
+        // constant folding
+        std::map<int, Operand> const_values;
+
         for (int i = 0; i < num_ins; i++) {
             auto *hin = iseq->get_instruction(i);
+            int opcode = hin->get_opcode();
 
-            // TODO
+            if (opcode == HINS_LOAD_ICONST) {
+                // lhs is virtual register, rhs is const literal
+                Operand dest = hin->get_operand(0);
+                int vreg = dest.get_base_reg();
+                Operand lit = hin->get_operand(1);
+
+                const_values[vreg] = lit;
+                // TODO: remove print
+                //printf("Found vr with constant value %ld\n", lit.get_int_value());
+                // for further instructions, replace all usages of vreg with $lit
+                // do not include HINS_LOAD_ICONST instructions
+            } else {
+                const long num_ops = hin->get_num_operands();
+                Instruction *instruction = hin->duplicate();
+
+                for (int j = 0; j < num_ops; j++) {
+                    Operand operand = hin->get_operand(j);
+
+                    if (operand.has_base_reg()) {
+                        auto it = const_values.find(operand.get_base_reg());
+                        if (it == const_values.end()) {
+                            // Operator representing const was not found
+                        } else {
+                            // vreg representing constant found
+                            // replace vreg with literal
+                            instruction->operator[](j) = it->second;
+                        }
+                    }
+                }
+                ins->add_instruction(instruction);
+            }
         }
-        return iseq;
+        return ins;
     }
 };
 
@@ -1667,6 +1716,7 @@ void Context::gen_code() {
     hlcodegen->visit(root);
 
     InstructionSequence *iseq = hlcodegen->get_iseq();
+    // TODO: Calculate number of vregs independent of highlevel code gen
 
     if (flag_optimize) {
         HighLevelControlFlowGraphBuilder cfg_builder(iseq);
