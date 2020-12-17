@@ -1609,10 +1609,9 @@ public:
                 Operand lit = hin->get_operand(1);
 
                 const_values[vreg] = lit;
-                // TODO: remove print
-                //printf("Found vr with constant value %ld\n", lit.get_int_value());
+
                 // for further instructions, replace all usages of vreg with $lit
-                // do not include HINS_LOAD_ICONST instructions
+                // remove (aka don't add to ins) HINS_LOAD_ICONST instructions
             } else {
                 const long num_ops = hin->get_num_operands();
 
