@@ -371,6 +371,20 @@ public:
         code = new InstructionSequence();
     }
 
+    InstructionSequence* get_iseq() {
+        return code;
+    }
+
+    long get_storage_size() {
+        return m_symtab->get_total_size();
+    }
+
+    long get_vreg_max() {
+        // if N is the index of vreg used, e.g. vrN, then the number of registers is N + 1
+        return m_vreg_max + 1;
+    }
+
+private:
     long next_vreg() {
         m_vreg += 1;
         if (m_vreg_max < (m_vreg)) {
@@ -387,19 +401,6 @@ public:
         std::string label = cpputil::format(".L%ld", loop_index);
         loop_index++;
         return label;
-    }
-
-    InstructionSequence* get_iseq() {
-        return code;
-    }
-
-    long get_storage_size() {
-        return m_symtab->get_total_size();
-    }
-
-    long get_vreg_max() {
-        // if N is the index of vreg used, e.g. vrN, then the number of registers is N + 1
-        return m_vreg_max + 1;
     }
 
 public:

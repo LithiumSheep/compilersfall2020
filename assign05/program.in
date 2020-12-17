@@ -1,7 +1,7 @@
-PROGRAM multidim10;
-  -- this program multiplies 10x10 square matrices,
-  -- represented as 100 element 1-D arrays
-  CONST M = 10;
+PROGRAM array20;
+  -- this program multiplies 500x500 square matrices,
+  -- represented as 250000 element 1-D arrays
+  CONST M = 500;
   CONST N = M*M;
   TYPE Matrix = ARRAY N OF INTEGER;
   VAR a, b, c : Matrix;
