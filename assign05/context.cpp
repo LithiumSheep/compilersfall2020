@@ -1582,18 +1582,15 @@ private:
     }
 };
 
-class CFGHighLevelTransform : public ControlFlowGraphTransform {
+class ConstantPropagation : public ControlFlowGraphTransform {
 
 public:
-    CFGHighLevelTransform(ControlFlowGraph *cfg) : ControlFlowGraphTransform(cfg) {}
+    ConstantPropagation(ControlFlowGraph *cfg) : ControlFlowGraphTransform(cfg) {}
 
 public:
     InstructionSequence *transform_basic_block(InstructionSequence *iseq) override {
         auto out = new InstructionSequence();
 
-        const long num_ins = iseq->get_length();
-
-        // constant folding
         std::map<int, Operand> const_values;
 
         for (auto ins : *iseq) {
@@ -1699,8 +1696,8 @@ void Context::gen_code() {
         LiveVregsControlFlowGraphPrinter live_vregs_printer(cfg, live_vregs);
         //live_vregs_printer.print();
 
-        CFGHighLevelTransform hltransformer(cfg);
-        ControlFlowGraph *cfg_local_opt = hltransformer.transform_cfg();
+        ConstantPropagation constantPropagation(cfg);
+        ControlFlowGraph *cfg_local_opt = constantPropagation.transform_cfg();
 
         iseq = cfg_local_opt->create_instruction_sequence();
     }
