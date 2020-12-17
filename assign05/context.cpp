@@ -1589,15 +1589,15 @@ public:
 
 public:
     InstructionSequence *transform_basic_block(InstructionSequence *iseq) override {
-        auto ins = new InstructionSequence();
+        auto out = new InstructionSequence();
 
         const long num_ins = iseq->get_length();
 
         // constant folding
         std::map<int, Operand> const_values;
 
-        for (int i = 0; i < num_ins; i++) {
-            auto *hin = iseq->get_instruction(i);
+        for (auto ins : *iseq) {
+            Instruction *hin = ins->duplicate();
             int opcode = hin->get_opcode();
 
             // the instruction that may be modified
@@ -1614,16 +1614,13 @@ public:
                 // for further instructions, replace all usages of vreg with $lit
                 // remove (aka don't add to ins) HINS_LOAD_ICONST instructions
             } else {
-                const long num_ops = hin->get_num_operands();
 
-                for (int j = 0; j < num_ops; j++) {
+                for (int j = 0; j < hin->get_num_operands(); j++) {
                     Operand operand = hin->get_operand(j);
 
                     if (operand.has_base_reg()) {
                         auto it = const_values.find(operand.get_base_reg());
-                        if (it == const_values.end()) {
-                            // Operator representing const was not found
-                        } else {
+                        if (it != const_values.end()) {
                             if (opcode == HINS_LOCALADDR || opcode == HINS_LOAD_INT) {
                                 // if used in LOCALADDR or LOAD_INT, vreg is now in use for a scalar variable
                                 const_values.erase(it);
@@ -1635,10 +1632,10 @@ public:
                         }
                     }
                 }
-                ins->add_instruction(instruction);
+                out->add_instruction(instruction);
             }
         }
-        return ins;
+        return out;
     }
 };
 
