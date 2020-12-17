@@ -46,13 +46,6 @@ public:
   void gen_code();
 };
 
-// Known issues:
-// bug: Modifying enum start value in enums Kind and RealType change the behavior of record printing (???)
-// unimplemented: Consts can be dereferenced and used in subsequent declarations
-// unimplemented: Consts can be checked for variable references and throw an error
-// unimplemented: array and field references are not being type checked
-// unimolemented: READ and WRITE operands are not being checked
-//
 class SymbolTableBuilder : public ASTVisitor {
 private:
     SymbolTable* scope;
