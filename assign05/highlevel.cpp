@@ -29,6 +29,7 @@ std::string PrintHighLevelInstructionSequence::get_opcode_name(int opcode) {
         case HINS_JGTE:        return "jgte";
         case HINS_INT_COMPARE: return "cmpi";
         case HINS_LEA:         return "lea";
+        case HINS_MOV:         return "mov";
 
         default:
             assert(false);
@@ -48,7 +49,6 @@ bool HighLevel::is_def(Instruction *ins) {
         case HINS_INT_NEGATE:   return true;
         case HINS_LOCALADDR:    return true;
         case HINS_LOAD_INT:     return true;
-        case HINS_STORE_INT:    return true;
         case HINS_READ_INT:     return true;
         default:                return false;
     }
