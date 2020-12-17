@@ -33,6 +33,7 @@ class HighLevel {
 public:
     static bool is_def(Instruction *ins);
     static bool is_use(Instruction *ins, unsigned i);
+    static int get_num_vregs(InstructionSequence *hins);
 };
 
 class PrintHighLevelInstructionSequence : public PrintInstructionSequence {

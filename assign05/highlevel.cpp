@@ -71,6 +71,26 @@ bool HighLevel::is_use(Instruction *ins, unsigned i) {
     return false;
 }
 
+int HighLevel::get_num_vregs(InstructionSequence *hins) {
+    // map unique vregs
+    std::map<long, Operand> vregs;
+
+    const long num_ins = hins->get_length();
+    for (int i = 0; i < num_ins; i++) {
+        auto *hin = hins->get_instruction(i);
+        const long num_operands = hin->get_num_operands();
+        for (int j = 0; j < num_operands; j++) {
+            Operand operand = hin->get_operand(j);
+            if (operand.get_kind() == OPERAND_VREG || operand.get_kind() == OPERAND_VREG_MEMREF) {
+                int base_reg = operand.get_base_reg();
+                vregs[base_reg] = operand;
+            }
+        }
+    }
+
+    return vregs.size();
+}
+
 std::string PrintHighLevelInstructionSequence::get_mreg_name(int regnum) {
     // high level instructions should not use machine registers
     assert(false);

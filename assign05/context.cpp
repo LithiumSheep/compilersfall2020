@@ -1688,7 +1688,6 @@ void Context::gen_code() {
     hlcodegen->visit(root);
 
     InstructionSequence *iseq = hlcodegen->get_iseq();
-    // TODO: Calculate number of vregs independent of highlevel code gen
 
     if (flag_optimize) {
         HighLevelControlFlowGraphBuilder cfg_builder(iseq);
@@ -1715,6 +1714,8 @@ void Context::gen_code() {
     }
 
     if (flag_compile) {
+        // TODO: Calculate number of vregs independent of highlevel code gen
+
         auto *asmcodegen = new AssemblyCodeGen(
                 iseq,
                 hlcodegen->get_storage_size(),
