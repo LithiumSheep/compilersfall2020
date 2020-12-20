@@ -531,7 +531,9 @@ public:
 
         if (!rhs->is_const()) {
             tag = node_get_tag(rhs);
-            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            if (r_op.get_is_scalar()) {
+                // just use r_op directly
+            } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
                 // ldi vr4, (vr2)
                 long rreg = next_vreg();
                 Operand rdest(OPERAND_VREG, rreg);
@@ -578,7 +580,9 @@ public:
 
         if (!rhs->is_const()) {
             tag = node_get_tag(rhs);
-            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            if (r_op.get_is_scalar()) {
+                // just use r_op directly
+            } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
                 // ldi vr4, (vr2)
                 long rreg = next_vreg();
                 Operand rdest(OPERAND_VREG, rreg);
@@ -625,7 +629,9 @@ public:
 
         if (!rhs->is_const()) {
             tag = node_get_tag(rhs);
-            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            if (r_op.get_is_scalar()) {
+                // just use r_op directly
+            } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
                 // ldi vr4, (vr2)
                 long rreg = next_vreg();
                 Operand rdest(OPERAND_VREG, rreg);
@@ -672,7 +678,9 @@ public:
 
         if (!rhs->is_const()) {
             tag = node_get_tag(rhs);
-            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            if (r_op.get_is_scalar()) {
+                // just use r_op directly
+            } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
                 // ldi vr4, (vr2)
                 long rreg = next_vreg();
                 Operand rdest(OPERAND_VREG, rreg);
@@ -719,7 +727,9 @@ public:
 
         if (!rhs->is_const()) {
             tag = node_get_tag(rhs);
-            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            if (r_op.get_is_scalar()) {
+                // just use r_op directly
+            } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
                 // ldi vr4, (vr2)
                 long rreg = next_vreg();
                 Operand rdest(OPERAND_VREG, rreg);
@@ -766,7 +776,9 @@ public:
 
         if (!rhs->is_const()) {
             tag = node_get_tag(rhs);
-            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            if (r_op.get_is_scalar()) {
+                // just use r_op directly
+            } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
                 // ldi vr4, (vr2)
                 long rreg = next_vreg();
                 Operand rdest(OPERAND_VREG, rreg);
