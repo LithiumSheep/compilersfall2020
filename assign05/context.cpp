@@ -1673,7 +1673,6 @@ private:
 
         if (vreg.get_does_map_mreg()) {
             // naively map vr0 - vr4 to rbx, r12, r13, r14, r15
-            printf("Mapping vr%d to mreg\n", vreg.get_base_reg());
             switch(vreg.get_base_reg()) {
                 case 0:
                     return Operand(OPERAND_MREG, MREG_RBX);
@@ -1774,7 +1773,6 @@ public:
             for (int j = 0; j < hin->get_num_operands(); j++) {
                 Operand operand = hin->get_operand(j);
                 if (operand.get_is_scalar()) {
-                    printf("Found an operand vr%d to map to mreg\n", operand.get_base_reg());
                     operand.set_does_map_mreg(true);
                     hin->operator[](j) = operand;
                 }
