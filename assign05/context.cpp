@@ -517,7 +517,9 @@ public:
         Operand r_op = rhs->get_operand();
 
         int tag = node_get_tag(lhs);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+        if (l_op.get_is_scalar()) {
+            // just use l_op directly
+        } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
             // ldi vr3, (vr1)
             long lreg = next_vreg();
             Operand ldest(OPERAND_VREG, lreg);
@@ -562,7 +564,9 @@ public:
         Operand r_op = rhs->get_operand();
 
         int tag = node_get_tag(lhs);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+        if (l_op.get_is_scalar()) {
+            // just use l_op directly
+        } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
             // ldi vr3, (vr1)
             long lreg = next_vreg();
             Operand ldest(OPERAND_VREG, lreg);
@@ -654,7 +658,9 @@ public:
         Operand r_op = rhs->get_operand();
 
         int tag = node_get_tag(lhs);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+        if (l_op.get_is_scalar()) {
+            // just use l_op directly
+        } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
             // ldi vr3, (vr1)
             long lreg = next_vreg();
             Operand ldest(OPERAND_VREG, lreg);
@@ -699,7 +705,9 @@ public:
         Operand r_op = rhs->get_operand();
 
         int tag = node_get_tag(lhs);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+        if (l_op.get_is_scalar()) {
+            // just use l_op directly
+        } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
             // ldi vr3, (vr1)
             long lreg = next_vreg();
             Operand ldest(OPERAND_VREG, lreg);
@@ -744,7 +752,9 @@ public:
         Operand r_op = rhs->get_operand();
 
         int tag = node_get_tag(lhs);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+        if (l_op.get_is_scalar()) {
+            // just use l_op directly
+        } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
             // ldi vr3, (vr1)
             long lreg = next_vreg();
             Operand ldest(OPERAND_VREG, lreg);
