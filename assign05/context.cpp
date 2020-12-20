@@ -1117,7 +1117,10 @@ public:
 
         Node *index = node_get_kid(ast, 1);
         Operand index_op = index->get_operand();
-        if (node_get_tag(index) == AST_VAR_REF) {   // dereference any identifiers passed into index
+
+        if (index_op.get_is_scalar()) {
+            // do nothing
+        } else if (node_get_tag(index) == AST_VAR_REF) {   // dereference any identifiers passed into index
             index_op = index_op.to_memref();
         }   // otherwise, the index immediate is safe to use
 
