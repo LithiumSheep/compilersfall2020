@@ -1273,6 +1273,7 @@ public:
     }
 
     void translate_instructions() {
+        // callee-owned
         Operand rsp(OPERAND_MREG, MREG_RSP);
         Operand rdi(OPERAND_MREG, MREG_RDI);
         Operand rsi(OPERAND_MREG, MREG_RSI);
@@ -1280,6 +1281,8 @@ public:
         Operand r11(OPERAND_MREG, MREG_R11);
         Operand rax(OPERAND_MREG, MREG_RAX);
         Operand rdx(OPERAND_MREG, MREG_RDX);
+
+        // static labels
         Operand inputfmt("s_readint_fmt", true);
         Operand outputfmt("s_writeint_fmt", true);
         Operand printf_label("printf");
@@ -1334,7 +1337,7 @@ public:
                     Operand vreg = hin->get_operand(0);
                     Operand lit = hin->get_operand(1);
 
-                    Operand dest = get_mreg_operand(vreg);
+                    Operand dest = get_mreg(vreg);
                     auto *movins = new Instruction(MINS_MOVQ, lit, dest);
                     movins->set_comment(get_hins_comment(hin));
                     assembly->add_instruction(movins);
@@ -1544,12 +1547,12 @@ public:
                     Operand l_op = hin->get_operand(0);
                     Operand r_op = hin->get_operand(1);
 
-                    Operand l_arg = get_mreg_operand(l_op);
+                    Operand l_arg = get_mreg_or_lit(l_op);
                     auto *movarg1 = new Instruction(MINS_MOVQ, l_arg, r10);
                     movarg1->set_comment(get_hins_comment(hin));
                     assembly->add_instruction(movarg1);
 
-                    Operand r_arg = get_mreg_operand(r_op);
+                    Operand r_arg = get_mreg_or_lit(r_op);
                     auto *movarg2 = new Instruction(MINS_MOVQ, r_arg, r11);
                     assembly->add_instruction(movarg2);
 
@@ -1636,6 +1639,11 @@ private:
         printf("\t.section .text\n");
         printf("\t.globl main\n");
         printf("main:\n");
+        printf("\tpushq %%rbx\n");
+        printf("\tpushq %%r12\n");
+        printf("\tpushq %%r13\n");
+        printf("\tpushq %%r14\n");
+        printf("\tpushq %%r15\n");
         printf("\tsubq $%ld, %%rsp\n", total_storage_size);
     }
 
@@ -1647,6 +1655,11 @@ private:
     // addq storage + (8 * num_vreg), rsp
     void emit_epilogue() {
         printf("\taddq $%ld, %%rsp\n", total_storage_size);
+        printf("\tpopq %%rbx\n");
+        printf("\tpopq %%r12\n");
+        printf("\tpopq %%r13\n");
+        printf("\tpopq %%r14\n");
+        printf("\tpopq %%r15\n");
         printf("\tmovl $0, %%eax\n");
         printf("\tret\n");
     }
@@ -1655,19 +1668,26 @@ private:
         return print_helper->format_instruction(hin);
     }
 
-    Operand get_mreg_operand(Operand vreg_or_lit) {
-        // Don't use this method to get the operand for LOCALADDR, since it uses the literal to determine offset
-        if (vreg_or_lit.get_kind() == OPERAND_INT_LITERAL) {
-            return vreg_or_lit; // use the literal
-        } else {
-            long offset = local_storage_size + (vreg_or_lit.get_base_reg() * WORD_SIZE);
-            Operand rspwithoffset(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, offset);
-            return rspwithoffset;
-        }
-    }
-
-    Operand get_mreg(const Operand vreg) {
+    Operand get_mreg(Operand vreg) {
         assert(vreg.has_base_reg());
+
+        if (vreg.get_does_map_mreg()) {
+            // naively map vr0 - vr4 to rbx, r12, r13, r14, r15
+            printf("Mapping vr%d to mreg\n", vreg.get_base_reg());
+            switch(vreg.get_base_reg()) {
+                case 0:
+                    return Operand(OPERAND_MREG, MREG_RBX);
+                case 1:
+                    return Operand(OPERAND_MREG, MREG_R12);
+                case 2:
+                    return Operand(OPERAND_MREG, MREG_R13);
+                case 3:
+                    return Operand(OPERAND_MREG, MREG_R14);
+                case 4:
+                    return Operand(OPERAND_MREG, MREG_R15);
+            }
+        }
+
         long offset = local_storage_size + (vreg.get_base_reg() * WORD_SIZE);
         Operand rspwithoffset(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, offset);
         return rspwithoffset;
@@ -1754,7 +1774,9 @@ public:
             for (int j = 0; j < hin->get_num_operands(); j++) {
                 Operand operand = hin->get_operand(j);
                 if (operand.get_is_scalar()) {
+                    printf("Found an operand vr%d to map to mreg\n", operand.get_base_reg());
                     operand.set_does_map_mreg(true);
+                    hin->operator[](j) = operand;
                 }
             }
 
