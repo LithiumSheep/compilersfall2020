@@ -1736,6 +1736,35 @@ public:
     }
 };
 
+class NaiveRegisterAllocation : public ControlFlowGraphTransform {
+
+public:
+    NaiveRegisterAllocation(ControlFlowGraph *cfg) : ControlFlowGraphTransform(cfg) {}
+
+public:
+    InstructionSequence *transform_basic_block(InstructionSequence *iseq) override {
+        auto out = new InstructionSequence();
+
+        for (auto ins : *iseq) {
+            Instruction *hin = ins->duplicate();
+            int opcode = hin->get_opcode();
+
+            // transform operands that are scalars contained in vregs
+            // set them to want mregs
+            for (int j = 0; j < hin->get_num_operands(); j++) {
+                Operand operand = hin->get_operand(j);
+                if (operand.get_is_scalar()) {
+                    operand.set_does_map_mreg(true);
+                }
+            }
+
+            out->add_instruction(hin);
+        }
+
+        return out;
+    }
+};
+
 ////////////////////////////////////////////////////////////////////////
 // Context class implementation
 ////////////////////////////////////////////////////////////////////////
@@ -1792,14 +1821,17 @@ void Context::gen_code() {
         //cfg_printer.print();
 
         // Live Vregs Printer
-        auto live_vregs = new LiveVregs(cfg);
-        LiveVregsControlFlowGraphPrinter live_vregs_printer(cfg, live_vregs);
+        // auto live_vregs = new LiveVregs(cfg);
+        // LiveVregsControlFlowGraphPrinter live_vregs_printer(cfg, live_vregs);
         //live_vregs_printer.print();
 
-        ConstantPropagation constantPropagation(cfg);
-        ControlFlowGraph *cfg_local_opt = constantPropagation.transform_cfg();
+        NaiveRegisterAllocation registerAllocation(cfg);
+        cfg = registerAllocation.transform_cfg();
 
-        iseq = cfg_local_opt->create_instruction_sequence();
+        ConstantPropagation constantPropagation(cfg);
+        // cfg = constantPropagation.transform_cfg();
+
+        iseq = cfg->create_instruction_sequence();
     }
 
     if (flag_print_hins) {

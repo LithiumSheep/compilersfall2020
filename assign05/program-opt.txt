@@ -1,0 +1,6 @@
+	ldci vr2, $2
+	mov vr0, vr2
+	ldci vr2, $3
+	mov vr1, vr2
+	addi vr2, vr0, vr1
+	writei vr2
