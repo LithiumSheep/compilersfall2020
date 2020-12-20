@@ -13,6 +13,8 @@ Operand::Operand()
         , m_basereg(0)
         , m_indexreg(0)
         , m_ival(0)
+        , m_is_scalar(false)
+        , m_maps_mreg(false)
 {
 }
 
@@ -20,7 +22,9 @@ Operand::Operand(OperandKind kind, long ival)
         : m_kind(kind)
         , m_basereg(0)
         , m_indexreg(0)
-        , m_ival(0) {
+        , m_ival(0)
+        , m_is_scalar(false)
+        , m_maps_mreg(false) {
     assert(kind == OPERAND_VREG || kind == OPERAND_MREG ||
            kind == OPERAND_VREG_MEMREF || kind == OPERAND_MREG_MEMREF ||
            kind == OPERAND_INT_LITERAL);
@@ -36,7 +40,9 @@ Operand::Operand(OperandKind kind, int basereg, int offset_or_index)
         : m_kind(kind)
         , m_basereg(basereg)
         , m_indexreg(0)
-        , m_ival(0) {
+        , m_ival(0)
+        , m_is_scalar(false)
+        , m_maps_mreg(false) {
     assert(kind == OPERAND_VREG_MEMREF_OFFSET || kind == OPERAND_VREG_MEMREF_INDEX ||
            kind == OPERAND_MREG_MEMREF_OFFSET || kind == OPERAND_MREG_MEMREF_INDEX);
 
@@ -51,7 +57,9 @@ Operand::Operand(OperandKind kind, int basereg, int indexreg, int offset)
         : m_kind(kind)
         , m_basereg(basereg)
         , m_indexreg(indexreg)
-        , m_ival(offset) {
+        , m_ival(offset)
+        , m_is_scalar(false)
+        , m_maps_mreg(false) {
     // currently there is only one kind of reg+reg+offset operand
     assert(m_kind == OPERAND_MREG_MEMREF_OFFSET_INDEX);
 }
@@ -61,6 +69,8 @@ Operand::Operand(const std::string &target_label, bool is_immediate)
         , m_basereg(0)
         , m_indexreg(0)
         , m_ival(0)
+        , m_is_scalar(false)
+        , m_maps_mreg(false)
         , m_target_label(target_label) {
 }
 
