@@ -98,3 +98,72 @@ sys 0m0.000s
 
 The speed improvement for constant folding improved running time by about 5%, 
 a small but still noticeable speedup.
+
+
+## Register Allocation
+
+In the high-level IR, I set scalar variables (operands) from vr0-vr5 to indicate 
+to the low-level generator that they should be replaced by machine registers
+instead of by memory.  
+
+So the algorithm naively replaces the following registers in assembly:
+
+```
+Unoptimized
+    vr0 -> 0(rsp)
+    vr1 -> 8(rsp)
+    ...
+
+Optimized
+    vr0 -> rbx
+    vr1 -> r12
+    ...
+    vr4 -> r15
+```
+
+Any virtual registers above vr4 are mapped to memory like normal.  I implmented
+register allocation this way because specifically in the benchmark program, I 
+noticed that many of the scalar variables were used as loop variables, which 
+should speed up the program by a good amount.
+
+### Benefits
+- Benchmark programs gained a lot of speed as many memory operations are now done
+with machine registers
+
+### Benchmarks
+
+
+```
+./build.rb array20
+
+time ./out/array20 < data/array20.in > actual_output/array20.out
+real	0m2.210s
+user	0m2.183s
+sys	0m0.004s
+time ./out/array20 < data/array20.in > actual_output/array20.out
+real	0m2.205s
+user	0m2.184s
+sys	0m0.000s
+time ./out/array20 < data/array20.in > actual_output/array20.out
+real	0m2.214s
+user	0m2.1892
+sys	0m0.000s
+
+./build.rb -o array20
+
+time ./out/array20 < data/array20.in > actual_output/array20.out
+real	0m1.151s
+user	0m1.127s
+sys	0m0.000s
+time ./out/array20 < data/array20.in > actual_output/array20.out
+real	0m1.152s
+user	0m1.126s
+sys	0m0.000s
+time ./out/array20 < data/array20.in > actual_output/array20.out
+real	0m1.160s
+user	0m1.137s
+sys 0m0.000s
+```
+
+The speed improvement for register allocation improved running time by about 
+48%, nearly halving the running time for the benchmark program!
