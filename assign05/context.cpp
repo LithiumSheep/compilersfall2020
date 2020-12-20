@@ -1744,6 +1744,10 @@ public:
                                 // vreg representing constant found
                                 // replace vreg with literal
                                 instruction->operator[](j) = it->second;
+                                if (opcode == HINS_MOV) {
+                                    // we can stop constant propagation after HINS_MOV
+                                    const_values.erase(it);
+                                }
                             }
                         }
                     }
@@ -1849,8 +1853,7 @@ void Context::gen_code() {
         cfg = registerAllocation.transform_cfg();
 
         ConstantPropagation constantPropagation(cfg);
-        // TODO: Enable constant propogation after vreg changes
-        // cfg = constantPropagation.transform_cfg();
+        cfg = constantPropagation.transform_cfg();
 
         iseq = cfg->create_instruction_sequence();
     }
