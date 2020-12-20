@@ -1744,10 +1744,9 @@ public:
                                 // vreg representing constant found
                                 // replace vreg with literal
                                 instruction->operator[](j) = it->second;
-                                if (opcode == HINS_MOV) {
-                                    // we can stop constant propagation after HINS_MOV
-                                    const_values.erase(it);
-                                }
+
+                                // after a usage, we can kill the constant
+                                const_values.erase(it);
                             }
                         }
                     }
