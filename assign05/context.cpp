@@ -1849,6 +1849,7 @@ void Context::gen_code() {
         cfg = registerAllocation.transform_cfg();
 
         ConstantPropagation constantPropagation(cfg);
+        // TODO: Enable constant propogation after vreg changes
         // cfg = constantPropagation.transform_cfg();
 
         iseq = cfg->create_instruction_sequence();
@@ -1860,8 +1861,6 @@ void Context::gen_code() {
     }
 
     if (flag_compile) {
-        // TODO: Calculate number of vregs independent of highlevel code gen
-
         auto *asmcodegen = new AssemblyCodeGen(
                 iseq,
                 hlcodegen->get_storage_size(),
