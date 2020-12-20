@@ -607,7 +607,9 @@ public:
         Operand r_op = rhs->get_operand();
 
         int tag = node_get_tag(lhs);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+        if (l_op.get_is_scalar()) {
+            // just use l_op directly
+        } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
             // ldi vr3, (vr1)
             long lreg = next_vreg();
             Operand ldest(OPERAND_VREG, lreg);
@@ -835,7 +837,7 @@ public:
 
         Operand valop = rhs->get_operand();
 
-        if (!rhs->is_const()) {
+        if (!rhs->is_const() && !valop.get_is_scalar()) {
             int tag = node_get_tag(rhs);
             if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
                 long vreg = next_vreg();
@@ -847,10 +849,14 @@ public:
         }
 
         Operand l_vreg = lhs->get_operand();
-        Operand refop(OPERAND_VREG_MEMREF, l_vreg.get_base_reg());
-
-        auto *storeins = new Instruction(HINS_STORE_INT, refop, valop);
-        code->add_instruction(storeins);
+        if (l_vreg.get_is_scalar()) {
+            auto movins = new Instruction(HINS_MOV, l_vreg, valop);
+            code->add_instruction(movins);
+        } else {
+            Operand refop = l_vreg.to_memref();
+            auto *storeins = new Instruction(HINS_STORE_INT, refop, valop);
+            code->add_instruction(storeins);
+        }
 
         reset_vreg();
     }
@@ -865,7 +871,9 @@ public:
         Operand r_op = rhs->get_operand();
 
         int tag = node_get_tag(lhs);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+        if (l_op.get_is_scalar()) {
+            // just use l_op directly
+        } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
             // ldi vr3, (vr1)
             long lreg = next_vreg();
             Operand ldest(OPERAND_VREG, lreg);
@@ -877,7 +885,9 @@ public:
 
         if (!rhs->is_const()) {
             tag = node_get_tag(rhs);
-            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            if (r_op.get_is_scalar()) {
+                // just use l_op directly
+            } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
                 // ldi vr4, (vr2)
                 long rreg = next_vreg();
                 Operand rdest(OPERAND_VREG, rreg);
@@ -908,7 +918,9 @@ public:
 
         // ldi vr3, (vr1)
         int tag = node_get_tag(lhs);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+        if (l_op.get_is_scalar()) {
+            // just use l_op directly
+        } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
             long lreg = next_vreg();
             Operand ldest(OPERAND_VREG, lreg);
             Operand lfrom(OPERAND_VREG_MEMREF, l_op.get_base_reg());
@@ -919,7 +931,9 @@ public:
 
         if (!rhs->is_const()) {
             tag = node_get_tag(rhs);
-            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            if (r_op.get_is_scalar()) {
+                // just use l_op directly
+            } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
                 // ldi vr4, (vr2)
                 long rreg = next_vreg();
                 Operand rdest(OPERAND_VREG, rreg);
@@ -949,7 +963,9 @@ public:
         Operand r_op = rhs->get_operand();
 
         int tag = node_get_tag(lhs);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+        if (l_op.get_is_scalar()) {
+            // just use l_op directly
+        } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
             // ldi vr3, (vr1)
             long lreg = next_vreg();
             Operand ldest(OPERAND_VREG, lreg);
@@ -961,7 +977,9 @@ public:
 
         if (!rhs->is_const()) {
             tag = node_get_tag(rhs);
-            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            if (r_op.get_is_scalar()) {
+                // just use l_op directly
+            } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
                 // ldi vr4, (vr2)
                 long rreg = next_vreg();
                 Operand rdest(OPERAND_VREG, rreg);
@@ -991,7 +1009,9 @@ public:
         Operand r_op = rhs->get_operand();
 
         int tag = node_get_tag(lhs);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+        if (l_op.get_is_scalar()) {
+            // just use l_op directly
+        } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
             // ldi vr3, (vr1)
             long lreg = next_vreg();
             Operand ldest(OPERAND_VREG, lreg);
@@ -1003,7 +1023,9 @@ public:
 
         if (!rhs->is_const()) {
             tag = node_get_tag(rhs);
-            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            if (r_op.get_is_scalar()) {
+                // just use l_op directly
+            } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
                 // ldi vr4, (vr2)
                 long rreg = next_vreg();
                 Operand rdest(OPERAND_VREG, rreg);
@@ -1033,7 +1055,9 @@ public:
         Operand r_op = rhs->get_operand();
 
         int tag = node_get_tag(lhs);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+        if (l_op.get_is_scalar()) {
+            // just use l_op directly
+        } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
             // ldi vr3, (vr1)
             long lreg = next_vreg();
             Operand ldest(OPERAND_VREG, lreg);
@@ -1045,7 +1069,9 @@ public:
 
         if (!rhs->is_const()) {
             tag = node_get_tag(rhs);
-            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            if (r_op.get_is_scalar()) {
+                // just use l_op directly
+            } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
                 // ldi vr4, (vr2)
                 long rreg = next_vreg();
                 Operand rdest(OPERAND_VREG, rreg);
@@ -1291,6 +1317,17 @@ public:
                     Operand memrefdest(OPERAND_MREG_MEMREF, MREG_R10);
                     auto *mov3 = new Instruction(MINS_MOVQ, r11, memrefdest);
                     assembly->add_instruction(mov3);
+                    break;
+                }
+                case HINS_MOV: {
+                    Operand rhs = hin->get_operand(1);
+                    Operand src = get_mreg_or_lit(rhs);
+                    Operand lhs = hin->get_operand(0);
+                    Operand dest = get_mreg(lhs);
+
+                    auto *movins = new Instruction(MINS_MOVQ, src, dest);
+                    movins->set_comment(get_hins_comment(hin));
+                    assembly->add_instruction(movins);
                     break;
                 }
                 case HINS_WRITE_INT: {
