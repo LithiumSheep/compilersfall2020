@@ -793,9 +793,14 @@ public:
         // sti (vr0), vr1
         Node *varref = node_get_kid(ast, 0);
         Operand destreg = varref->get_operand();    // don't use this one
-        Operand toaddr(OPERAND_VREG_MEMREF, destreg.get_base_reg());   // use this one
-        auto *storeins = new Instruction(HINS_STORE_INT, toaddr, readdest);
-        code->add_instruction(storeins);
+        if (destreg.get_is_scalar()) {
+            auto *movins = new Instruction(HINS_MOV, destreg, readdest);
+            code->add_instruction(movins);
+        } else {
+            Operand toaddr(OPERAND_VREG_MEMREF, destreg.get_base_reg());   // use this one
+            auto *storeins = new Instruction(HINS_STORE_INT, toaddr, readdest);
+            code->add_instruction(storeins);
+        }
 
         reset_vreg();
     }
