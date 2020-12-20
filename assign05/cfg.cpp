@@ -97,6 +97,23 @@ std::string Operand::get_target_label() const {
     return m_target_label;
 }
 
+bool Operand::get_is_scalar() {
+    return m_is_scalar;
+}
+
+void Operand::set_is_scalar(bool is_scalar) {
+    m_is_scalar = is_scalar;
+}
+
+bool Operand::get_does_map_mreg() {
+    return m_maps_mreg;
+}
+
+void Operand::set_does_map_mreg(bool maps_mreg) {
+    m_maps_mreg = maps_mreg;
+}
+
+
 ////////////////////////////////////////////////////////////////////////
 // Instruction implementation
 ////////////////////////////////////////////////////////////////////////

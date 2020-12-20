@@ -411,6 +411,7 @@ public:
                 // this is a scalar variable
                 long next = next_vreg();
                 Operand scalar_vreg(OPERAND_VREG, next);
+                scalar_vreg.set_is_scalar(true);
                 scalars[symbol.get_name()] = scalar_vreg;
             }
         }
@@ -1118,12 +1119,20 @@ public:
     void visit_identifier(struct Node *ast) override {
         ASTVisitor::visit_identifier(ast);
 
+        const char* varname = node_get_str(ast);
+
+        auto it = scalars.find(varname);
+        if (it != scalars.end()) {
+            Operand scalar_vreg = it->second;
+            ast->set_operand(scalar_vreg);
+            return;
+        }
+
         // loadaddr lhs by offset
         // localaddr vr0, $8
         long vreg = next_vreg();
         Operand destreg(OPERAND_VREG, vreg);
 
-        const char* varname = node_get_str(ast);
         // get offset from symbol
         // instruction is an offset ref
         Symbol sym = m_symtab->lookup(varname);
