@@ -355,12 +355,15 @@ private:
     long m_vreg = -1;
     long m_vreg_max = -1;
     long loop_index = 0;
+    long initial_vreg = -1;
     SymbolTable* m_symtab;
+    std::map<std::string, Operand> scalars;
     InstructionSequence* code;
 
 public:
-    HighLevelCodeGen(SymbolTable* symbolTable) {
-        m_symtab = symbolTable;
+    HighLevelCodeGen(SymbolTable* symbolTable)
+        : m_symtab(symbolTable),
+        scalars() {
         code = new InstructionSequence();
     }
 
@@ -386,8 +389,12 @@ private:
         return m_vreg;
     }
 
+    void set_initial_vreg(long initial) {
+        initial_vreg = initial;
+    }
+
     void reset_vreg() {
-        m_vreg = -1;
+        m_vreg = initial_vreg;
     }
 
     std::string next_label() {
@@ -399,6 +406,17 @@ private:
 public:
 
     void visit_declarations(struct Node *ast) override {
+        for (auto symbol : m_symtab->get_symbols()) {
+            if (symbol.get_kind() == VARIABLE && symbol.get_type()->realType == PRIMITIVE) {
+                // this is a scalar variable
+                long next = next_vreg();
+                Operand scalar_vreg(OPERAND_VREG, next);
+                scalars[symbol.get_name()] = scalar_vreg;
+            }
+        }
+
+        set_initial_vreg(scalars.size() - 1);
+
         // specifically disable visits to declarations so no vregs are incremented
         //ASTVisitor::visit_declarations(ast);
         reset_vreg();
