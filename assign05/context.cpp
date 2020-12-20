@@ -1325,9 +1325,12 @@ public:
                     Operand lhs = hin->get_operand(0);
                     Operand dest = get_mreg(lhs);
 
-                    auto *movins = new Instruction(MINS_MOVQ, src, dest);
+                    auto *movins = new Instruction(MINS_MOVQ, src, r11);
                     movins->set_comment(get_hins_comment(hin));
                     assembly->add_instruction(movins);
+
+                    auto *movins2 = new Instruction(MINS_MOVQ, r11, dest);
+                    assembly->add_instruction(movins2);
                     break;
                 }
                 case HINS_WRITE_INT: {
