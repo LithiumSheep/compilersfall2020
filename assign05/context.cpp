@@ -839,9 +839,11 @@ public:
 
         Operand valop = rhs->get_operand();
 
-        if (!rhs->is_const() && !valop.get_is_scalar()) {
+        if (!rhs->is_const()) {
             int tag = node_get_tag(rhs);
-            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            if (valop.get_is_scalar()) {
+                // do nothing
+            } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
                 long vreg = next_vreg();
                 Operand loaddest(OPERAND_VREG, vreg);
                 auto *loadins = new Instruction(HINS_LOAD_INT, loaddest, valop.to_memref());
