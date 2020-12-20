@@ -1265,7 +1265,7 @@ public:
         // calculate total storage
         total_storage_size = local_storage_size + (num_vreg * WORD_SIZE);
         // stack alignment check
-        if (total_storage_size % 16 == 0) {
+        if (total_storage_size % 16 != 0) {
             total_storage_size += 8;
         }
         assembly = new InstructionSequence();
