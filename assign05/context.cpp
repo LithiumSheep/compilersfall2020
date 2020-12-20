@@ -851,13 +851,19 @@ public:
         }
 
         Operand l_vreg = lhs->get_operand();
-        if (l_vreg.get_is_scalar()) {
-            auto movins = new Instruction(HINS_MOV, l_vreg, valop);
-            code->add_instruction(movins);
+
+        if (node_get_tag(lhs) == AST_VAR_REF || node_get_tag(lhs) == AST_ARRAY_ELEMENT_REF) {
+            if (l_vreg.get_is_scalar()) {
+                auto *movins = new Instruction(HINS_MOV, l_vreg, valop);
+                code->add_instruction(movins);
+            } else {
+                Operand refop(OPERAND_VREG_MEMREF, l_vreg.get_base_reg());
+                auto *storeins = new Instruction(HINS_STORE_INT, refop, valop);
+                code->add_instruction(storeins);
+            }
         } else {
-            Operand refop = l_vreg.to_memref();
-            auto *storeins = new Instruction(HINS_STORE_INT, refop, valop);
-            code->add_instruction(storeins);
+            auto *movins = new Instruction(HINS_MOV, l_vreg, valop);
+            code->add_instruction(movins);
         }
 
         reset_vreg();
