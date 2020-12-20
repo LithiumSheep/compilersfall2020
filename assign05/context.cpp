@@ -46,13 +46,6 @@ public:
   void gen_code();
 };
 
-// Known issues:
-// bug: Modifying enum start value in enums Kind and RealType change the behavior of record printing (???)
-// unimplemented: Consts can be dereferenced and used in subsequent declarations
-// unimplemented: Consts can be checked for variable references and throw an error
-// unimplemented: array and field references are not being type checked
-// unimolemented: READ and WRITE operands are not being checked
-//
 class SymbolTableBuilder : public ASTVisitor {
 private:
     SymbolTable* scope;
@@ -362,12 +355,15 @@ private:
     long m_vreg = -1;
     long m_vreg_max = -1;
     long loop_index = 0;
+    long initial_vreg = -1;
     SymbolTable* m_symtab;
+    std::map<std::string, Operand> scalars;
     InstructionSequence* code;
 
 public:
-    HighLevelCodeGen(SymbolTable* symbolTable) {
-        m_symtab = symbolTable;
+    HighLevelCodeGen(SymbolTable* symbolTable)
+        : m_symtab(symbolTable),
+        scalars() {
         code = new InstructionSequence();
     }
 
@@ -393,8 +389,12 @@ private:
         return m_vreg;
     }
 
+    void set_initial_vreg(long initial) {
+        initial_vreg = initial;
+    }
+
     void reset_vreg() {
-        m_vreg = -1;
+        m_vreg = initial_vreg;
     }
 
     std::string next_label() {
@@ -406,6 +406,18 @@ private:
 public:
 
     void visit_declarations(struct Node *ast) override {
+        for (auto symbol : m_symtab->get_symbols()) {
+            if (symbol.get_kind() == VARIABLE && symbol.get_type()->realType == PRIMITIVE) {
+                // this is a scalar variable
+                long next = next_vreg();
+                Operand scalar_vreg(OPERAND_VREG, next);
+                scalar_vreg.set_is_scalar(true);
+                scalars[symbol.get_name()] = scalar_vreg;
+            }
+        }
+
+        set_initial_vreg(scalars.size() - 1);
+
         // specifically disable visits to declarations so no vregs are incremented
         //ASTVisitor::visit_declarations(ast);
         reset_vreg();
@@ -505,7 +517,9 @@ public:
         Operand r_op = rhs->get_operand();
 
         int tag = node_get_tag(lhs);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+        if (l_op.get_is_scalar()) {
+            // just use l_op directly
+        } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
             // ldi vr3, (vr1)
             long lreg = next_vreg();
             Operand ldest(OPERAND_VREG, lreg);
@@ -517,7 +531,9 @@ public:
 
         if (!rhs->is_const()) {
             tag = node_get_tag(rhs);
-            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            if (r_op.get_is_scalar()) {
+                // just use r_op directly
+            } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
                 // ldi vr4, (vr2)
                 long rreg = next_vreg();
                 Operand rdest(OPERAND_VREG, rreg);
@@ -550,7 +566,9 @@ public:
         Operand r_op = rhs->get_operand();
 
         int tag = node_get_tag(lhs);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+        if (l_op.get_is_scalar()) {
+            // just use l_op directly
+        } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
             // ldi vr3, (vr1)
             long lreg = next_vreg();
             Operand ldest(OPERAND_VREG, lreg);
@@ -562,7 +580,9 @@ public:
 
         if (!rhs->is_const()) {
             tag = node_get_tag(rhs);
-            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            if (r_op.get_is_scalar()) {
+                // just use r_op directly
+            } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
                 // ldi vr4, (vr2)
                 long rreg = next_vreg();
                 Operand rdest(OPERAND_VREG, rreg);
@@ -595,7 +615,9 @@ public:
         Operand r_op = rhs->get_operand();
 
         int tag = node_get_tag(lhs);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+        if (l_op.get_is_scalar()) {
+            // just use l_op directly
+        } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
             // ldi vr3, (vr1)
             long lreg = next_vreg();
             Operand ldest(OPERAND_VREG, lreg);
@@ -607,7 +629,9 @@ public:
 
         if (!rhs->is_const()) {
             tag = node_get_tag(rhs);
-            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            if (r_op.get_is_scalar()) {
+                // just use r_op directly
+            } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
                 // ldi vr4, (vr2)
                 long rreg = next_vreg();
                 Operand rdest(OPERAND_VREG, rreg);
@@ -640,7 +664,9 @@ public:
         Operand r_op = rhs->get_operand();
 
         int tag = node_get_tag(lhs);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+        if (l_op.get_is_scalar()) {
+            // just use l_op directly
+        } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
             // ldi vr3, (vr1)
             long lreg = next_vreg();
             Operand ldest(OPERAND_VREG, lreg);
@@ -652,7 +678,9 @@ public:
 
         if (!rhs->is_const()) {
             tag = node_get_tag(rhs);
-            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            if (r_op.get_is_scalar()) {
+                // just use r_op directly
+            } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
                 // ldi vr4, (vr2)
                 long rreg = next_vreg();
                 Operand rdest(OPERAND_VREG, rreg);
@@ -685,7 +713,9 @@ public:
         Operand r_op = rhs->get_operand();
 
         int tag = node_get_tag(lhs);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+        if (l_op.get_is_scalar()) {
+            // just use l_op directly
+        } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
             // ldi vr3, (vr1)
             long lreg = next_vreg();
             Operand ldest(OPERAND_VREG, lreg);
@@ -697,7 +727,9 @@ public:
 
         if (!rhs->is_const()) {
             tag = node_get_tag(rhs);
-            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            if (r_op.get_is_scalar()) {
+                // just use r_op directly
+            } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
                 // ldi vr4, (vr2)
                 long rreg = next_vreg();
                 Operand rdest(OPERAND_VREG, rreg);
@@ -730,7 +762,9 @@ public:
         Operand r_op = rhs->get_operand();
 
         int tag = node_get_tag(lhs);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+        if (l_op.get_is_scalar()) {
+            // just use l_op directly
+        } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
             // ldi vr3, (vr1)
             long lreg = next_vreg();
             Operand ldest(OPERAND_VREG, lreg);
@@ -742,7 +776,9 @@ public:
 
         if (!rhs->is_const()) {
             tag = node_get_tag(rhs);
-            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            if (r_op.get_is_scalar()) {
+                // just use r_op directly
+            } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
                 // ldi vr4, (vr2)
                 long rreg = next_vreg();
                 Operand rdest(OPERAND_VREG, rreg);
@@ -779,9 +815,14 @@ public:
         // sti (vr0), vr1
         Node *varref = node_get_kid(ast, 0);
         Operand destreg = varref->get_operand();    // don't use this one
-        Operand toaddr(OPERAND_VREG_MEMREF, destreg.get_base_reg());   // use this one
-        auto *storeins = new Instruction(HINS_STORE_INT, toaddr, readdest);
-        code->add_instruction(storeins);
+        if (destreg.get_is_scalar()) {
+            auto *movins = new Instruction(HINS_MOV, destreg, readdest);
+            code->add_instruction(movins);
+        } else {
+            Operand toaddr(OPERAND_VREG_MEMREF, destreg.get_base_reg());   // use this one
+            auto *storeins = new Instruction(HINS_STORE_INT, toaddr, readdest);
+            code->add_instruction(storeins);
+        }
 
         reset_vreg();
     }
@@ -793,7 +834,9 @@ public:
         Operand op = kid->get_operand();
 
         int tag = node_get_tag(kid);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+        if (op.get_is_scalar()) {
+            // just use op directly
+        } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
             // loadint from addr to vreg
             // ldi vr1, (vr0)
             long toreg = next_vreg();
@@ -825,7 +868,9 @@ public:
 
         if (!rhs->is_const()) {
             int tag = node_get_tag(rhs);
-            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            if (valop.get_is_scalar()) {
+                // do nothing
+            } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
                 long vreg = next_vreg();
                 Operand loaddest(OPERAND_VREG, vreg);
                 auto *loadins = new Instruction(HINS_LOAD_INT, loaddest, valop.to_memref());
@@ -835,10 +880,20 @@ public:
         }
 
         Operand l_vreg = lhs->get_operand();
-        Operand refop(OPERAND_VREG_MEMREF, l_vreg.get_base_reg());
 
-        auto *storeins = new Instruction(HINS_STORE_INT, refop, valop);
-        code->add_instruction(storeins);
+        if (node_get_tag(lhs) == AST_VAR_REF || node_get_tag(lhs) == AST_ARRAY_ELEMENT_REF) {
+            if (l_vreg.get_is_scalar()) {
+                auto *movins = new Instruction(HINS_MOV, l_vreg, valop);
+                code->add_instruction(movins);
+            } else {
+                Operand refop(OPERAND_VREG_MEMREF, l_vreg.get_base_reg());
+                auto *storeins = new Instruction(HINS_STORE_INT, refop, valop);
+                code->add_instruction(storeins);
+            }
+        } else {
+            auto *movins = new Instruction(HINS_MOV, l_vreg, valop);
+            code->add_instruction(movins);
+        }
 
         reset_vreg();
     }
@@ -853,7 +908,9 @@ public:
         Operand r_op = rhs->get_operand();
 
         int tag = node_get_tag(lhs);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+        if (l_op.get_is_scalar()) {
+            // just use l_op directly
+        } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
             // ldi vr3, (vr1)
             long lreg = next_vreg();
             Operand ldest(OPERAND_VREG, lreg);
@@ -865,7 +922,9 @@ public:
 
         if (!rhs->is_const()) {
             tag = node_get_tag(rhs);
-            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            if (r_op.get_is_scalar()) {
+                // just use l_op directly
+            } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
                 // ldi vr4, (vr2)
                 long rreg = next_vreg();
                 Operand rdest(OPERAND_VREG, rreg);
@@ -896,7 +955,9 @@ public:
 
         // ldi vr3, (vr1)
         int tag = node_get_tag(lhs);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+        if (l_op.get_is_scalar()) {
+            // just use l_op directly
+        } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
             long lreg = next_vreg();
             Operand ldest(OPERAND_VREG, lreg);
             Operand lfrom(OPERAND_VREG_MEMREF, l_op.get_base_reg());
@@ -907,7 +968,9 @@ public:
 
         if (!rhs->is_const()) {
             tag = node_get_tag(rhs);
-            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            if (r_op.get_is_scalar()) {
+                // just use l_op directly
+            } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
                 // ldi vr4, (vr2)
                 long rreg = next_vreg();
                 Operand rdest(OPERAND_VREG, rreg);
@@ -937,7 +1000,9 @@ public:
         Operand r_op = rhs->get_operand();
 
         int tag = node_get_tag(lhs);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+        if (l_op.get_is_scalar()) {
+            // just use l_op directly
+        } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
             // ldi vr3, (vr1)
             long lreg = next_vreg();
             Operand ldest(OPERAND_VREG, lreg);
@@ -949,7 +1014,9 @@ public:
 
         if (!rhs->is_const()) {
             tag = node_get_tag(rhs);
-            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            if (r_op.get_is_scalar()) {
+                // just use l_op directly
+            } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
                 // ldi vr4, (vr2)
                 long rreg = next_vreg();
                 Operand rdest(OPERAND_VREG, rreg);
@@ -979,7 +1046,9 @@ public:
         Operand r_op = rhs->get_operand();
 
         int tag = node_get_tag(lhs);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+        if (l_op.get_is_scalar()) {
+            // just use l_op directly
+        } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
             // ldi vr3, (vr1)
             long lreg = next_vreg();
             Operand ldest(OPERAND_VREG, lreg);
@@ -991,7 +1060,9 @@ public:
 
         if (!rhs->is_const()) {
             tag = node_get_tag(rhs);
-            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            if (r_op.get_is_scalar()) {
+                // just use l_op directly
+            } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
                 // ldi vr4, (vr2)
                 long rreg = next_vreg();
                 Operand rdest(OPERAND_VREG, rreg);
@@ -1021,7 +1092,9 @@ public:
         Operand r_op = rhs->get_operand();
 
         int tag = node_get_tag(lhs);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+        if (l_op.get_is_scalar()) {
+            // just use l_op directly
+        } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
             // ldi vr3, (vr1)
             long lreg = next_vreg();
             Operand ldest(OPERAND_VREG, lreg);
@@ -1033,7 +1106,9 @@ public:
 
         if (!rhs->is_const()) {
             tag = node_get_tag(rhs);
-            if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+            if (r_op.get_is_scalar()) {
+                // just use l_op directly
+            } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
                 // ldi vr4, (vr2)
                 long rreg = next_vreg();
                 Operand rdest(OPERAND_VREG, rreg);
@@ -1071,7 +1146,10 @@ public:
 
         Node *index = node_get_kid(ast, 1);
         Operand index_op = index->get_operand();
-        if (node_get_tag(index) == AST_VAR_REF) {   // dereference any identifiers passed into index
+
+        if (index_op.get_is_scalar()) {
+            // do nothing
+        } else if (node_get_tag(index) == AST_VAR_REF) {   // dereference any identifiers passed into index
             index_op = index_op.to_memref();
         }   // otherwise, the index immediate is safe to use
 
@@ -1107,12 +1185,20 @@ public:
     void visit_identifier(struct Node *ast) override {
         ASTVisitor::visit_identifier(ast);
 
+        const char* varname = node_get_str(ast);
+
+        auto it = scalars.find(varname);
+        if (it != scalars.end()) {
+            Operand scalar_vreg = it->second;
+            ast->set_operand(scalar_vreg);
+            return;
+        }
+
         // loadaddr lhs by offset
         // localaddr vr0, $8
         long vreg = next_vreg();
         Operand destreg(OPERAND_VREG, vreg);
 
-        const char* varname = node_get_str(ast);
         // get offset from symbol
         // instruction is an offset ref
         Symbol sym = m_symtab->lookup(varname);
@@ -1179,7 +1265,7 @@ public:
         // calculate total storage
         total_storage_size = local_storage_size + (num_vreg * WORD_SIZE);
         // stack alignment check
-        if (total_storage_size % 16 == 0) {
+        if (total_storage_size % 16 != 0) {
             total_storage_size += 8;
         }
         assembly = new InstructionSequence();
@@ -1187,6 +1273,7 @@ public:
     }
 
     void translate_instructions() {
+        // callee-owned
         Operand rsp(OPERAND_MREG, MREG_RSP);
         Operand rdi(OPERAND_MREG, MREG_RDI);
         Operand rsi(OPERAND_MREG, MREG_RSI);
@@ -1194,6 +1281,8 @@ public:
         Operand r11(OPERAND_MREG, MREG_R11);
         Operand rax(OPERAND_MREG, MREG_RAX);
         Operand rdx(OPERAND_MREG, MREG_RDX);
+
+        // static labels
         Operand inputfmt("s_readint_fmt", true);
         Operand outputfmt("s_writeint_fmt", true);
         Operand printf_label("printf");
@@ -1248,7 +1337,7 @@ public:
                     Operand vreg = hin->get_operand(0);
                     Operand lit = hin->get_operand(1);
 
-                    Operand dest = get_mreg_operand(vreg);
+                    Operand dest = get_mreg(vreg);
                     auto *movins = new Instruction(MINS_MOVQ, lit, dest);
                     movins->set_comment(get_hins_comment(hin));
                     assembly->add_instruction(movins);
@@ -1271,6 +1360,20 @@ public:
                     Operand memrefdest(OPERAND_MREG_MEMREF, MREG_R10);
                     auto *mov3 = new Instruction(MINS_MOVQ, r11, memrefdest);
                     assembly->add_instruction(mov3);
+                    break;
+                }
+                case HINS_MOV: {
+                    Operand rhs = hin->get_operand(1);
+                    Operand src = get_mreg_or_lit(rhs);
+                    Operand lhs = hin->get_operand(0);
+                    Operand dest = get_mreg(lhs);
+
+                    auto *movins = new Instruction(MINS_MOVQ, src, r11);
+                    movins->set_comment(get_hins_comment(hin));
+                    assembly->add_instruction(movins);
+
+                    auto *movins2 = new Instruction(MINS_MOVQ, r11, dest);
+                    assembly->add_instruction(movins2);
                     break;
                 }
                 case HINS_WRITE_INT: {
@@ -1444,12 +1547,12 @@ public:
                     Operand l_op = hin->get_operand(0);
                     Operand r_op = hin->get_operand(1);
 
-                    Operand l_arg = get_mreg_operand(l_op);
+                    Operand l_arg = get_mreg_or_lit(l_op);
                     auto *movarg1 = new Instruction(MINS_MOVQ, l_arg, r10);
                     movarg1->set_comment(get_hins_comment(hin));
                     assembly->add_instruction(movarg1);
 
-                    Operand r_arg = get_mreg_operand(r_op);
+                    Operand r_arg = get_mreg_or_lit(r_op);
                     auto *movarg2 = new Instruction(MINS_MOVQ, r_arg, r11);
                     assembly->add_instruction(movarg2);
 
@@ -1536,6 +1639,11 @@ private:
         printf("\t.section .text\n");
         printf("\t.globl main\n");
         printf("main:\n");
+        printf("\tpushq %%rbx\n");
+        printf("\tpushq %%r12\n");
+        printf("\tpushq %%r13\n");
+        printf("\tpushq %%r14\n");
+        printf("\tpushq %%r15\n");
         printf("\tsubq $%ld, %%rsp\n", total_storage_size);
     }
 
@@ -1547,6 +1655,11 @@ private:
     // addq storage + (8 * num_vreg), rsp
     void emit_epilogue() {
         printf("\taddq $%ld, %%rsp\n", total_storage_size);
+        printf("\tpopq %%r15\n");
+        printf("\tpopq %%r14\n");
+        printf("\tpopq %%r13\n");
+        printf("\tpopq %%r12\n");
+        printf("\tpopq %%rbx\n");
         printf("\tmovl $0, %%eax\n");
         printf("\tret\n");
     }
@@ -1555,19 +1668,25 @@ private:
         return print_helper->format_instruction(hin);
     }
 
-    Operand get_mreg_operand(Operand vreg_or_lit) {
-        // Don't use this method to get the operand for LOCALADDR, since it uses the literal to determine offset
-        if (vreg_or_lit.get_kind() == OPERAND_INT_LITERAL) {
-            return vreg_or_lit; // use the literal
-        } else {
-            long offset = local_storage_size + (vreg_or_lit.get_base_reg() * WORD_SIZE);
-            Operand rspwithoffset(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, offset);
-            return rspwithoffset;
-        }
-    }
-
-    Operand get_mreg(const Operand vreg) {
+    Operand get_mreg(Operand vreg) {
         assert(vreg.has_base_reg());
+
+        if (vreg.get_does_map_mreg()) {
+            // naively map vr0 - vr4 to rbx, r12, r13, r14, r15
+            switch(vreg.get_base_reg()) {
+                case 0:
+                    return Operand(OPERAND_MREG, MREG_RBX);
+                case 1:
+                    return Operand(OPERAND_MREG, MREG_R12);
+                case 2:
+                    return Operand(OPERAND_MREG, MREG_R13);
+                case 3:
+                    return Operand(OPERAND_MREG, MREG_R14);
+                case 4:
+                    return Operand(OPERAND_MREG, MREG_R15);
+            }
+        }
+
         long offset = local_storage_size + (vreg.get_base_reg() * WORD_SIZE);
         Operand rspwithoffset(OPERAND_MREG_MEMREF_OFFSET, MREG_RSP, offset);
         return rspwithoffset;
@@ -1636,6 +1755,36 @@ public:
     }
 };
 
+class NaiveRegisterAllocation : public ControlFlowGraphTransform {
+
+public:
+    NaiveRegisterAllocation(ControlFlowGraph *cfg) : ControlFlowGraphTransform(cfg) {}
+
+public:
+    InstructionSequence *transform_basic_block(InstructionSequence *iseq) override {
+        auto out = new InstructionSequence();
+
+        for (auto ins : *iseq) {
+            Instruction *hin = ins->duplicate();
+            int opcode = hin->get_opcode();
+
+            // transform operands that are scalars contained in vregs
+            // set them to want mregs
+            for (int j = 0; j < hin->get_num_operands(); j++) {
+                Operand operand = hin->get_operand(j);
+                if (operand.get_is_scalar()) {
+                    operand.set_does_map_mreg(true);
+                    hin->operator[](j) = operand;
+                }
+            }
+
+            out->add_instruction(hin);
+        }
+
+        return out;
+    }
+};
+
 ////////////////////////////////////////////////////////////////////////
 // Context class implementation
 ////////////////////////////////////////////////////////////////////////
@@ -1692,14 +1841,18 @@ void Context::gen_code() {
         //cfg_printer.print();
 
         // Live Vregs Printer
-        auto live_vregs = new LiveVregs(cfg);
-        LiveVregsControlFlowGraphPrinter live_vregs_printer(cfg, live_vregs);
+        // auto live_vregs = new LiveVregs(cfg);
+        // LiveVregsControlFlowGraphPrinter live_vregs_printer(cfg, live_vregs);
         //live_vregs_printer.print();
 
-        ConstantPropagation constantPropagation(cfg);
-        ControlFlowGraph *cfg_local_opt = constantPropagation.transform_cfg();
+        NaiveRegisterAllocation registerAllocation(cfg);
+        cfg = registerAllocation.transform_cfg();
 
-        iseq = cfg_local_opt->create_instruction_sequence();
+        ConstantPropagation constantPropagation(cfg);
+        // TODO: Enable constant propogation after vreg changes
+        // cfg = constantPropagation.transform_cfg();
+
+        iseq = cfg->create_instruction_sequence();
     }
 
     if (flag_print_hins) {
@@ -1708,8 +1861,6 @@ void Context::gen_code() {
     }
 
     if (flag_compile) {
-        // TODO: Calculate number of vregs independent of highlevel code gen
-
         auto *asmcodegen = new AssemblyCodeGen(
                 iseq,
                 hlcodegen->get_storage_size(),

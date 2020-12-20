@@ -55,6 +55,8 @@ private:
     int m_basereg;              // base register number
     int m_indexreg;             // index register number
     long m_ival;                // literal integer value or offset value
+    bool m_is_scalar;             // this operand represents a scalar variable in the program
+    bool m_maps_mreg;             // this Operand wants to be mapped to a mreg when converting from vreg
     std::string m_target_label;
 
 public:
@@ -124,6 +126,14 @@ public:
 
     // get target label name
     std::string get_target_label() const;
+
+    bool get_is_scalar();
+
+    void set_is_scalar(bool is_scalar);
+
+    bool get_does_map_mreg();
+
+    void set_does_map_mreg(bool maps_mreg);
 };
 
 class Instruction {
