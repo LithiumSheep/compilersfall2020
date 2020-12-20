@@ -807,7 +807,9 @@ public:
         Operand op = kid->get_operand();
 
         int tag = node_get_tag(kid);
-        if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
+        if (op.get_is_scalar()) {
+            // just use op directly
+        } else if (tag == AST_VAR_REF || tag == AST_ARRAY_ELEMENT_REF) {
             // loadint from addr to vreg
             // ldi vr1, (vr0)
             long toreg = next_vreg();
