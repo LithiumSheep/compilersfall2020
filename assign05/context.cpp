@@ -1655,11 +1655,11 @@ private:
     // addq storage + (8 * num_vreg), rsp
     void emit_epilogue() {
         printf("\taddq $%ld, %%rsp\n", total_storage_size);
-        printf("\tpopq %%rbx\n");
-        printf("\tpopq %%r12\n");
-        printf("\tpopq %%r13\n");
-        printf("\tpopq %%r14\n");
         printf("\tpopq %%r15\n");
+        printf("\tpopq %%r14\n");
+        printf("\tpopq %%r13\n");
+        printf("\tpopq %%r12\n");
+        printf("\tpopq %%rbx\n");
         printf("\tmovl $0, %%eax\n");
         printf("\tret\n");
     }
