@@ -121,13 +121,15 @@ Optimized
     vr4 -> r15
 ```
 
-Any virtual registers above vr4 are mapped to memory like normal.  I implmented
+Any virtual registers above vr4 are mapped to memory like normal.  I implemented
 register allocation this way because specifically in the benchmark program, I 
 noticed that many of the scalar variables were used as loop variables, which 
-should speed up the program by a good amount.
+should speed up the program by a good amount.  In x86_64, there are also 5 caller-owned 
+registers (excluding %rbp) that could be used as machine registers, and there
+are 5 scalar variables in the benchmark program.  
 
 ### Benefits
-- Benchmark programs gained a lot of speed as many memory operations are now done
+- The henchmark program gained a lot of speed as many memory operations are now done
 with machine registers
 
 ### Benchmarks
@@ -167,3 +169,88 @@ sys 0m0.000s
 
 The speed improvement for register allocation improved running time by about 
 48%, nearly halving the running time for the benchmark program!
+
+
+### Optimizations combined
+
+Benchmarks
+
+```
+./build.rb array20
+
+time ./out/array20 < data/array20.in > actual_output/array20.out
+real	0m2.210s
+user	0m2.183s
+sys	0m0.004s
+time ./out/array20 < data/array20.in > actual_output/array20.out
+real	0m2.205s
+user	0m2.184s
+sys	0m0.000s
+time ./out/array20 < data/array20.in > actual_output/array20.out
+real	0m2.214s
+user	0m2.1892
+sys	0m0.000s
+
+./build.rb -o array20
+
+time ./out/array20 < data/array20.in > actual_output/array20.out
+real	0m0.918s
+user	0m0.883s
+sys	0m0.012s
+time ./out/array20 < data/array20.in > actual_output/array20.out
+real	0m0.926s
+user	0m0.895s
+sys	0m0.008s
+time ./out/array20 < data/array20.in > actual_output/array20.out
+real	0m0.918s
+user	0m0.893s
+sys 0m0.004s
+```
+
+With both constant propagation and register allocation enabled, running time 
+of the benchmark program was cut by about 59% from the unoptimized version.
+
+```
+baseline            ~2.210s
+constant-propgation ~2.209  (~5% improvement)
+register allocation ~1.154s (~48% improvement)
+both                ~0.921s (~58% improvement)
+```
+
+### Conclusions
+
+It appears that some optimizations may have compounding effects, as the time 
+improvement of combining both optimizations ended up better than 
+multiplicatively applying the improvements.
+
+Some inefficiencies still remain in the code, however.  
+
+One optimization that could certainly help is during array address calculations, algebraic identities
+could be discovered, such as when calculating the address of arr[0].  In the current
+implementation, we get the address of arr, multiply the type size by the index, then add it to the address.
+
+```asm
+localaddr vr0, $0
+muli vr2, vr1, $8   // if vr1 = 0, this instruction can be skipped
+addi vr3, vr0, vr2  // once again, if vr1 = 0, this instruction can also be skipped
+```
+
+Another optimization opportunity will be in register allocation.  Currently, 
+a maximum of 5 scalar variables are mapped to machine registers in optimized code.
+A more general optimization strategy would be to perform live register analysis 
+on virtual registers and do better register allocation for basic blocks based on 
+currently live registers, returned used machine registers to a pool when 
+a virtual register is marked dead.  
+
+Finally, peephole optimizations in x86_64 code to eliminate unnecessary instructions
+could reduce code size and improve running time.  For example,
+
+```asm
+movq %rbx, %r11             /* addi vr7, vr0, $1 */
+movq $1, %r10               // could be removed
+addq %r11, %r10             // replaceable with addq $1, %r10
+```
+
+Many algebraic instructions had code that moved instructions into %r10 and %r11 before
+calculating, and they could be simplified by moving one value to a destination register
+and use a memory reference or literal directly in the left hand side argument.
