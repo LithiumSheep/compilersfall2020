@@ -1,6 +1,6 @@
 PROGRAM arith01;
   VAR a, b: INTEGER;
-  FUNCTION add: INTEGER = FUNCTION(c, d)
+  FUNCTION add: FUNCTION(c, d)
     c + d;
   END;
 
