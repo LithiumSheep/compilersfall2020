@@ -1,8 +1,11 @@
 PROGRAM arith01;
   VAR a, b: INTEGER;
+  FUNCTION add: INTEGER = FUNCTION(c, d)
+    c + d;
+  END;
 
 BEGIN
   a := 2;
   b := 3;
-  WRITE a + b;
+  WRITE add(a, b);
 END.
