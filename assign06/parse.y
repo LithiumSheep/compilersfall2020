@@ -94,7 +94,7 @@ typedefn
     ;
 
 vardecl
-    : TOK_VAR vardefn_list { $$ = $2; }
+    : TOK_VAR vardefn_list TOK_SEMICOLON { $$ = $2; }
     ;
 
 vardefn_list
@@ -103,11 +103,11 @@ vardefn_list
     ;
 
 vardefn
-    : identifier_list TOK_COLON type TOK_SEMICOLON { $$ = node_build2(AST_VAR_DEF, $1, $3); }
+    : identifier_list TOK_COLON type{ $$ = node_build2(AST_VAR_DEF, $1, $3); }
     ;
 
 funcdefn
-    : TOK_FUNCTION TOK_IDENT TOK_LPAREN TOK_RPAREN TOK_COLON named_type TOK_BEGIN opt_instructions TOK_END TOK_DOT { }
+    : TOK_FUNCTION TOK_IDENT TOK_LPAREN vardefn TOK_RPAREN TOK_COLON named_type TOK_BEGIN opt_instructions TOK_END TOK_DOT { $$ = node_build3(AST_FUNCDEF, $2, $4, $9); }
     ;
 
 funccall
