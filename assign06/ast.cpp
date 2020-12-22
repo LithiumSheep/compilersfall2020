@@ -51,6 +51,8 @@ const char *ast_get_tag_name(int ast_tag) {
   case AST_FIELD_REF: return "field_ref";
   case AST_IDENTIFIER_LIST: return "identifier_list";
   case AST_EXPRESSION_LIST: return "expression_list";
+  case AST_FUNCDEF: return "funcdef";
+  case AST_FUNCCALL: return "funccall";
   default:
     err_fatal("Unknown AST node type %d\n", ast_tag);
     return "<<unknown>>";

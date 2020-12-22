@@ -49,6 +49,9 @@ enum ASTKind {
 
   AST_IDENTIFIER_LIST,
   AST_EXPRESSION_LIST,
+
+  AST_FUNCDEF,
+  AST_FUNCCALL
 };
 
 const char *ast_get_tag_name(int ast_tag);

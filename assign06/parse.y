@@ -24,6 +24,7 @@ int yylex(void);
 %token<node> TOK_ARRAY TOK_OF TOK_RECORD TOK_DIV TOK_MOD TOK_IF
 %token<node> TOK_THEN TOK_ELSE TOK_REPEAT TOK_UNTIL TOK_WHILE TOK_DO
 %token<node> TOK_READ TOK_WRITE
+%token<node> TOK_FUNCTION
 
 %token<node> TOK_ASSIGN
 %token<node> TOK_SEMICOLON TOK_EQUALS TOK_COLON TOK_PLUS TOK_MINUS TOK_TIMES
@@ -40,6 +41,7 @@ int yylex(void);
 %type<node> expression term factor primary
 %type<node> assignstmt ifstmt repeatstmt whilestmt condition writestmt readstmt
 %type<node> designator identifier_list
+%type<node> funcdefn funccall
 
 %%
 
@@ -62,6 +64,7 @@ declaration
     : constdecl { $$ = $1; }
     | typedecl { $$ = $1; }
     | vardecl { $$ = $1; }
+    | funcdefn { $$ = $1; }
     ;
 
 constdecl
@@ -101,6 +104,14 @@ vardefn_list
 
 vardefn
     : identifier_list TOK_COLON type TOK_SEMICOLON { $$ = node_build2(AST_VAR_DEF, $1, $3); }
+    ;
+
+funcdefn
+    : TOK_FUNCTION TOK_IDENT TOK_LPAREN TOK_RPAREN TOK_COLON named_type TOK_BEGIN opt_instructions TOK_END TOK_DOT { }
+    ;
+
+funccall
+    : TOK_IDENT TOK_LPAREN TOK_RPAREN { $$ = node_build1(AST_FUNCCALL, $1); }
     ;
 
 identifier_list
@@ -143,6 +154,7 @@ instruction
     | whilestmt TOK_SEMICOLON
     | writestmt TOK_SEMICOLON
     | readstmt TOK_SEMICOLON
+    | expression TOK_SEMICOLON
     ;
 
 assignstmt
@@ -186,9 +198,14 @@ designator
     ;
 
 /*
+opt_expression_list
+    : expression_list
+    : { $$ = node_build0(AST_EXPRESSION_LIST); }
+    ;
+
 expression_list
     : expression_list TOK_COMMA expression { $$ = $1; node_add_kid($1, $3); }
-    | expression { $$ = node_build1(NODE_expression_list, $1); }
+    | expression { $$ = node_build1(AST_expression_list, $1); }
     ;
 */
 
@@ -212,6 +229,7 @@ factor
 primary
     : TOK_INT_LITERAL { $$ = $1; }
     | designator { $$ = $1; }
+    | funccall { $$ = $1; }
     | TOK_LPAREN expression TOK_RPAREN { $$ = $2; }
     ;
 
