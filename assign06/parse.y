@@ -107,7 +107,7 @@ vardefn
     ;
 
 funcdefn
-    : TOK_FUNCTION TOK_IDENT TOK_LPAREN vardefn TOK_RPAREN TOK_COLON named_type TOK_BEGIN opt_instructions TOK_END TOK_DOT { $$ = node_build3(AST_FUNCDEF, $2, $4, $9); }
+    : TOK_FUNCTION TOK_IDENT TOK_LPAREN TOK_RPAREN TOK_COLON named_type TOK_BEGIN opt_instructions TOK_END TOK_DOT { $$ = node_build2(AST_FUNCDEF, $2, $8); }
     ;
 
 funccall
@@ -198,11 +198,6 @@ designator
     ;
 
 /*
-opt_expression_list
-    : expression_list
-    : { $$ = node_build0(AST_EXPRESSION_LIST); }
-    ;
-
 expression_list
     : expression_list TOK_COMMA expression { $$ = $1; node_add_kid($1, $3); }
     | expression { $$ = node_build1(AST_expression_list, $1); }

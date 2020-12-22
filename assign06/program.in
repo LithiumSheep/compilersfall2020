@@ -1,9 +1,9 @@
 PROGRAM arith01;
   VAR a, b: INTEGER;
 
-FUNCTION add(c, d: INTEGER): INTEGER
+FUNCTION print1(): INTEGER
   BEGIN
-    c + d;
+    WRITE 1;
   END.
 
 BEGIN
