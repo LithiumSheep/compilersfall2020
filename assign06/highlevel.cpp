@@ -31,6 +31,8 @@ std::string PrintHighLevelInstructionSequence::get_opcode_name(int opcode) {
         case HINS_LEA:         return "lea";
         case HINS_MOV:         return "mov";
         case HINS_CALL:        return "call";
+        case HINS_MAIN_START: return "mainstart";
+        case HINS_MAIN_FINISH: return "mainfinish";
         case HINS_FUNC_ENTER:  return "funcenter";
         case HINS_FUNC_LEAVE:  return "funcleave";
 

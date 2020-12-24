@@ -29,6 +29,8 @@ enum HighLevelOpcode {
     HINS_LEA,
     HINS_MOV,
     HINS_CALL,
+    HINS_MAIN_START,
+    HINS_MAIN_FINISH,
     HINS_FUNC_ENTER,
     HINS_FUNC_LEAVE,
 };

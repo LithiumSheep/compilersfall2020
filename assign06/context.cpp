@@ -449,9 +449,8 @@ public:
     }
 
     void visit_instructions(struct Node *ast) override {
-        ASTVisitor::visit_instructions(ast);
 
-        // then, check function declarations and add to highlevel
+        // add function declarations to highlevel
         for (auto symbol : m_symtab->get_symbols()) {
             if (symbol.get_kind() == FUNCTION) {
                 const char* func_name = symbol.get_name();
@@ -482,6 +481,14 @@ public:
                 code->add_instruction(leave);
             }
         }
+
+        auto *mainstart = new Instruction(HINS_MAIN_START);
+        code->add_instruction(mainstart);
+
+        ASTVisitor::visit_instructions(ast);
+
+        auto *mainleave = new Instruction(HINS_MAIN_FINISH);
+        code->add_instruction(mainleave);
     }
 
     void visit_if(struct Node *ast) override {
@@ -1755,6 +1762,9 @@ private:
         printf("s_readint_fmt: .string \"%%ld\"\n");
         printf("s_writeint_fmt: .string \"%%ld\\n\"\n");
         printf("\t.section .text\n");
+
+        // emit function(s)
+
         printf("\t.globl main\n");
         printf("main:\n");
         printf("\tpushq %%rbx\n");

@@ -3,18 +3,6 @@
 s_readint_fmt: .string "%ld"
 s_writeint_fmt: .string "%ld\n"
 	.section .text
-foo:
-	pushq %rbp                  /* funcenter  */
-	pushq %rbx
-	movq $0, 48(%rsp)           /* ldci vr3, $0 */
-	movq $0, 56(%rsp)           /* ldci vr4, $0 */
-	movq 48(%rsp), %r11         /* addi vr5, vr3, vr4 */
-	movq 56(%rsp), %r10
-	addq %r11, %r10
-	movq %r10, 64(%rsp)
-	popq %rbx                   /* funcleave  */
-	popq %rbp
-	ret
 	.globl main
 main:
 	pushq %rbx
@@ -23,8 +11,20 @@ main:
 	pushq %r14
 	pushq %r15
 	subq $80, %rsp
-	movq $2, 40(%rsp)           /* ldci vr2, $2 */
-	movq 40(%rsp), %r11         /* mov vr0, vr2 */
+foo:
+	pushq %rbp                  /* funcenter  */
+	pushq %rbx
+	movq $0, 40(%rsp)           /* ldci vr2, $0 */
+	movq $0, 48(%rsp)           /* ldci vr3, $0 */
+	movq 40(%rsp), %r11         /* addi vr4, vr2, vr3 */
+	movq 48(%rsp), %r10
+	addq %r11, %r10
+	movq %r10, 56(%rsp)
+	popq %rbx                   /* funcleave  */
+	popq %rbp
+	ret 
+	movq $2, 64(%rsp)           /* ldci vr5, $2 */
+	movq 64(%rsp), %r11         /* mov vr0, vr5 */
 	movq %r11, 24(%rsp)
 	movq $3, 40(%rsp)           /* ldci vr2, $3 */
 	movq 40(%rsp), %r11         /* mov vr1, vr2 */
