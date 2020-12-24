@@ -1715,13 +1715,13 @@ public:
                     break;
                 }
                 case HINS_FUNC_LEAVE: {
-                    auto *popins = new Instruction(MINS_POPQ, rbp);
-                    popins->set_comment(get_hins_comment(hin));
-                    assembly->add_instruction(popins);
-
                     // bit of a hack to achieve stack alignment
                     auto *pop = new Instruction(MINS_POPQ, rbx);
+                    pop->set_comment(get_hins_comment(hin));
                     assembly->add_instruction(pop);
+
+                    auto *popins = new Instruction(MINS_POPQ, rbp);
+                    assembly->add_instruction(popins);
 
                     auto *retins = new Instruction(MINS_RET);
                     assembly->add_instruction(retins);
