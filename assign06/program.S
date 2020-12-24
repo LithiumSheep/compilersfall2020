@@ -3,6 +3,18 @@
 s_readint_fmt: .string "%ld"
 s_writeint_fmt: .string "%ld\n"
 	.section .text
+foo:
+	pushq %rbp                  /* funcenter  */
+	pushq %rbx
+	movq $0, 48(%rsp)           /* ldci vr3, $0 */
+	movq $0, 56(%rsp)           /* ldci vr4, $0 */
+	movq 48(%rsp), %r11         /* addi vr5, vr3, vr4 */
+	movq 56(%rsp), %r10
+	addq %r11, %r10
+	movq %r10, 64(%rsp)
+	popq %rbx                   /* funcleave  */
+	popq %rbp
+	ret
 	.globl main
 main:
 	pushq %rbx
@@ -25,18 +37,6 @@ main:
 	movq 40(%rsp), %rsi
 	call printf
 	call foo                    /* call foo */
-foo:
-	pushq %rbp                  /* funcenter  */
-	pushq %rbx
-	movq $0, 48(%rsp)           /* ldci vr3, $0 */
-	movq $0, 56(%rsp)           /* ldci vr4, $0 */
-	movq 48(%rsp), %r11         /* addi vr5, vr3, vr4 */
-	movq 56(%rsp), %r10
-	addq %r11, %r10
-	movq %r10, 64(%rsp)
-	popq %rbx                   /* funcleave  */
-	popq %rbp
-	ret 
 	addq $80, %rsp
 	popq %r15
 	popq %r14
