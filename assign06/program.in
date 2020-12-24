@@ -3,7 +3,7 @@ PROGRAM arith01;
 
 FUNCTION foo(): INTEGER
   BEGIN
-    WRITE 0;
+
   END.
 
 BEGIN

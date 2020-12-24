@@ -7,10 +7,7 @@ s_writeint_fmt: .string "%ld\n"
 foo:
 	pushq %rbp                  /* funcenter  */
 	pushq %rbx
-	movq $0, 40(%rsp)           /* ldci vr2, $0 */
-	movq $s_writeint_fmt, %rdi  /* writei vr2 */
-	movq 40(%rsp), %rsi
-	call printf
+	nop                         /* nop  */
 	popq %rbx                   /* funcleave  */
 	popq %rbp
 	ret 
