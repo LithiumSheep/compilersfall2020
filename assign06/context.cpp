@@ -450,7 +450,6 @@ public:
 
     void visit_instructions(struct Node *ast) override {
         ASTVisitor::visit_instructions(ast);
-        // finish other instructions first
 
         // then, check function declarations and add to highlevel
         for (auto symbol : m_symtab->get_symbols()) {
