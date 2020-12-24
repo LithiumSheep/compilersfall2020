@@ -3,7 +3,7 @@ PROGRAM arith01;
 
 FUNCTION incr_var_a(): INTEGER
   BEGIN
-    a := a + 1;
+    1 + 1;
   END.
 
 BEGIN

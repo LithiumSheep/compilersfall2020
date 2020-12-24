@@ -1,4 +1,4 @@
-/* 4 vregs used */
+/* 5 vregs used */
 	.section .rodata
 s_readint_fmt: .string "%ld"
 s_writeint_fmt: .string "%ld\n"
@@ -36,12 +36,11 @@ incr_var_a:
 	pushq %rbp                  /* funcenter  */
 	pushq %rbx
 	movq $0, 40(%rsp)           /* ldci vr2, $0 */
-	movq 24(%rsp), %r11         /* addi vr3, vr0, vr2 */
-	movq 40(%rsp), %r10
+	movq $0, 48(%rsp)           /* ldci vr3, $0 */
+	movq 40(%rsp), %r11         /* addi vr4, vr2, vr3 */
+	movq 48(%rsp), %r10
 	addq %r11, %r10
-	movq %r10, 48(%rsp)
-	movq 48(%rsp), %r11         /* mov vr0, vr3 */
-	movq %r11, 24(%rsp)
+	movq %r10, 56(%rsp)
 	popq %rbp                   /* funcleave  */
 	popq %rbx
 	ret 
