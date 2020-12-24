@@ -1,14 +1,15 @@
 PROGRAM arith01;
   VAR a, b: INTEGER;
 
-FUNCTION print0(): INTEGER
+FUNCTION incr_var_a(): INTEGER
   BEGIN
-    WRITE 0;
+    a := a + 1;
   END.
 
 BEGIN
   a := 2;
   b := 3;
   WRITE a + b;
-  print0();
+  incr_var_a();
+  WRITE a + b;
 END.
