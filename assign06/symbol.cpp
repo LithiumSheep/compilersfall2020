@@ -41,6 +41,16 @@ struct Symbol *symbol_create(const char* name, Type* type, int kind, long offset
     return symbol;
 }
 
+struct Symbol *symbol_create(const char* name, Type* type, int kind, long offset, Node *instructions) {
+    Symbol *symbol = new Symbol();
+    symbol->m_name = name;
+    symbol->m_type = type;
+    symbol->m_kind = kind;
+    symbol->m_offset = offset;
+    symbol->m_instructions = instructions;
+    return symbol;
+}
+
 const char* get_name_for_kind(int kind) {
     if (kind == TYPE) {
         return "TYPE";

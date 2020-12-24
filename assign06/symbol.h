@@ -6,8 +6,10 @@
 #define ASSIGN03_SYMBOL_H
 
 #include "type.h"
+#include "node.h"
 
 struct Type;
+struct Node;
 
 enum Kind {
     VARIABLE = 5000,
@@ -23,6 +25,7 @@ public:
     int m_kind;
     long m_offset;
     long ival;
+    Node* m_instructions;
     const char* get_name();
     Type* get_type();
     int get_kind();
@@ -33,6 +36,8 @@ public:
 };
 
 Symbol *symbol_create(const char* name, Type* type, int kind, long offset);
+
+Symbol *symbol_create(const char* name, Type* type, int kind, long offset, Node* instructions);
 
 const char* get_name_for_kind(int kind);
 

@@ -180,7 +180,7 @@ public:
         Type *type = func_type->get_type();
 
         long offset = get_curr_offset();
-        Symbol *sym = symbol_create(function_name, type, FUNCTION, offset);
+        Symbol *sym = symbol_create(function_name, type, FUNCTION, offset, func_ins);
         // some increase in offset based on local variables in function
         if (scope->s_exists(function_name)) {
             SourceInfo info = node_get_source_info(func_name);
