@@ -3,7 +3,7 @@ PROGRAM arith01;
 
 FUNCTION print1(): INTEGER
   BEGIN
-    WRITE 1;
+    WRITE 0;
   END.
 
 BEGIN

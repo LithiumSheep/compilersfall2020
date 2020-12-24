@@ -463,20 +463,16 @@ public:
                 auto *enter = new Instruction(HINS_FUNC_ENTER);
                 code->add_instruction(enter);
 
-                // function body
-                auto *nop = new Instruction(HINS_NOP);
-                code->add_instruction(nop);
-
-                // fixme
-                /*
                 Node* instructions = symbol.m_instructions;
-                if (node_get_num_kids(instructions) > 0) {
-                    //visit(instructions);
+                int num_instructions = node_get_num_kids(instructions);
+                if (num_instructions > 0) {
+                    for (int i = 0; i < num_instructions; i++) {
+                        visit(node_get_kid(instructions, i));
+                    }
                 } else {
-                    auto *nop = new Instruction(HINS_NOP);
-                    code->add_instruction(nop);
+                    auto *noop = new Instruction(HINS_NOP);
+                    code->add_instruction(noop);
                 }
-                 */
 
                 // if return has a type, move return value to %rax
                 // TODO
