@@ -1,7 +1,7 @@
 PROGRAM arith01;
   VAR a, b: INTEGER;
 
-FUNCTION print1(): INTEGER
+FUNCTION print0(): INTEGER
   BEGIN
     WRITE 0;
   END.
@@ -10,5 +10,5 @@ BEGIN
   a := 2;
   b := 3;
   WRITE a + b;
-  print1();
+  print0();
 END.

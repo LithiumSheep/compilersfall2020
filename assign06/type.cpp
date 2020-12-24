@@ -44,7 +44,7 @@ Type* type_create_record(SymbolTable* symbolTable) {
 }
 
 std::string Type::to_string() {
-    switch(realType){
+    switch(realType) {
         case PRIMITIVE:
             return name;
         case ARRAY:

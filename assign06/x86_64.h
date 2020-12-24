@@ -40,6 +40,9 @@ enum X86_64Instruction {
     MINS_IMULQ,
     MINS_IDIVQ,
     MINS_CQTO,
+    MINS_PUSHQ,
+    MINS_POPQ,
+    MINS_RET,
 };
 
 class PrintX86_64InstructionSequence : public PrintInstructionSequence {

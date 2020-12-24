@@ -177,7 +177,8 @@ public:
         Node *func_ins = node_get_kid(ast, 2);
 
         const char* function_name = node_get_str(func_name);
-        Type *type = func_type->get_type();
+        //Type *type = func_type->get_type();
+        Type *type = type_create_integer(); // fixme
 
         long offset = get_curr_offset();
         Symbol *sym = symbol_create(function_name, type, FUNCTION, offset, func_ins);
@@ -1367,6 +1368,7 @@ public:
         Operand r11(OPERAND_MREG, MREG_R11);
         Operand rax(OPERAND_MREG, MREG_RAX);
         Operand rdx(OPERAND_MREG, MREG_RDX);
+        Operand rbp(OPERAND_MREG, MREG_RBP);
 
         // static labels
         Operand inputfmt("s_readint_fmt", true);
@@ -1693,6 +1695,28 @@ public:
                     auto *jumpins = new Instruction(MINS_JGE, label);
                     jumpins->set_comment(get_hins_comment(hin));
                     assembly->add_instruction(jumpins);
+                    break;
+                }
+                case HINS_CALL: {
+                    Operand label = hin->get_operand(0);
+                    auto *callins = new Instruction(MINS_CALL, label);
+                    callins->set_comment(get_hins_comment(hin));
+                    assembly->add_instruction(callins);
+                    break;
+                }
+                case HINS_FUNC_ENTER: {
+                    auto *pushins = new Instruction(MINS_PUSHQ, rbp);
+                    pushins->set_comment(get_hins_comment(hin));
+                    assembly->add_instruction(pushins);
+                    break;
+                }
+                case HINS_FUNC_LEAVE: {
+                    auto *popins = new Instruction(MINS_POPQ, rbp);
+                    popins->set_comment(get_hins_comment(hin));
+                    assembly->add_instruction(popins);
+
+                    auto *retins = new Instruction(MINS_RET);
+                    assembly->add_instruction(retins);
                     break;
                 }
                 case HINS_NOP: {
