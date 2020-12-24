@@ -423,8 +423,13 @@ private:
         return label;
     }
 
-    std::string func_label(const char* function_name) {
+    std::string func_directive(const char* function_name) {
         std::string label = cpputil::format("\t.globl %s\n%s", function_name, function_name);
+        return label;
+    }
+
+    std::string func_label(const char* function_name) {
+        std::string label = cpputil::format("%s", function_name);
         return label;
     }
 
@@ -455,7 +460,8 @@ public:
             if (symbol.get_kind() == FUNCTION) {
                 const char* func_name = symbol.get_name();
 
-                std::string function_label = func_label(func_name);
+                //hacky way to emit .globl directive
+                std::string function_label = func_directive(func_name);
                 code->define_label(function_label);
 
                 // function start

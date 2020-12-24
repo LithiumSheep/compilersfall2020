@@ -35,9 +35,7 @@ main:
 	movq $s_writeint_fmt, %rdi  /* writei vr2 */
 	movq 40(%rsp), %rsi
 	call printf
-	call 	.globl foo
-foo        /* call 	.globl foo
-foo */
+	call foo                    /* call foo */
 	addq $48, %rsp
 	popq %r15
 	popq %r14
