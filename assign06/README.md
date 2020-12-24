@@ -1,5 +1,11 @@
 ## Procedures
 
+### Running the compiler
+- run `make` in the folder
+- run `./compiler program.in > program.S` to generate assembly from the input program, `program.in`
+- run `gcc -g -no-pie -o program program.S`
+- run `./program` to see the output
+
 ### Anatomy of procedure
 A procedure in assembly is defined as a directive that looks like `.globl func`
 followed by a label `func:`, which can then be called from main or another 
