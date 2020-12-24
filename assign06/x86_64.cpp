@@ -54,6 +54,7 @@ std::string PrintX86_64InstructionSequence::get_mreg_name(int regnum) {
         case MREG_R13: s = "%r13"; break;
         case MREG_R14: s = "%r14"; break;
         case MREG_R15: s = "%r15"; break;
+        case MREG_EAX: s = "%eax"; break;
         default:
             assert(false);
             s = "<invalid>";

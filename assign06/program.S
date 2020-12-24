@@ -41,5 +41,5 @@ main:
 	popq %r13
 	popq %r12
 	popq %rbx
-	movl $0, %eax
-	ret
+	movq $0, %eax
+	ret 

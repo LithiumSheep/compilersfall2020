@@ -1749,19 +1749,22 @@ public:
                     assembly->add_instruction(new Instruction(MINS_SUBQ, storage_lit, rsp));
                     break;
                 }
-//                case HINS_MAIN_FINISH: {
-//                    Operand storage_lit(OPERAND_INT_LITERAL, total_storage_size);
-//                    assembly->add_instruction(new Instruction(MINS_ADDQ, storage_lit, rsp));
-//
-//                    assembly->add_instruction(new Instruction(MINS_PUSHQ, r15));
-//                    assembly->add_instruction(new Instruction(MINS_PUSHQ, r14));
-//                    assembly->add_instruction(new Instruction(MINS_PUSHQ, r13));
-//                    assembly->add_instruction(new Instruction(MINS_PUSHQ, r12));
-//                    assembly->add_instruction(new Instruction(MINS_PUSHQ, rbx));
-//
-//                    Operand eax(OPERAND_MREG, MREG_EAX);
-//                    assembly->add_instruction(new Instruction(MINS_MOVQ));
-//                }
+                case HINS_MAIN_FINISH: {
+                    Operand storage_lit(OPERAND_INT_LITERAL, total_storage_size);
+                    assembly->add_instruction(new Instruction(MINS_ADDQ, storage_lit, rsp));
+
+                    assembly->add_instruction(new Instruction(MINS_POPQ, r15));
+                    assembly->add_instruction(new Instruction(MINS_POPQ, r14));
+                    assembly->add_instruction(new Instruction(MINS_POPQ, r13));
+                    assembly->add_instruction(new Instruction(MINS_POPQ, r12));
+                    assembly->add_instruction(new Instruction(MINS_POPQ, rbx));
+
+                    Operand zero(OPERAND_INT_LITERAL, 0);
+                    Operand eax(OPERAND_MREG, MREG_EAX);
+                    assembly->add_instruction(new Instruction(MINS_MOVQ, zero, eax));
+
+                    assembly->add_instruction(new Instruction(MINS_RET));
+                }
                 default:
                     break;
             }
@@ -1802,14 +1805,14 @@ private:
 
     // addq storage + (8 * num_vreg), rsp
     void emit_epilogue() {
-        printf("\taddq $%ld, %%rsp\n", total_storage_size);
-        printf("\tpopq %%r15\n");
-        printf("\tpopq %%r14\n");
-        printf("\tpopq %%r13\n");
-        printf("\tpopq %%r12\n");
-        printf("\tpopq %%rbx\n");
-        printf("\tmovl $0, %%eax\n");
-        printf("\tret\n");
+//        printf("\taddq $%ld, %%rsp\n", total_storage_size);
+//        printf("\tpopq %%r15\n");
+//        printf("\tpopq %%r14\n");
+//        printf("\tpopq %%r13\n");
+//        printf("\tpopq %%r12\n");
+//        printf("\tpopq %%rbx\n");
+//        printf("\tmovl $0, %%eax\n");
+//        printf("\tret\n");
     }
 
     std::string get_hins_comment(Instruction* hin) {
