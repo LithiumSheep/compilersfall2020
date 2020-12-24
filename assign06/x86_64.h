@@ -26,6 +26,7 @@ enum X86_64Reg {
 enum X86_64Instruction {
     MINS_NOP,
     MINS_MOVQ,
+    MINS_MOVL,
     MINS_ADDQ,
     MINS_SUBQ,
     MINS_LEAQ,

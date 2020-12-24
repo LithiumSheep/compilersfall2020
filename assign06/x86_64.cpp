@@ -10,6 +10,7 @@ std::string PrintX86_64InstructionSequence::get_opcode_name(int opcode) {
     switch (opcode) {
         case MINS_NOP:  return "nop";
         case MINS_MOVQ: return "movq";
+        case MINS_MOVL: return "movl";
         case MINS_ADDQ: return "addq";
         case MINS_SUBQ: return "subq";
         case MINS_LEAQ: return "leaq";

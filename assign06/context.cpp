@@ -1761,7 +1761,7 @@ public:
 
                     Operand zero(OPERAND_INT_LITERAL, 0);
                     Operand eax(OPERAND_MREG, MREG_EAX);
-                    assembly->add_instruction(new Instruction(MINS_MOVQ, zero, eax));
+                    assembly->add_instruction(new Instruction(MINS_MOVL, zero, eax));
 
                     assembly->add_instruction(new Instruction(MINS_RET));
                 }
