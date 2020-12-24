@@ -1367,6 +1367,7 @@ public:
         Operand r11(OPERAND_MREG, MREG_R11);
         Operand rax(OPERAND_MREG, MREG_RAX);
         Operand rdx(OPERAND_MREG, MREG_RDX);
+        Operand rbx(OPERAND_MREG, MREG_RBX);
         Operand rbp(OPERAND_MREG, MREG_RBP);
 
         // static labels
@@ -1707,12 +1708,20 @@ public:
                     auto *pushins = new Instruction(MINS_PUSHQ, rbp);
                     pushins->set_comment(get_hins_comment(hin));
                     assembly->add_instruction(pushins);
+
+                    // bit of a hack to achieve stack alignment
+                    auto *push = new Instruction(MINS_PUSHQ, rbx);
+                    assembly->add_instruction(push);
                     break;
                 }
                 case HINS_FUNC_LEAVE: {
                     auto *popins = new Instruction(MINS_POPQ, rbp);
                     popins->set_comment(get_hins_comment(hin));
                     assembly->add_instruction(popins);
+
+                    // bit of a hack to achieve stack alignment
+                    auto *pop = new Instruction(MINS_POPQ, rbx);
+                    assembly->add_instruction(pop);
 
                     auto *retins = new Instruction(MINS_RET);
                     assembly->add_instruction(retins);

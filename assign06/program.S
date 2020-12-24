@@ -27,11 +27,13 @@ main:
 	call print0                 /* call print0 */
 print0:
 	pushq %rbp                  /* funcenter  */
+	pushq %rbx
 	movq $0, 48(%rsp)           /* ldci vr3, $0 */
 	movq $s_writeint_fmt, %rdi  /* writei vr3 */
 	movq 48(%rsp), %rsi
 	call printf
 	popq %rbp                   /* funcleave  */
+	popq %rbx
 	ret 
 	addq $64, %rsp
 	popq %r15
