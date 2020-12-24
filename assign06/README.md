@@ -1,4 +1,4 @@
-### Procedures
+## Procedures
 
 ### Anatomy of procedure
 A procedure in assembly is defined as a directive that looks like `.globl func`
