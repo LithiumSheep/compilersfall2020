@@ -424,7 +424,7 @@ private:
     }
 
     std::string func_label(const char* function_name) {
-        std::string label = cpputil::format("%s", function_name);
+        std::string label = cpputil::format("\t.globl %s\n%s", function_name, function_name);
         return label;
     }
 
@@ -1731,12 +1731,6 @@ public:
                     assembly->add_instruction(retins);
                     break;
                 }
-                case HINS_NOP: {
-                    auto *nopins = new Instruction(MINS_NOP);
-                    nopins->set_comment(get_hins_comment(hin));
-                    assembly->add_instruction(nopins);
-                    break;
-                }
                 case HINS_MAIN_START: {
                     assembly->define_label("\t.globl main\nmain");
                     assembly->add_instruction(new Instruction(MINS_PUSHQ, rbx));
@@ -1764,6 +1758,12 @@ public:
                     assembly->add_instruction(new Instruction(MINS_MOVL, zero, eax));
 
                     assembly->add_instruction(new Instruction(MINS_RET));
+                }
+                case HINS_NOP: {
+                    auto *nopins = new Instruction(MINS_NOP);
+                    nopins->set_comment(get_hins_comment(hin));
+                    assembly->add_instruction(nopins);
+                    break;
                 }
                 default:
                     break;

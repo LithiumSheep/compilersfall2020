@@ -3,6 +3,7 @@
 s_readint_fmt: .string "%ld"
 s_writeint_fmt: .string "%ld\n"
 	.section .text
+	.globl foo
 foo:
 	pushq %rbp                  /* funcenter  */
 	pushq %rbx
@@ -34,7 +35,9 @@ main:
 	movq $s_writeint_fmt, %rdi  /* writei vr2 */
 	movq 40(%rsp), %rsi
 	call printf
-	call foo                    /* call foo */
+	call 	.globl foo
+foo        /* call 	.globl foo
+foo */
 	addq $48, %rsp
 	popq %r15
 	popq %r14
@@ -43,3 +46,4 @@ main:
 	popq %rbx
 	movl $0, %eax
 	ret 
+	nop                         /* mainfinish  */
