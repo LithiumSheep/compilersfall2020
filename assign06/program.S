@@ -1,4 +1,4 @@
-/* 4 vregs used */
+/* 6 vregs used */
 	.section .rodata
 s_readint_fmt: .string "%ld"
 s_writeint_fmt: .string "%ld\n"
@@ -10,7 +10,7 @@ main:
 	pushq %r13
 	pushq %r14
 	pushq %r15
-	subq $64, %rsp
+	subq $80, %rsp
 	movq $2, 40(%rsp)           /* ldci vr2, $2 */
 	movq 40(%rsp), %r11         /* mov vr0, vr2 */
 	movq %r11, 24(%rsp)
@@ -24,18 +24,20 @@ main:
 	movq $s_writeint_fmt, %rdi  /* writei vr2 */
 	movq 40(%rsp), %rsi
 	call printf
-	call print0                 /* call print0 */
-print0:
+	call foo                    /* call foo */
+foo:
 	pushq %rbp                  /* funcenter  */
 	pushq %rbx
 	movq $0, 48(%rsp)           /* ldci vr3, $0 */
-	movq $s_writeint_fmt, %rdi  /* writei vr3 */
-	movq 48(%rsp), %rsi
-	call printf
+	movq $0, 56(%rsp)           /* ldci vr4, $0 */
+	movq 48(%rsp), %r11         /* addi vr5, vr3, vr4 */
+	movq 56(%rsp), %r10
+	addq %r11, %r10
+	movq %r10, 64(%rsp)
 	popq %rbx                   /* funcleave  */
 	popq %rbp
 	ret 
-	addq $64, %rsp
+	addq $80, %rsp
 	popq %r15
 	popq %r14
 	popq %r13

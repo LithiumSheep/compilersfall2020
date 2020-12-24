@@ -1,14 +1,14 @@
 PROGRAM arith01;
   VAR a, b: INTEGER;
 
-FUNCTION print0(): INTEGER
+FUNCTION foo(): INTEGER
   BEGIN
-    WRITE 0;
+    1 + 1;
   END.
 
 BEGIN
   a := 2;
   b := 3;
   WRITE a + b;
-  print0();
+  foo();
 END.
