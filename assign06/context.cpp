@@ -171,6 +171,25 @@ public:
         }
     }
 
+    void visit_func_defn(struct Node *ast) override {
+        Node *func_name = node_get_kid(ast, 0);
+        Node *func_type = node_get_kid(ast, 1);
+        Node *func_ins = node_get_kid(ast, 2);
+
+        const char* function_name = node_get_str(func_name);
+        Type *type = func_type->get_type();
+
+        long offset = get_curr_offset();
+        Symbol *sym = symbol_create(function_name, type, FUNCTION, offset);
+        // some increase in offset based on local variables in function
+        if (scope->s_exists(function_name)) {
+            SourceInfo info = node_get_source_info(func_name);
+            err_fatal("%s:%d:%d: Error: Name '%s' is already defined\n", info.filename, info.line, info.col, function_name);
+        } else {
+            scope->insert(*sym);
+        }
+    }
+
     void visit_named_type(struct Node *ast) override {
         Node* type = node_get_kid(ast, 0);
 

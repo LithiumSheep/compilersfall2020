@@ -46,6 +46,8 @@ const char* get_name_for_kind(int kind) {
         return "TYPE";
     } else if (kind == CONST) {
         return "CONST";
+    } else if (kind == FUNCTION) {
+        return "FUNCTION";
     } else {
         return "VAR";
     }

@@ -10,5 +10,5 @@ BEGIN
   a := 2;
   b := 3;
   WRITE a + b;
-  add();
+  print1();
 END.

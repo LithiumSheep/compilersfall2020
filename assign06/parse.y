@@ -107,7 +107,7 @@ vardefn
     ;
 
 funcdefn
-    : TOK_FUNCTION TOK_IDENT TOK_LPAREN TOK_RPAREN TOK_COLON named_type TOK_BEGIN opt_instructions TOK_END TOK_DOT { $$ = node_build2(AST_FUNCDEF, $2, $8); }
+    : TOK_FUNCTION TOK_IDENT TOK_LPAREN TOK_RPAREN TOK_COLON named_type TOK_BEGIN opt_instructions TOK_END TOK_DOT { $$ = node_build3(AST_FUNCDEF, $2, $6, $8); }
     ;
 
 funccall

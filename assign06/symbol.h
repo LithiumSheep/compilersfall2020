@@ -12,7 +12,8 @@ struct Type;
 enum Kind {
     VARIABLE = 5000,
     CONST,
-    TYPE
+    TYPE,
+    FUNCTION
 };
 
 struct Symbol {
