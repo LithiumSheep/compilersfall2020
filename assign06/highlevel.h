@@ -27,7 +27,11 @@ enum HighLevelOpcode {
     HINS_JGTE,
     HINS_INT_COMPARE,
     HINS_LEA,
-    HINS_MOV
+    HINS_MOV,
+    HINS_CALL,
+    HINS_PUSH,
+    HINS_POP,
+    HINS_RET
 };
 
 class HighLevel {

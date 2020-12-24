@@ -30,6 +30,10 @@ std::string PrintHighLevelInstructionSequence::get_opcode_name(int opcode) {
         case HINS_INT_COMPARE: return "cmpi";
         case HINS_LEA:         return "lea";
         case HINS_MOV:         return "mov";
+        case HINS_CALL:        return "call";
+        case HINS_PUSH:        return "push";
+        case HINS_POP:         return "pop";
+        case HINS_RET:         return "ret";
 
         default:
             assert(false);

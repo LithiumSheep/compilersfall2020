@@ -422,6 +422,11 @@ private:
         return label;
     }
 
+    std::string func_label(const char* function_name) {
+        std::string label = cpputil::format("%s", function_name);
+        return label;
+    }
+
 public:
 
     void visit_declarations(struct Node *ast) override {
@@ -440,6 +445,45 @@ public:
         // specifically disable visits to declarations so no vregs are incremented
         //ASTVisitor::visit_declarations(ast);
         reset_vreg();
+    }
+
+    void visit_instructions(struct Node *ast) override {
+        ASTVisitor::visit_instructions(ast);
+        // finish other instructions first
+
+        // then, check function declarations and add to highlevel
+        for (auto symbol : m_symtab->get_symbols()) {
+            if (symbol.get_kind() == FUNCTION) {
+                const char* func_name = symbol.get_name();
+
+                std::string function_label = func_label(func_name);
+                code->define_label(function_label);
+
+                // function start
+                Operand rbp(OPERAND_MREG, MREG_RBP);
+                auto *push_rbp = new Instruction(HINS_PUSH, rbp);
+                code->add_instruction(push_rbp);
+
+                // function body
+                auto *nop = new Instruction(HINS_NOP);
+                code->add_instruction(nop);
+
+                // fixme
+                /*
+                Node* instructions = symbol.m_instructions;
+                if (node_get_num_kids(instructions) > 0) {
+                    //visit(instructions);
+                } else {
+                    auto *nop = new Instruction(HINS_NOP);
+                    code->add_instruction(nop);
+                }
+                 */
+
+                // function return
+                auto *pop_rbp = new Instruction(HINS_POP, rbp);
+                code->add_instruction(pop_rbp);
+            }
+        }
     }
 
     void visit_if(struct Node *ast) override {
@@ -524,6 +568,23 @@ public:
         code->define_label(loop_condition_label);
         condition->set_operand(op_loop_body);
         visit(condition);
+    }
+
+    void visit_func_call(struct Node *ast) override {
+        ASTVisitor::visit_func_call(ast);
+
+        Node *func_name = node_get_kid(ast, 0);
+        const char* funcname = node_get_str(func_name);
+
+        std::string function_label = func_label(funcname);
+        Operand function_call_label(function_label);
+
+        auto *callins = new Instruction(HINS_CALL, function_call_label);
+        code->add_instruction(callins);
+
+        Operand return_reg = func_name->get_operand();
+        // potentially do things with return vreg
+        // move %rax to %vreg
     }
 
     void visit_compare_eq(struct Node *ast) override {
@@ -1228,16 +1289,24 @@ public:
 
             auto *loadins = new Instruction(HINS_LOAD_ICONST, destreg, constval);
             code->add_instruction(loadins);
-        } else {
+        } else if (sym.get_kind() == VARIABLE) {
             long offset = sym.get_offset();
             Operand addroffset(OPERAND_INT_LITERAL, offset);
 
             auto *loadaddrins = new Instruction(HINS_LOCALADDR, destreg, addroffset);
             code->add_instruction(loadaddrins);
-        }
+        } /*else if (sym.get_kind() == FUNCTION) {
+            std::string function_label = func_label(varname);
+            Operand function_call_label(function_label);
+
+            auto *callins = new Instruction(HINS_CALL, function_call_label);
+            code->add_instruction(callins);
+        }*/
+        // fixme
 
         // set Operand to Node
         ast->set_operand(destreg);
+        ast->set_str(varname);
 
         // don't reset virtual registers
     }
