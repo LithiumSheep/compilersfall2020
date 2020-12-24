@@ -460,9 +460,8 @@ public:
                 code->define_label(function_label);
 
                 // function start
-                Operand rbp(OPERAND_MREG, MREG_RBP);
-                auto *push_rbp = new Instruction(HINS_PUSH, rbp);
-                code->add_instruction(push_rbp);
+                auto *enter = new Instruction(HINS_FUNC_ENTER);
+                code->add_instruction(enter);
 
                 // function body
                 auto *nop = new Instruction(HINS_NOP);
@@ -479,9 +478,12 @@ public:
                 }
                  */
 
-                // function return
-                auto *pop_rbp = new Instruction(HINS_POP, rbp);
-                code->add_instruction(pop_rbp);
+                // if return has a type, move return value to %rax
+                // TODO
+
+                // function leave
+                auto *leave = new Instruction(HINS_FUNC_LEAVE);
+                code->add_instruction(leave);
             }
         }
     }

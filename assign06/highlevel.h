@@ -29,9 +29,8 @@ enum HighLevelOpcode {
     HINS_LEA,
     HINS_MOV,
     HINS_CALL,
-    HINS_PUSH,
-    HINS_POP,
-    HINS_RET
+    HINS_FUNC_ENTER,
+    HINS_FUNC_LEAVE,
 };
 
 class HighLevel {
