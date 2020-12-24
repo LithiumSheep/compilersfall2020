@@ -1300,14 +1300,7 @@ public:
 
             auto *loadaddrins = new Instruction(HINS_LOCALADDR, destreg, addroffset);
             code->add_instruction(loadaddrins);
-        } /*else if (sym.get_kind() == FUNCTION) {
-            std::string function_label = func_label(varname);
-            Operand function_call_label(function_label);
-
-            auto *callins = new Instruction(HINS_CALL, function_call_label);
-            code->add_instruction(callins);
-        }*/
-        // fixme
+        }
 
         // set Operand to Node
         ast->set_operand(destreg);
@@ -1366,7 +1359,6 @@ public:
     }
 
     void translate_instructions() {
-        // callee-owned
         Operand rsp(OPERAND_MREG, MREG_RSP);
         Operand rdi(OPERAND_MREG, MREG_RDI);
         Operand rsi(OPERAND_MREG, MREG_RSI);
@@ -1374,7 +1366,12 @@ public:
         Operand r11(OPERAND_MREG, MREG_R11);
         Operand rax(OPERAND_MREG, MREG_RAX);
         Operand rdx(OPERAND_MREG, MREG_RDX);
+
         Operand rbx(OPERAND_MREG, MREG_RBX);
+        Operand r12(OPERAND_MREG, MREG_R12);
+        Operand r13(OPERAND_MREG, MREG_R13);
+        Operand r14(OPERAND_MREG, MREG_R14);
+        Operand r15(OPERAND_MREG, MREG_R15);
         Operand rbp(OPERAND_MREG, MREG_RBP);
 
         // static labels
@@ -1738,7 +1735,33 @@ public:
                     auto *nopins = new Instruction(MINS_NOP);
                     nopins->set_comment(get_hins_comment(hin));
                     assembly->add_instruction(nopins);
+                    break;
                 }
+                case HINS_MAIN_START: {
+                    assembly->define_label("\t.globl main\nmain");
+                    assembly->add_instruction(new Instruction(MINS_PUSHQ, rbx));
+                    assembly->add_instruction(new Instruction(MINS_PUSHQ, r12));
+                    assembly->add_instruction(new Instruction(MINS_PUSHQ, r13));
+                    assembly->add_instruction(new Instruction(MINS_PUSHQ, r14));
+                    assembly->add_instruction(new Instruction(MINS_PUSHQ, r15));
+
+                    Operand storage_lit(OPERAND_INT_LITERAL, total_storage_size);
+                    assembly->add_instruction(new Instruction(MINS_SUBQ, storage_lit, rsp));
+                    break;
+                }
+//                case HINS_MAIN_FINISH: {
+//                    Operand storage_lit(OPERAND_INT_LITERAL, total_storage_size);
+//                    assembly->add_instruction(new Instruction(MINS_ADDQ, storage_lit, rsp));
+//
+//                    assembly->add_instruction(new Instruction(MINS_PUSHQ, r15));
+//                    assembly->add_instruction(new Instruction(MINS_PUSHQ, r14));
+//                    assembly->add_instruction(new Instruction(MINS_PUSHQ, r13));
+//                    assembly->add_instruction(new Instruction(MINS_PUSHQ, r12));
+//                    assembly->add_instruction(new Instruction(MINS_PUSHQ, rbx));
+//
+//                    Operand eax(OPERAND_MREG, MREG_EAX);
+//                    assembly->add_instruction(new Instruction(MINS_MOVQ));
+//                }
                 default:
                     break;
             }
@@ -1762,17 +1785,14 @@ private:
         printf("s_readint_fmt: .string \"%%ld\"\n");
         printf("s_writeint_fmt: .string \"%%ld\\n\"\n");
         printf("\t.section .text\n");
-
-        // emit function(s)
-
-        printf("\t.globl main\n");
-        printf("main:\n");
-        printf("\tpushq %%rbx\n");
-        printf("\tpushq %%r12\n");
-        printf("\tpushq %%r13\n");
-        printf("\tpushq %%r14\n");
-        printf("\tpushq %%r15\n");
-        printf("\tsubq $%ld, %%rsp\n", total_storage_size);
+//        printf("\t.globl main\n");
+//        printf("main:\n");
+//        printf("\tpushq %%rbx\n");
+//        printf("\tpushq %%r12\n");
+//        printf("\tpushq %%r13\n");
+//        printf("\tpushq %%r14\n");
+//        printf("\tpushq %%r15\n");
+//        printf("\tsubq $%ld, %%rsp\n", total_storage_size);
     }
 
     void emit_asm() {
